@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Environment files (only the example is committed)
+.env*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Misc
+.DS_Store
+*.pem
+*.log
