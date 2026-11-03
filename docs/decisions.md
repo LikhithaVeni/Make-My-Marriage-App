@@ -83,3 +83,22 @@ Decisions not covered by the project docs (`PRD_v1.md`, `System Design v1.md`, `
 34. **Email-verification and password-reset tokens live in one `authTokens` collection, as Database Design specifies.** System Design names the auth collection `passwordResets` instead. Database Design wins because it is the more detailed source: it defines the fields (`userId`, `type: VERIFY_EMAIL | RESET_PASSWORD`, `tokenHash`, `expiresAt`, `usedAt`) and the indexes. Both token kinds have the same shape, lifecycle and errors (`410 TOKEN_EXPIRED`, `410 TOKEN_USED`). `passwordResets` would leave verification tokens with no home. Organiser invites stay in their own `invites` collection (wedding module), as both docs say.
 35. **The job runner wraps its result in `data`, like every other endpoint.** API Design shows `POST /api/jobs/run` returning `{ "processed": 37, "failed": 1, "remaining": 120 }` unwrapped. It will return `{ "data": { "processed": …, "failed": …, "remaining": … } }`, so every JSON response has the same shape.
 36. **Errors include `requestId`, following API Design.** System Design's error example omits it.
+
+## Dashboard (November 2026)
+
+The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard follows `dashboard-desktop-1440px-updated`, adjusted as below.
+
+37. **Our design system wins over Stitch's.** Stitch's palette is nearly ours (maroon `#7A1F3D` vs our `#7A263A`, ivory `#FBF8F4` vs `#FAF7F2`, the same 14px and 10px radii and 44px controls), so the Stitch look is built from the tokens in `design-system.md`, whose contrast is measured. Headings stay in Fraunces (decision 28), not Stitch's Newsreader. Stitch's hard-coded badge colours become our `success`, `warning` and `danger` tokens, and nothing goes below the 12px `caption` size.
+38. **Only Phase 1 cards are built now:** countdown, task progress, my tasks, upcoming events, totals, pending payments, wedding-day contacts and recent activity. Stitch's RSVP summary, invitations, gallery, wedding website and "Live now" banner wait for their features (Phases 2 and 3). The guests total shows "Soon" until guests exist.
+39. **"Spent" is the sum of Paid expenses; "pending" is the sum of Pending ones.** The PRD says expenses track "what was actually spent, with no budget system", so Stitch's "of ₹35.0 L planned budget" is dropped.
+40. **The dashboard response extends API Design's** (the PRD needs these and the API shape lacks them):
+    - `countdown` adds `title`, `city` and `coverUrl` (the PRD's countdown card shows the wedding name and cover image).
+    - `myTasks` items add `eventName`, shown as a chip.
+    - `upcomingEvents` items add `endAt` and `dressCode`.
+    - `money` adds `pendingPayments`: up to 3 Pending expenses, nearest due first, each with `id`, `description`, `vendorName`, `amountPaise` and `dueDate`. `nextDue` stays for compatibility.
+    - New `weddingDayContacts`: up to 4, with `id`, `name`, `role` and `phone`, from vendors flagged as wedding-day contacts plus organisers (the PRD's Wedding-day contacts screen).
+    - `recentActivity` items add `actorName`, for the avatar initial.
+      Dropped from Stitch because no data backs them: "pacing on schedule", "% contact details added", the vendor booked/in-inquiry split, and the invitation counts.
+41. **No checkbox on dashboard tasks.** Tasks move To Do → In Progress → Completed (PRD), so a tick that jumps straight to Completed would skip a step. Each row opens the task instead (shown as "Soon" until the Tasks page exists, decision 30). This also avoids Stitch's 16px checkbox, which is below the 44px touch target.
+42. **The dashboard has a `dashboard` module** (`src/modules/dashboard/`) with a service, schemas and index but no model: it owns no collections and builds its response by calling other modules' services. Until those exist, its service returns sample data that matches the schema exactly, so swapping in real data changes no UI code.
+43. **Mobile layout is ours, not Stitch's** (Stitch has no mobile dashboard): one column, cards in PRD order, using the existing app shell.
