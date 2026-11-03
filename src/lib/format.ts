@@ -161,6 +161,12 @@ export function formatTimeAgo(instant: string, now: Date = new Date()): string {
   return formatDate(kolkataDateOf(instant));
 }
 
+/** E.164 phone for display: "+919876500002" → "+91 98765 00002"; others unchanged. */
+export function formatPhone(phone: string): string {
+  const india = /^\+91(\d{5})(\d{5})$/.exec(phone);
+  return india ? `+91 ${india[1]} ${india[2]}` : phone;
+}
+
 /** Storage size: "1.3 GB", "640 MB", "12 KB". Decimal units, as storage providers bill. */
 export function formatBytes(bytes: number): string {
   const units = ["B", "KB", "MB", "GB", "TB"];

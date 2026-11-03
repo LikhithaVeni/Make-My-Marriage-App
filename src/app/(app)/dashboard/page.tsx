@@ -3,8 +3,10 @@ import { connection } from "next/server";
 import { CountdownCard } from "@/components/dashboard/CountdownCard";
 import { MyTasksCard } from "@/components/dashboard/MyTasksCard";
 import { PendingPaymentsCard } from "@/components/dashboard/PendingPaymentsCard";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { TotalsRow } from "@/components/dashboard/TotalsRow";
 import { UpcomingEventsCard } from "@/components/dashboard/UpcomingEventsCard";
+import { WeddingDayContactsCard } from "@/components/dashboard/WeddingDayContactsCard";
 import { TopBar } from "@/components/layout/TopBar";
 import { todayInKolkata } from "@/lib/format";
 import { getDashboard } from "@/modules/dashboard";
@@ -32,9 +34,11 @@ export default async function DashboardPage() {
           />
           <UpcomingEventsCard events={dashboard.upcomingEvents} />
         </div>
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-2">
           <PendingPaymentsCard money={dashboard.money} today={today} />
+          <WeddingDayContactsCard contacts={dashboard.weddingDayContacts} />
         </div>
+        <RecentActivityCard activity={dashboard.recentActivity} />
       </main>
     </>
   );

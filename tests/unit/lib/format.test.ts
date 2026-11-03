@@ -7,6 +7,7 @@ import {
   formatDate,
   formatDayMonth,
   formatDue,
+  formatPhone,
   formatRupees,
   formatRupeesShort,
   formatTime,
@@ -102,6 +103,16 @@ describe("formatTimeAgo", () => {
     expect(formatTimeAgo("2026-11-02T23:30:00+05:30", now)).toBe("yesterday");
     expect(formatTimeAgo("2026-10-31T09:10:00+05:30", now)).toBe("3 days ago");
     expect(formatTimeAgo("2026-10-20T09:10:00+05:30", now)).toBe("20 Oct 2026");
+  });
+});
+
+describe("formatPhone", () => {
+  it("spaces Indian mobile numbers", () => {
+    expect(formatPhone("+919876500002")).toBe("+91 98765 00002");
+  });
+
+  it("leaves other numbers as stored", () => {
+    expect(formatPhone("+14155550123")).toBe("+14155550123");
   });
 });
 
