@@ -18,10 +18,10 @@ export default async function DashboardPage({
   // never frozen at build time.
   await connection();
   // While the dashboard shows sample data, ?sample=empty previews a brand-new
-  // wedding (docs/decisions.md, decision 45).
+  // wedding and ?sample=error the error state (docs/decisions.md, decision 45).
   const { sample } = await searchParams;
   const dashboard = await getDashboard({
-    sample: sample === "empty" ? "empty" : "full",
+    sample: sample === "empty" || sample === "error" ? sample : "full",
   });
   // One "today" for every card, taken from the data (docs/decisions.md, 40).
   const { today } = dashboard;

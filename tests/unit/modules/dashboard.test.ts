@@ -126,3 +126,11 @@ describe("empty sample (a brand-new wedding)", () => {
     );
   });
 });
+
+describe("error sample", () => {
+  it("fails, so the error state can be seen", async () => {
+    await expect(getDashboard({ sample: "error" })).rejects.toThrow(
+      "Sample dashboard failure",
+    );
+  });
+});
