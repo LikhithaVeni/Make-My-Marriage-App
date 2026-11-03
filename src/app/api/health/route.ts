@@ -4,8 +4,9 @@ import { dbStatus } from "@/platform/db";
 import { errorResponse, ok } from "@/platform/http";
 import { createRequestId } from "@/platform/request-id";
 
-// Always 200 while the app is running; the database state is reported in `db`
-// (see docs/decisions.md). Monitors must read `data.db`, not the status code.
+// 503 when MongoDB is configured but unreachable, so uptime monitors alert on
+// the status code alone; 200 otherwise, including "not_configured" (see
+// docs/decisions.md).
 export async function GET() {
   const requestId = createRequestId();
   const headers = { "Cache-Control": "no-store" };
@@ -13,7 +14,7 @@ export async function GET() {
     const db = await dbStatus();
     return ok(
       { status: "ok", version: packageJson.version, db },
-      { requestId, headers },
+      { requestId, headers, status: db === "down" ? 503 : 200 },
     );
   } catch (err) {
     return errorResponse(err, { requestId, headers });

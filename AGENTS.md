@@ -7,3 +7,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# Project rules
+
+- **Specs:** `docs/` (PRD, System Design, Database Design, API Design, design system) are the source of truth. Log anything they don't cover, or that differs from them, in `docs/decisions.md`. Never edit or reformat `docs/*v1.md`.
+- **Structure:** route handlers stay thin (parse, authorize, call a service); business logic lives in `src/modules/<name>/service.ts`. Import another module only via `@/modules/<name>` (ESLint enforces it).
+- **Data:** every query filters by `ctx.weddingId`; money is integer paise; dates use Asia/Kolkata.
+- **API:** responses use the `{ data }` / `{ data, page }` / `{ error }` envelope from `src/platform/http.ts`; throw `AppError` with codes from API Design.
+- **Naming:** React components in PascalCase, all other files kebab-case.
+- **UI:** only the tokens in `docs/design-system.md`; mobile first from 360 px.
+- **Before committing:** `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm test:e2e`.

@@ -37,7 +37,7 @@ Decisions not covered by the project docs (`PRD_v1.md`, `System Design v1.md`, `
 20. **The error envelope always includes `details`,** set to `null` when there are none, so the shape never changes.
 21. **Every API response carries an `X-Request-Id` header** (`req_` + 24 hex characters). API Design puts `requestId` only in error bodies. The header makes any request traceable from the browser and in logs.
 22. **`Content-Type: application/json; charset=utf-8`** is set explicitly on every API response, as API Design specifies.
-23. **`GET /api/health` always returns 200** and reports the database in `data.db` (`up`, `down` or `not_configured`). API Design says 200 or 503. **Caveat:** an uptime monitor must check `data.db` in the body, because the status code won't change when MongoDB is down. It sends `Cache-Control: no-store` and answers within 2 seconds (1.5-second cap on the database check).
+23. **`GET /api/health` returns 503 only when MongoDB is configured but unreachable** (`data.db` is `down`), as API Design specifies, so an uptime monitor can alert on the status code alone. With `up` or `not_configured` it returns 200: a missing database is normal in development and CI (decision 14), not an outage. The body always has the same `data` shape, including on 503. Because of the cold-start effect in decision 25, a single 503 right after a deploy can be a false alarm; set monitors to alert after two consecutive failures. It sends `Cache-Control: no-store` and answers within 2 seconds (1.5-second cap on the database check).
 24. **`POST /api/jobs/run` returns `404 NOT_FOUND`** until the job runner is built. That matches how API Design says it treats a missing secret.
 
 ### Database
