@@ -92,13 +92,15 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
 38. **Only Phase 1 cards are built now:** countdown, task progress, my tasks, upcoming events, totals, pending payments, wedding-day contacts and recent activity. Stitch's RSVP summary, invitations, gallery, wedding website and "Live now" banner wait for their features (Phases 2 and 3). The guests total shows "Soon" until guests exist.
 39. **"Spent" is the sum of Paid expenses; "pending" is the sum of Pending ones.** The PRD says expenses track "what was actually spent, with no budget system", so Stitch's "of ₹35.0 L planned budget" is dropped.
 40. **The dashboard response extends API Design's** (the PRD needs these and the API shape lacks them):
+    - New top-level `today`: the Asia/Kolkata date that `daysLeft`, the `overdue` flags and every due label are measured from. Cards never compute their own "today", so they can't disagree (for example around midnight, or with fixed sample data).
     - `countdown` adds `title`, `city` and `coverUrl` (the PRD's countdown card shows the wedding name and cover image).
     - `myTasks` items add `eventName`, shown as a chip.
     - `upcomingEvents` items add `endAt` and `dressCode`.
     - `money` adds `pendingPayments`: up to 3 Pending expenses, nearest due first, each with `id`, `description`, `vendorName`, `amountPaise` and `dueDate`. `nextDue` stays for compatibility.
     - New `weddingDayContacts`: up to 4, with `id`, `name`, `role` and `phone`, from vendors flagged as wedding-day contacts plus organisers (the PRD's Wedding-day contacts screen).
-    - `recentActivity` items add `actorName`, for the avatar initial.
+    - `recentActivity` items add `id` (the `activityLog` document id, used as the list key) and `actorName`, for the avatar initial.
       Dropped from Stitch because no data backs them: "pacing on schedule", "% contact details added", the vendor booked/in-inquiry split, and the invitation counts.
 41. **No checkbox on dashboard tasks.** Tasks move To Do → In Progress → Completed (PRD), so a tick that jumps straight to Completed would skip a step. Each row opens the task instead (shown as "Soon" until the Tasks page exists, decision 30). This also avoids Stitch's 16px checkbox, which is below the 44px touch target.
 42. **The dashboard has a `dashboard` module** (`src/modules/dashboard/`) with a service, schemas and index but no model: it owns no collections and builds its response by calling other modules' services. Until those exist, its service returns sample data that matches the schema exactly, so swapping in real data changes no UI code.
 43. **Mobile layout is ours, not Stitch's** (Stitch has no mobile dashboard): one column, cards in PRD order, using the existing app shell.
+44. **No real data reaches the dashboard before auth.** `/dashboard` has no login yet, so anyone with a Preview URL can open it. It shows only sample data (fake names, and phone numbers in the unassigned `+91 00000` range so call buttons ring nobody) until auth protects it; `getDashboard()` switches to real data only after that.

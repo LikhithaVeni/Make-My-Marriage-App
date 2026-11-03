@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { getDashboard } from "@/modules/dashboard";
 // Test-only reach into the module, to check its sample data and schema.
 // eslint-disable-next-line no-restricted-imports
-import { SAMPLE_AS_OF, sampleDashboard } from "@/modules/dashboard/sample";
+import { sampleDashboard } from "@/modules/dashboard/sample";
 // eslint-disable-next-line no-restricted-imports
 import { dashboardSchema } from "@/modules/dashboard/schemas";
 
@@ -37,16 +37,16 @@ describe("dashboard schema", () => {
 });
 
 describe("sample dashboard is internally consistent", () => {
-  it("counts days left from the sample date", () => {
+  it("counts days left from the sample's today", () => {
     const days =
-      (Date.parse(sample.countdown.date) - Date.parse(SAMPLE_AS_OF)) / DAY_MS;
+      (Date.parse(sample.countdown.date) - Date.parse(sample.today)) / DAY_MS;
     expect(sample.countdown.daysLeft).toBe(days);
   });
 
-  it("marks exactly the tasks due before the sample date as overdue, listed first", () => {
+  it("marks exactly the tasks due before today as overdue, listed first", () => {
     for (const task of sample.myTasks) {
       expect(task.overdue).toBe(
-        task.dueDate !== null && task.dueDate < SAMPLE_AS_OF,
+        task.dueDate !== null && task.dueDate < sample.today,
       );
     }
     const flags = sample.myTasks.map((task) => task.overdue);

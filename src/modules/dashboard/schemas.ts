@@ -15,6 +15,9 @@ const paise = z.number().int().nonnegative();
 export const taskPrioritySchema = z.enum(["LOW", "MEDIUM", "HIGH"]);
 
 export const dashboardSchema = z.object({
+  // The date in Asia/Kolkata that daysLeft, overdue flags and due labels are
+  // all measured from, so the cards never disagree about "today".
+  today: date,
   countdown: z.object({
     date,
     daysLeft: z.number().int(),
@@ -104,6 +107,7 @@ export const dashboardSchema = z.object({
   recentActivity: z
     .array(
       z.object({
+        id,
         summary: z.string().min(1),
         actorName: z.string().min(1),
         at: dateTime,

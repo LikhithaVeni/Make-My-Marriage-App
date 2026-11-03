@@ -3,10 +3,13 @@ import type { Dashboard } from "./schemas";
 // Sample dashboard for building the UI before the modules behind it exist
 // (docs/decisions.md, decision 42). It is a realistic mid-planning snapshot as
 // of 3 November 2026 and is internally consistent: counts, sums and dates agree.
+// Delete this file when getDashboard() reads real data; it ships in the bundle.
+// Phone numbers use the unassigned +91 00000 range so the call buttons ring nobody.
 
 export const SAMPLE_AS_OF = "2026-11-03";
 
 export const sampleDashboard: Dashboard = {
+  today: SAMPLE_AS_OF,
   countdown: {
     date: "2028-01-28",
     daysLeft: 451,
@@ -125,49 +128,54 @@ export const sampleDashboard: Dashboard = {
     ],
   },
   weddingDayContacts: [
-    { id: "contact_01", name: "Venu", role: "Admin", phone: "+919876500001" },
+    { id: "contact_01", name: "Venu", role: "Admin", phone: "+910000000001" },
     {
       id: "contact_02",
       name: "Rajesh Verma",
       role: "Caterer lead",
-      phone: "+919876500002",
+      phone: "+910000000002",
     },
     {
       id: "contact_03",
       name: "Ananya Rao",
       role: "Decor and florals",
-      phone: "+919876500003",
+      phone: "+910000000003",
     },
     {
       id: "contact_04",
       name: "Studio Memory",
       role: "Photographer",
-      phone: "+919876500004",
+      phone: "+910000000004",
     },
   ],
   recentActivity: [
     {
+      id: "activity_01",
       summary: "Priya completed 'Book the pandit'",
       actorName: "Priya",
       at: "2026-11-03T10:15:00+05:30",
     },
     {
+      id: "activity_02",
       summary: "Venu added an expense of ₹45,000 for Decor",
       actorName: "Venu",
       at: "2026-11-02T18:40:00+05:30",
     },
     {
+      id: "activity_03",
       summary:
         "Karthik assigned 'Visit ITC Kohenur for the Sangeet venue' to Venu",
       actorName: "Karthik",
       at: "2026-11-02T12:05:00+05:30",
     },
     {
+      id: "activity_04",
       summary: "Lipika added the vendor Bloom Decor",
       actorName: "Lipika",
       at: "2026-11-01T20:30:00+05:30",
     },
     {
+      id: "activity_05",
       summary: "Venu updated the Sangeet venue",
       actorName: "Venu",
       at: "2026-10-31T09:10:00+05:30",

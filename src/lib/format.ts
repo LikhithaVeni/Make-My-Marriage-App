@@ -29,12 +29,11 @@ export function formatRupees(paise: number): string {
 /** Compact amount for stat tiles: "₹18.5 L", "₹1.2 Cr"; below a lakh, as formatRupees. */
 export function formatRupeesShort(paise: number): string {
   const value = paise / 100;
-  if (value >= 1_00_00_000) {
-    return `₹${oneDecimal.format(value / 1_00_00_000)} Cr`;
-  }
-  if (value >= 1_00_000) {
-    return `₹${oneDecimal.format(value / 1_00_000)} L`;
-  }
+  // Choose the unit from the rounded figure, so ₹99,95,000 (99.95 lakh, shown
+  // as 100.0) becomes "₹1 Cr" rather than "₹100 L".
+  const lakhs = Math.round(value / 10_000) / 10;
+  if (lakhs >= 100) return `₹${oneDecimal.format(value / 1_00_00_000)} Cr`;
+  if (lakhs >= 1) return `₹${oneDecimal.format(lakhs)} L`;
   return rupees.format(Math.round(value));
 }
 

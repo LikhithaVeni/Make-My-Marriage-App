@@ -35,6 +35,12 @@ describe("formatRupeesShort", () => {
     expect(formatRupeesShort(1_200_000_000)).toBe("₹1.2 Cr");
   });
 
+  it("moves up a unit when rounding reaches it", () => {
+    expect(formatRupeesShort(999_500_000)).toBe("₹1 Cr");
+    expect(formatRupeesShort(9_996_000)).toBe("₹1 L");
+    expect(formatRupeesShort(999_400_000)).toBe("₹99.9 L");
+  });
+
   it("shows smaller amounts in full", () => {
     expect(formatRupeesShort(4_000_000)).toBe("₹40,000");
   });

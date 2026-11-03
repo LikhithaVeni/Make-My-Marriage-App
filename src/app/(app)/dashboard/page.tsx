@@ -8,14 +8,15 @@ import { TotalsRow } from "@/components/dashboard/TotalsRow";
 import { UpcomingEventsCard } from "@/components/dashboard/UpcomingEventsCard";
 import { WeddingDayContactsCard } from "@/components/dashboard/WeddingDayContactsCard";
 import { TopBar } from "@/components/layout/TopBar";
-import { todayInKolkata } from "@/lib/format";
 import { getDashboard } from "@/modules/dashboard";
 
 export default async function DashboardPage() {
-  // Render per request, so "today" (due-date labels) is never the build date.
+  // Render per request: the data and the "3 h ago" labels must be current,
+  // never frozen at build time.
   await connection();
   const dashboard = await getDashboard();
-  const today = todayInKolkata();
+  // One "today" for every card, taken from the data (docs/decisions.md, 40).
+  const { today } = dashboard;
 
   return (
     <>

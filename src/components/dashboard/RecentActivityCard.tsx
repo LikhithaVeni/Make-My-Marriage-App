@@ -33,10 +33,7 @@ export function RecentActivityCard({
       ) : (
         <ul className="divide-y divide-border">
           {activity.map((entry) => (
-            <li
-              key={`${entry.at}-${entry.summary}`}
-              className="flex items-center gap-3 py-3"
-            >
+            <li key={entry.id} className="flex items-center gap-3 py-3">
               <span
                 aria-hidden="true"
                 className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-tint font-display text-small font-medium text-accent"
