@@ -2,6 +2,8 @@ import { connection } from "next/server";
 
 import { CountdownCard } from "@/components/dashboard/CountdownCard";
 import { MyTasksCard } from "@/components/dashboard/MyTasksCard";
+import { PendingPaymentsCard } from "@/components/dashboard/PendingPaymentsCard";
+import { TotalsRow } from "@/components/dashboard/TotalsRow";
 import { UpcomingEventsCard } from "@/components/dashboard/UpcomingEventsCard";
 import { TopBar } from "@/components/layout/TopBar";
 import { todayInKolkata } from "@/lib/format";
@@ -21,6 +23,7 @@ export default async function DashboardPage() {
           countdown={dashboard.countdown}
           tasks={dashboard.tasks}
         />
+        <TotalsRow totals={dashboard.totals} money={dashboard.money} />
         <div className="grid gap-6 lg:grid-cols-3">
           <MyTasksCard
             tasks={dashboard.myTasks}
@@ -28,6 +31,9 @@ export default async function DashboardPage() {
             className="lg:col-span-2"
           />
           <UpcomingEventsCard events={dashboard.upcomingEvents} />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <PendingPaymentsCard money={dashboard.money} today={today} />
         </div>
       </main>
     </>
