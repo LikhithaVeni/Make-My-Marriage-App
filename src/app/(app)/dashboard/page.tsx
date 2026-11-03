@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 
 import { CountdownCard } from "@/components/dashboard/CountdownCard";
+import { GettingStartedCard } from "@/components/dashboard/GettingStartedCard";
 import { MyTasksCard } from "@/components/dashboard/MyTasksCard";
 import { PendingPaymentsCard } from "@/components/dashboard/PendingPaymentsCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
@@ -10,11 +11,18 @@ import { WeddingDayContactsCard } from "@/components/dashboard/WeddingDayContact
 import { TopBar } from "@/components/layout/TopBar";
 import { getDashboard } from "@/modules/dashboard";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: PageProps<"/dashboard">) {
   // Render per request: the data and the "3 h ago" labels must be current,
   // never frozen at build time.
   await connection();
-  const dashboard = await getDashboard();
+  // While the dashboard shows sample data, ?sample=empty previews a brand-new
+  // wedding (docs/decisions.md, decision 45).
+  const { sample } = await searchParams;
+  const dashboard = await getDashboard({
+    sample: sample === "empty" ? "empty" : "full",
+  });
   // One "today" for every card, taken from the data (docs/decisions.md, 40).
   const { today } = dashboard;
 
@@ -26,6 +34,7 @@ export default async function DashboardPage() {
           countdown={dashboard.countdown}
           tasks={dashboard.tasks}
         />
+        <GettingStartedCard dashboard={dashboard} />
         <TotalsRow totals={dashboard.totals} money={dashboard.money} />
         <div className="grid gap-6 lg:grid-cols-3">
           <MyTasksCard

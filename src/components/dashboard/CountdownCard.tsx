@@ -51,16 +51,22 @@ export function CountdownCard({ countdown, tasks }: CountdownCardProps) {
         </div>
 
         <div className="md:w-80">
-          <p className="text-small text-text">
-            {tasks.completed} of {total} tasks done
-          </p>
-          <div className="mt-2">
-            <ProgressBar
-              value={tasks.completed}
-              max={total}
-              label="Tasks completed"
-            />
-          </div>
+          {total === 0 ? (
+            <p className="text-small text-text-muted">No tasks yet</p>
+          ) : (
+            <>
+              <p className="text-small text-text">
+                {tasks.completed} of {total} tasks done
+              </p>
+              <div className="mt-2">
+                <ProgressBar
+                  value={tasks.completed}
+                  max={total}
+                  label="Tasks completed"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 

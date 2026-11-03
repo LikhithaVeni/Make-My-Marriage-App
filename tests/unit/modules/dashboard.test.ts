@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 import { getDashboard } from "@/modules/dashboard";
 // Test-only reach into the module, to check its sample data and schema.
 // eslint-disable-next-line no-restricted-imports
-import { sampleDashboard } from "@/modules/dashboard/sample";
+import {
+  emptySampleDashboard,
+  sampleDashboard,
+} from "@/modules/dashboard/sample";
 // eslint-disable-next-line no-restricted-imports
 import { dashboardSchema } from "@/modules/dashboard/schemas";
 
@@ -100,5 +103,26 @@ describe("sample dashboard is internally consistent", () => {
 describe("getDashboard", () => {
   it("returns the sample until the real modules exist", async () => {
     await expect(getDashboard()).resolves.toEqual(sample);
+  });
+});
+
+describe("empty sample (a brand-new wedding)", () => {
+  it("is valid and has nothing added yet", () => {
+    const empty = dashboardSchema.parse(emptySampleDashboard);
+    expect(empty.totals).toEqual({
+      members: 1,
+      events: 0,
+      vendors: 0,
+      households: 0,
+      people: 0,
+    });
+    expect(empty.myTasks).toEqual([]);
+    expect(empty.money.pendingPayments).toEqual([]);
+  });
+
+  it("is what getDashboard returns for sample: empty", async () => {
+    await expect(getDashboard({ sample: "empty" })).resolves.toEqual(
+      emptySampleDashboard,
+    );
   });
 });

@@ -16,3 +16,12 @@ test("GET /dashboard renders every Phase 1 card", async ({ request }) => {
     expect(html).toContain(heading);
   }
 });
+
+test("the checklist shows only for a new wedding", async ({ request }) => {
+  const empty = await (await request.get("/dashboard?sample=empty")).text();
+  expect(empty).toContain("Get started");
+  expect(empty).toContain("Invite family members");
+
+  const full = await (await request.get("/dashboard")).text();
+  expect(full).not.toContain("Get started");
+});

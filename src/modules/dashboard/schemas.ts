@@ -58,6 +58,8 @@ export const dashboardSchema = z.object({
     )
     .max(3),
   totals: z.object({
+    // Organisers in the wedding, including the viewer.
+    members: count,
     events: count,
     vendors: count,
     households: count,

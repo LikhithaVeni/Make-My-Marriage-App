@@ -86,7 +86,13 @@ export const sampleDashboard: Dashboard = {
       dressCode: "Indo-western",
     },
   ],
-  totals: { events: 5, vendors: 14, households: 1180, people: 3420 },
+  totals: {
+    members: 6,
+    events: 5,
+    vendors: 14,
+    households: 1180,
+    people: 3420,
+  },
   rsvp: {
     replied: 640,
     pending: 540,
@@ -182,4 +188,31 @@ export const sampleDashboard: Dashboard = {
     },
   ],
   storage: { usedBytes: 1_250_000_000 },
+};
+
+/**
+ * A wedding created moments ago: only the Admin, nothing added yet. Shows the
+ * PRD's empty-state checklist (key flow F1, step 5).
+ */
+export const emptySampleDashboard: Dashboard = {
+  today: SAMPLE_AS_OF,
+  countdown: sampleDashboard.countdown,
+  myTasks: [],
+  tasks: { todo: 0, inProgress: 0, completed: 0, overdue: 0 },
+  upcomingEvents: [],
+  totals: { members: 1, events: 0, vendors: 0, households: 0, people: 0 },
+  rsvp: { replied: 0, pending: 0, byEvent: [] },
+  money: { spentPaise: 0, pendingPaise: 0, nextDue: null, pendingPayments: [] },
+  weddingDayContacts: [
+    { id: "contact_01", name: "Venu", role: "Admin", phone: "+910000000001" },
+  ],
+  recentActivity: [
+    {
+      id: "activity_01",
+      summary: "Venu created the wedding",
+      actorName: "Venu",
+      at: "2026-11-03T09:00:00+05:30",
+    },
+  ],
+  storage: { usedBytes: 0 },
 };
