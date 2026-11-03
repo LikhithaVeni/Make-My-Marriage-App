@@ -69,6 +69,25 @@ export function formatDate(
   return (style === "long" ? longDate : shortDate).format(calendarDate(date));
 }
 
+const weekdayParts = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "UTC",
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+});
+
+/** "2028-01-26" → { weekday: "Wed", day: "26", month: "Jan" }, for date blocks. */
+export function dateParts(date: string): {
+  weekday: string;
+  day: string;
+  month: string;
+} {
+  const parts = weekdayParts.formatToParts(calendarDate(date));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  return { weekday: part("weekday"), day: part("day"), month: part("month") };
+}
+
 /** "2026-11-20" → "20 Nov". */
 export function formatDayMonth(date: string): string {
   return dayMonth.format(calendarDate(date));

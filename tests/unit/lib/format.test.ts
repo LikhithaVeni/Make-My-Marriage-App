@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  dateParts,
   daysBetween,
   formatBytes,
   formatDate,
@@ -43,6 +44,14 @@ describe("dates", () => {
     expect(formatDate("2028-01-28")).toBe("28 Jan 2028");
     expect(formatDate("2028-01-28", "long")).toBe("28 January 2028");
     expect(formatDayMonth("2026-11-20")).toBe("20 Nov");
+  });
+
+  it("splits a date into parts for date blocks", () => {
+    expect(dateParts("2028-01-26")).toEqual({
+      weekday: "Wed",
+      day: "26",
+      month: "Jan",
+    });
   });
 
   it("formats times in Asia/Kolkata", () => {

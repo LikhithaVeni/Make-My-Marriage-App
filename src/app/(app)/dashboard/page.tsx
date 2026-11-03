@@ -1,9 +1,17 @@
+import { connection } from "next/server";
+
 import { CountdownCard } from "@/components/dashboard/CountdownCard";
+import { MyTasksCard } from "@/components/dashboard/MyTasksCard";
+import { UpcomingEventsCard } from "@/components/dashboard/UpcomingEventsCard";
 import { TopBar } from "@/components/layout/TopBar";
+import { todayInKolkata } from "@/lib/format";
 import { getDashboard } from "@/modules/dashboard";
 
 export default async function DashboardPage() {
+  // Render per request, so "today" (due-date labels) is never the build date.
+  await connection();
   const dashboard = await getDashboard();
+  const today = todayInKolkata();
 
   return (
     <>
@@ -13,6 +21,14 @@ export default async function DashboardPage() {
           countdown={dashboard.countdown}
           tasks={dashboard.tasks}
         />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <MyTasksCard
+            tasks={dashboard.myTasks}
+            today={today}
+            className="lg:col-span-2"
+          />
+          <UpcomingEventsCard events={dashboard.upcomingEvents} />
+        </div>
       </main>
     </>
   );
