@@ -65,7 +65,7 @@ function StatusIcon({ done }: { done: boolean }) {
       <path
         d="m6 10.5 2.5 2.5L14 7.5"
         fill="none"
-        stroke="white"
+        className="stroke-surface"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

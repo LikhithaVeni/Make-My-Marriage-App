@@ -1,4 +1,4 @@
-import { CardLink } from "@/components/ui/Card";
+import { CardLink, cardSurface } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
 import { formatRupeesShort } from "@/lib/format";
 import type { Dashboard } from "@/modules/dashboard";
@@ -58,7 +58,7 @@ export function TotalsRow({ totals, money }: TotalsRowProps) {
         {tiles.map((tile) => (
           <li
             key={tile.label}
-            className="flex flex-col rounded-card border border-border bg-surface p-4 md:p-6"
+            className={`flex flex-col p-4 md:p-6 ${cardSurface}`}
           >
             <div className="flex-1">
               <Stat

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import { TopBar } from "@/components/layout/TopBar";
+import { cardSurface } from "@/components/ui/Card";
 
 // Next.js 16 passes `retry` (not the older `reset`), and `error` may be any
 // thrown value (node_modules/next/dist/docs, "error.js").
@@ -32,7 +33,7 @@ export default function DashboardError({
       <main className="flex flex-1 flex-col p-4 md:p-8">
         <section
           role="alert"
-          className="mx-auto mt-8 flex w-full max-w-md flex-col items-center rounded-card border border-border bg-surface p-8 text-center"
+          className={`mx-auto mt-8 flex w-full max-w-md flex-col items-center p-8 text-center ${cardSurface}`}
         >
           <h2 className="font-display text-heading text-text">
             Couldn&apos;t load the dashboard

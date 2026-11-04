@@ -12,6 +12,9 @@ const count = z.number().int().nonnegative();
 // Money is integer paise (docs/Database Design v1.md).
 const paise = z.number().int().nonnegative();
 
+/** At most this many tasks come back in myTasks (API Design: "up to 10"). */
+export const MY_TASKS_LIMIT = 10;
+
 export const taskPrioritySchema = z.enum(["LOW", "MEDIUM", "HIGH"]);
 
 export const dashboardSchema = z.object({
@@ -37,7 +40,7 @@ export const dashboardSchema = z.object({
         eventName: z.string().nullable(),
       }),
     )
-    .max(10),
+    .max(MY_TASKS_LIMIT),
   // Overdue tasks are also counted in todo or inProgress.
   tasks: z.object({
     todo: count,

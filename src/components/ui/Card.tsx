@@ -10,6 +10,9 @@ interface CardProps {
   children: React.ReactNode;
 }
 
+/** The card surface (docs/design-system.md, "Cards"), shared by every card-shaped panel. */
+export const cardSurface = "rounded-card border border-border bg-surface";
+
 function headingId(title: string): string {
   return `card-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
@@ -21,7 +24,7 @@ export function Card({ title, aside, footer, className, children }: CardProps) {
   return (
     <section
       aria-labelledby={id}
-      className={`flex flex-col rounded-card border border-border bg-surface p-6 ${className ?? ""}`}
+      className={`flex flex-col p-6 ${cardSurface} ${className ?? ""}`}
     >
       <header className="flex items-start justify-between gap-4">
         <h2 id={id} className="font-display text-heading text-text">

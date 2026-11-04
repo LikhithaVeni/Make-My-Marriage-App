@@ -1,3 +1,4 @@
+import { cardSurface } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { formatDate } from "@/lib/format";
 import type { Dashboard } from "@/modules/dashboard";
@@ -30,10 +31,7 @@ export function CountdownCard({ countdown, tasks }: CountdownCardProps) {
   ];
 
   return (
-    <section
-      aria-labelledby="card-countdown"
-      className="rounded-card border border-border bg-surface p-6"
-    >
+    <section aria-labelledby="card-countdown" className={`p-6 ${cardSurface}`}>
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div>
           <h2

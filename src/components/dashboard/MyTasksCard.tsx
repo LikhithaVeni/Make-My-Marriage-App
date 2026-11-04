@@ -2,7 +2,11 @@ import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { Card, CardLink } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDayMonth, formatDue } from "@/lib/format";
-import type { Dashboard, TaskPriority } from "@/modules/dashboard";
+import {
+  type Dashboard,
+  MY_TASKS_LIMIT,
+  type TaskPriority,
+} from "@/modules/dashboard";
 
 const priorities: Record<TaskPriority, { label: string; tone: BadgeTone }> = {
   HIGH: { label: "High", tone: "accent" },
@@ -23,6 +27,8 @@ interface MyTasksCardProps {
 /** Tasks assigned to the viewer, overdue first (PRD, "My tasks"). */
 export function MyTasksCard({ tasks, today, className }: MyTasksCardProps) {
   const overdue = tasks.filter((task) => task.overdue).length;
+  // The list is capped, so a full list of overdue tasks may hide more.
+  const more = overdue === MY_TASKS_LIMIT ? "+" : "";
 
   return (
     <Card
@@ -30,7 +36,10 @@ export function MyTasksCard({ tasks, today, className }: MyTasksCardProps) {
       className={className}
       aside={
         overdue > 0 ? (
-          <span className="text-danger">{overdue} overdue</span>
+          <span className="text-danger">
+            {overdue}
+            {more} overdue
+          </span>
         ) : undefined
       }
       footer={

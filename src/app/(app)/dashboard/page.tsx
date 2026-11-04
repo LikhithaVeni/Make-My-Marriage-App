@@ -18,10 +18,13 @@ export default async function DashboardPage({
   // never frozen at build time.
   await connection();
   // While the dashboard shows sample data, ?sample=empty previews a brand-new
-  // wedding and ?sample=error the error state (docs/decisions.md, decision 45).
+  // wedding, and in development ?sample=error the error state (decision 45).
+  // Production ignores "error", so nobody can fill the logs with fake failures.
   const { sample } = await searchParams;
+  const showError =
+    sample === "error" && process.env.NODE_ENV === "development";
   const dashboard = await getDashboard({
-    sample: sample === "empty" || sample === "error" ? sample : "full",
+    sample: sample === "empty" ? "empty" : showError ? "error" : "full",
   });
   // One "today" for every card, taken from the data (docs/decisions.md, 40).
   const { today } = dashboard;
