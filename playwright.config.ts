@@ -17,7 +17,9 @@ export default defineConfig({
   webServer: {
     // CI tests the production build; locally the dev server is enough.
     command: isCI ? "pnpm start" : "pnpm dev",
-    url: `${baseURL}/api/health`,
+    // The landing page, not /api/health: health answers 503 when a configured
+    // database is down, which would stop every test from starting.
+    url: `${baseURL}/`,
     reuseExistingServer: !isCI,
     timeout: 120_000,
   },

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;500;600&amp;family=Inter:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}.font-fraunces{font-family:'Fraunces',serif;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-surface":"#1d1b17","secondary-container":"#e9e1dd","surface-variant":"#e8e2da","surface-container-low":"#f9f3ea","on-secondary":"#ffffff","tertiary-fixed-dim":"#cfc4c8","inverse-primary":"#ffb1c2","on-background":"#1d1b17","on-secondary-fixed":"#1e1b19","inverse-on-surface":"#f6f0e8","on-secondary-container":"#686361","on-primary":"#ffffff","on-primary-fixed-variant":"#802442","inverse-surface":"#33302b","surface-container-highest":"#e8e2da","primary":"#5c0427","outline":"#887275","primary-fixed":"#ffd9df","surface-container-lowest":"#ffffff","secondary-fixed":"#e9e1dd","secondary-fixed-dim":"#ccc5c2","primary-fixed-dim":"#ffb1c2","error":"#ba1a1a","surface-container-high":"#ede7df","error-container":"#ffdad6","on-error-container":"#93000a","on-tertiary-fixed":"#201a1d","on-surface-variant":"#554245","surface":"#fff8f0","surface-dim":"#dfd9d1","surface-container":"#f3ede5","tertiary-container":"#474043","on-tertiary-container":"#b6acb0","tertiary":"#302a2d","outline-variant":"#dac0c4","on-primary-fixed":"#3f0018","secondary":"#625d5b","surface-tint":"#9f3c59","surface-bright":"#fff8f0","on-secondary-fixed-variant":"#4a4643","tertiary-fixed":"#ebdfe3","background":"#fff8f0","primary-container":"#7a1f3d","on-tertiary-fixed-variant":"#4c4548","on-primary-container":"#ff8ba8","on-error":"#ffffff","on-tertiary":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter-sm":"1rem","space-xs":"0.25rem","margin":"3rem","space-sm":"0.5rem","gutter":"1.5rem","margin-mobile":"1.25rem","space-lg":"1.5rem","space-xl":"2.5rem","margin-tablet":"2rem","space-md":"1rem"},"fontFamily":{"caption-medium":["Inter"],"body-default":["Inter"],"headline-h1":["Newsreader"],"body-strong":["Inter"],"subheading-lead":["Inter"],"headline-h2":["Newsreader"],"overline":["Inter"],"display-hero-mobile":["Newsreader"],"caption":["Inter"],"display-hero":["Newsreader"],"label-badge":["Inter"],"headline-h1-mobile":["Newsreader"],"headline-h3":["Newsreader"]},"fontSize":{"caption-medium":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"500"}],"body-default":["16px",{"lineHeight":"26px","letterSpacing":"0em","fontWeight":"400"}],"headline-h1":["36px",{"lineHeight":"44px","letterSpacing":"-0.015em","fontWeight":"500"}],"body-strong":["16px",{"lineHeight":"26px","letterSpacing":"0em","fontWeight":"600"}],"subheading-lead":["18px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"400"}],"headline-h2":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"overline":["11px",{"lineHeight":"16px","letterSpacing":"0.08em","fontWeight":"600"}],"display-hero-mobile":["34px",{"lineHeight":"42px","letterSpacing":"-0.01em","fontWeight":"500"}],"caption":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"400"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"500"}],"label-badge":["13px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}],"headline-h1-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-h3":["22px",{"lineHeight":"30px","letterSpacing":"0em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-default text-body-default text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 bottom-0 w-[240px] bg-surface-container-lowest z-40 flex flex-col border-r border-surface-variant"><div class="h-20 flex items-center px-space-lg gap-space-sm border-b border-surface-variant/40"><div class="w-9 h-9 rounded-full border-[1.5px] border-primary-container flex items-center justify-center shrink-0"><span class="font-fraunces text-[14px] font-medium tracking-tight text-primary-container leading-none">LK</span></div><span class="font-headline-h3 text-headline-h3 text-on-surface tracking-tight truncate">KaLi's era</span></div><div class="flex-1 overflow-y-auto px-space-sm py-space-md"><nav class="flex flex-col gap-0.5" data-active-classes="bg-primary-fixed/40 text-primary font-medium rounded-lg"><a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-2 transition-colors bg-primary-fixed/40 text-primary font-medium rounded-lg" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="events" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">event</span><span>Events</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="tasks" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">check_circle</span><span>Tasks</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="guests" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">group</span><span>Guests</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="invitations" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">mail</span><span>Invitations</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="expenses" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">payments</span><span>Expenses</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="vendors" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">storefront</span><span>Vendors</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="gallery" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">photo_library</span><span>Gallery</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="website-and-livestream" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">nest_cam_wired_stand</span><span>Website &amp; livestream</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-caption-medium text-caption-medium" data-path="activity" href="#"><span class="material-symbols-outlined text-[19px] shrink-0">history</span><span>Activity</span></a></nav></div><div class="p-space-sm border-t border-surface-variant/40 flex flex-col gap-space-sm bg-surface-container-lowest"><details class="group"><summary class="flex items-center justify-between px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer list-none font-caption-medium text-caption-medium"><span class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[19px]">settings</span><span>Settings</span></span><span class="material-symbols-outlined text-[16px] transition-transform group-open:rotate-180">expand_more</span></summary><div class="mt-1 pl-7 flex flex-col gap-0.5"><a class="py-1 text-on-surface-variant hover:text-on-surface font-caption text-caption transition-colors truncate" data-path="wedding-members" href="#">Wedding members</a><a class="py-1 text-on-surface-variant hover:text-on-surface font-caption text-caption transition-colors truncate" data-path="wedding-details" href="#">Wedding details</a><a class="py-1 text-on-surface-variant hover:text-on-surface font-caption text-caption transition-colors truncate" data-path="photographer-access" href="#">Photographer access</a><a class="py-1 text-on-surface-variant hover:text-on-surface font-caption text-caption transition-colors truncate" data-path="album-password" href="#">Album password</a></div></details><div class="px-space-sm py-1"><div class="flex items-center justify-between font-overline text-overline uppercase text-on-surface-variant tracking-wider"><span>Storage</span><span class="font-label-badge text-label-badge font-normal text-on-surface-variant">7.4 GB</span></div><div class="w-full h-1 bg-surface-container-high rounded-full overflow-hidden mt-1.5"><div class="h-full bg-primary-container rounded-full w-[62%]"></div></div><span class="font-overline text-[10px] text-outline mt-1 block">Admin storage limit</span></div><div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container-low"><div class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[15px] text-on-surface-variant">shield_person</span></div><div class="flex flex-col min-w-0 flex-1"><span class="font-caption-medium text-[13px] text-on-surface truncate leading-tight">Venu</span><span class="font-caption text-[11px] text-outline truncate leading-tight">Admin</span></div></div></div></aside><div class="pl-[240px]"><header class="fixed top-0 left-[240px] right-0 h-20 bg-surface/85 backdrop-blur-md z-30 flex items-center justify-between px-space-xl border-b border-surface-variant/40"><div class="flex flex-col"><span class="font-headline-h2 text-headline-h2 text-on-surface leading-none tracking-tight">Dashboard</span><span class="font-caption text-caption text-outline mt-0.5">L &amp; K's Wedding · 28 Jan 2028</span></div><div class="flex items-center gap-space-md"><div class="relative flex items-center"><button aria-label="Search" class="w-9 h-9 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-[20px]">search</span></button></div><div class="relative flex items-center"><button aria-label="Notifications" class="w-9 h-9 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center justify-center relative" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface"></span></button></div><div class="relative"><button class="flex items-center gap-1.5 px-space-md py-2 rounded-lg bg-primary-container hover:bg-primary text-on-primary transition-colors font-caption-medium text-caption-medium shadow-[0_1px_4px_rgba(122,31,61,0.2)]" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span>New</span><span class="material-symbols-outlined text-[16px]">arrow_drop_down</span></button></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-1"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="w-full pt-20 bg-surface min-h-screen px-space-xl py-space-lg"><div class="max-w-[1200px] mx-auto"><div class="flex flex-col w-full pb-16 space-y-8">
+<!-- Live Stream Announcement Banner -->
+<div class="w-full bg-[#FDF2F4] border border-[#F3D2D9] rounded-[10px] px-5 py-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#7A1F3D] opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#7A1F3D]"></span>
+</span>
+<span class="font-caption-medium text-caption-medium text-on-surface">
+<strong class="font-semibold text-primary">Sangeet is live now</strong> · Live broadcast streaming from ITC Kohenur Grand Ballroom
+      </span>
+</div>
+<div class="flex items-center gap-4">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center gap-1 transition-colors" href="#">
+<span>Watch stream</span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+<span class="text-outline-variant font-caption">|</span>
+<button class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center gap-1 transition-colors" onclick="navigator.clipboard?.writeText(window.location.href)" type="button">
+<span class="material-symbols-outlined text-[16px]">share</span>
+<span>Share link</span>
+</button>
+</div>
+</div>
+<!-- 1. Countdown & Progress Card -->
+<div class="w-full bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-surface-variant">
+<div>
+<span class="font-overline text-overline uppercase text-secondary tracking-widest block mb-1">Wedding Countdown</span>
+<h1 class="font-fraunces text-[36px] leading-[44px] font-medium text-on-surface tracking-tight">461 days to go</h1>
+<p class="font-caption text-caption text-secondary mt-1">28 January 2028 · Hyderabad, Telangana</p>
+</div>
+<div class="flex flex-col lg:w-96 gap-2">
+<div class="flex justify-between items-center text-caption-medium font-caption-medium">
+<span class="text-on-surface">31 of 86 tasks completed</span>
+<span class="text-primary font-semibold">36%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 36%;"></div>
+</div>
+<span class="font-overline text-[11px] text-secondary tracking-normal">Pacing on schedule for Phase 2 Milestone</span>
+</div>
+</div>
+<!-- Task Breakdown Stat Row -->
+<div class="pt-4 flex flex-wrap items-center gap-y-2 text-caption-medium font-caption-medium text-secondary">
+<div class="flex items-center gap-2">
+<span class="text-on-surface font-semibold">To do</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface text-label-badge font-label-badge">42</span>
+</div>
+<span class="mx-3 text-surface-variant select-none">/</span>
+<div class="flex items-center gap-2">
+<span class="text-on-surface font-semibold">In progress</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface text-label-badge font-label-badge">9</span>
+</div>
+<span class="mx-3 text-surface-variant select-none">/</span>
+<div class="flex items-center gap-2">
+<span class="text-on-surface font-semibold">Completed</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface text-label-badge font-label-badge">31</span>
+</div>
+<span class="mx-3 text-surface-variant select-none">/</span>
+<div class="flex items-center gap-2">
+<span class="text-[#B42318] font-semibold">Overdue</span>
+<span class="px-2 py-0.5 rounded-full bg-red-50 text-[#B42318] border border-red-200 text-label-badge font-label-badge font-semibold">4</span>
+</div>
+</div>
+</div>
+<!-- 2. Four Stat Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Events -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between hover:border-outline-variant transition-colors">
+<div>
+<div class="flex items-center justify-between text-secondary mb-2">
+<span class="font-caption-medium text-caption-medium">Events</span>
+<span class="material-symbols-outlined text-[20px] text-outline">calendar_month</span>
+</div>
+<div class="font-fraunces text-[28px] leading-[36px] font-medium text-on-surface tracking-tight">6</div>
+<p class="font-caption text-caption text-secondary mt-1">All ceremonies scheduled</p>
+</div>
+<div class="pt-5 border-t border-surface-variant/50 mt-4">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>View events</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Vendors -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between hover:border-outline-variant transition-colors">
+<div>
+<div class="flex items-center justify-between text-secondary mb-2">
+<span class="font-caption-medium text-caption-medium">Vendors</span>
+<span class="material-symbols-outlined text-[20px] text-outline">storefront</span>
+</div>
+<div class="font-fraunces text-[28px] leading-[36px] font-medium text-on-surface tracking-tight">14</div>
+<p class="font-caption text-caption text-secondary mt-1">11 booked · 3 in inquiry</p>
+</div>
+<div class="pt-5 border-t border-surface-variant/50 mt-4">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>Manage vendors</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Guests -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between hover:border-outline-variant transition-colors">
+<div>
+<div class="flex items-center justify-between text-secondary mb-2">
+<span class="font-caption-medium text-caption-medium">Guests</span>
+<span class="material-symbols-outlined text-[20px] text-outline">group</span>
+</div>
+<div class="flex items-baseline gap-2 flex-wrap">
+<span class="font-fraunces text-[22px] leading-[30px] font-medium text-on-surface">1,180 hhs</span>
+<span class="font-body-default text-caption text-secondary font-medium">(3,420 people)</span>
+</div>
+<p class="font-caption text-caption text-secondary mt-1">86% contact details added</p>
+</div>
+<div class="pt-5 border-t border-surface-variant/50 mt-4">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>Guest directory</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Spent -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between hover:border-outline-variant transition-colors">
+<div>
+<div class="flex items-center justify-between text-secondary mb-2">
+<span class="font-caption-medium text-caption-medium">Spent</span>
+<span class="material-symbols-outlined text-[20px] text-outline">payments</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-fraunces text-[28px] leading-[36px] font-medium text-on-surface tracking-tight">₹18.5 L</span>
+<span class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-red-50 text-[#B42318] border border-red-200 whitespace-nowrap">₹4.5 L pending</span>
+</div>
+<p class="font-caption text-caption text-secondary mt-1">of ₹35.0 L planned budget</p>
+</div>
+<div class="pt-5 border-t border-surface-variant/50 mt-4">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>Expense tracker</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- 3. Tasks & Upcoming Events Split Row (2/3 and 1/3) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Tasks (8 cols = 2/3) -->
+<div class="lg:col-span-8 bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-surface-variant">
+<div>
+<h2 class="font-fraunces text-headline-h3 text-on-surface">My tasks</h2>
+<span class="font-caption text-caption text-secondary">Action items across critical event milestones</span>
+</div>
+<!-- Filter Tabs -->
+<div class="flex items-center space-x-1 bg-surface-container p-1 rounded-lg">
+<button class="px-3 py-1 rounded-md text-caption-medium font-caption-medium bg-surface-container-lowest text-primary shadow-xs" type="button">
+            All (42)
+          </button>
+<button class="px-3 py-1 rounded-md text-caption-medium font-caption-medium text-secondary hover:text-on-surface transition-colors" type="button">
+            Overdue (4)
+          </button>
+<button class="px-3 py-1 rounded-md text-caption-medium font-caption-medium text-secondary hover:text-on-surface transition-colors" type="button">
+            This week (12)
+          </button>
+</div>
+</div>
+<!-- Task Table/Rows -->
+<div class="divide-y divide-surface-variant">
+<!-- Row 1: Overdue -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<input class="w-4 h-4 rounded border-surface-variant text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-body-default text-caption-medium text-on-surface font-medium truncate">Finalize choreo playlist for Grand Entrance</span>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 text-[#B42318] border border-red-200">Overdue</span>
+</div>
+<div class="flex items-center gap-2 mt-1 text-caption font-caption text-secondary">
+<span>Due 14 Jan 2028</span>
+<span>·</span>
+<span class="bg-surface-container-high px-2 py-0.5 rounded text-label-badge font-label-badge text-on-surface-variant">Sangeet</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full text-label-badge font-label-badge bg-red-50 text-[#B42318] font-medium">High</span>
+</div>
+<!-- Row 2: Overdue -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<input class="w-4 h-4 rounded border-surface-variant text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-body-default text-caption-medium text-on-surface font-medium truncate">Confirm guest dietary requirements with Taj Chef</span>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 text-[#B42318] border border-red-200">Overdue</span>
+</div>
+<div class="flex items-center gap-2 mt-1 text-caption font-caption text-secondary">
+<span>Due 15 Jan 2028</span>
+<span>·</span>
+<span class="bg-surface-container-high px-2 py-0.5 rounded text-label-badge font-label-badge text-on-surface-variant">Reception</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full text-label-badge font-label-badge bg-red-50 text-[#B42318] font-medium">High</span>
+</div>
+<!-- Row 3: Normal -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<input class="w-4 h-4 rounded border-surface-variant text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<span class="font-body-default text-caption-medium text-on-surface font-medium truncate block">Select floral setup options for Mandap backdrop</span>
+<div class="flex items-center gap-2 mt-1 text-caption font-caption text-secondary">
+<span>Due 21 Jan 2028</span>
+<span>·</span>
+<span class="bg-surface-container-high px-2 py-0.5 rounded text-label-badge font-label-badge text-on-surface-variant">Pelli / Wedding</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full text-label-badge font-label-badge bg-amber-50 text-[#B7791F] font-medium">Med</span>
+</div>
+<!-- Row 4: Normal -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<input class="w-4 h-4 rounded border-surface-variant text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<span class="font-body-default text-caption-medium text-on-surface font-medium truncate block">Approve printed save-the-date cards draft</span>
+<div class="flex items-center gap-2 mt-1 text-caption font-caption text-secondary">
+<span>Due 24 Jan 2028</span>
+<span>·</span>
+<span class="bg-surface-container-high px-2 py-0.5 rounded text-label-badge font-label-badge text-on-surface-variant">Haldi</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full text-label-badge font-label-badge bg-surface-container text-secondary font-medium">Low</span>
+</div>
+</div>
+<div class="pt-4 border-t border-surface-variant mt-2">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center gap-1.5 transition-colors" href="#">
+<span>View all tasks</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Right Column: Upcoming Events (4 cols = 1/3) -->
+<div class="lg:col-span-4 bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-4 border-b border-surface-variant">
+<h2 class="font-fraunces text-headline-h3 text-on-surface">Upcoming events</h2>
+<span class="text-caption font-caption text-secondary">3 next</span>
+</div>
+<div class="divide-y divide-surface-variant mt-2">
+<!-- Event 1 -->
+<div class="py-4 flex gap-4 items-start">
+<div class="w-14 h-14 rounded-lg bg-surface-container flex flex-col items-center justify-center shrink-0 border border-surface-variant text-center">
+<span class="font-overline text-[10px] uppercase font-bold text-primary">JAN</span>
+<span class="font-fraunces text-[18px] leading-tight font-medium text-on-surface">26</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h3 class="font-caption-medium text-caption-medium text-on-surface font-semibold truncate">Haldi &amp; Mehendi</h3>
+</div>
+<p class="font-caption text-[13px] text-secondary mt-0.5">10:00 AM · The Royal Pavilion</p>
+<span class="inline-block mt-1 font-overline text-[10px] text-outline uppercase tracking-wider">Traditional Yellow theme</span>
+</div>
+</div>
+<!-- Event 2: Live Now -->
+<div class="py-4 flex gap-4 items-start bg-[#FDF2F4]/50 -mx-2 px-2 rounded-lg border-l-2 border-[#7A1F3D]">
+<div class="w-14 h-14 rounded-lg bg-primary-fixed flex flex-col items-center justify-center shrink-0 border border-primary-fixed-dim text-center">
+<span class="font-overline text-[10px] uppercase font-bold text-primary">JAN</span>
+<span class="font-fraunces text-[18px] leading-tight font-medium text-primary">27</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2">
+<h3 class="font-caption-medium text-caption-medium text-on-surface font-semibold truncate">Sangeet Night</h3>
+<span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-[#7A1F3D] text-white uppercase tracking-wider">Live now</span>
+</div>
+<p class="font-caption text-[13px] text-secondary mt-0.5">07:30 PM · ITC Kohenur Grand</p>
+<span class="inline-block mt-1 font-overline text-[10px] text-primary uppercase tracking-wider">Formal Evening Attire</span>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="py-4 flex gap-4 items-start">
+<div class="w-14 h-14 rounded-lg bg-surface-container flex flex-col items-center justify-center shrink-0 border border-surface-variant text-center">
+<span class="font-overline text-[10px] uppercase font-bold text-primary">JAN</span>
+<span class="font-fraunces text-[18px] leading-tight font-medium text-on-surface">28</span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="font-caption-medium text-caption-medium text-on-surface font-semibold truncate">Wedding Ceremony &amp; Reception</h3>
+<p class="font-caption text-[13px] text-secondary mt-0.5">09:15 AM Muhurtham · Grand Palace Grounds</p>
+<span class="inline-block mt-1 font-overline text-[10px] text-outline uppercase tracking-wider">Muhurtham &amp; Dinner</span>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-surface-variant mt-4">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>View timeline</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- 4. Three Cards Row: RSVP Summary, Invitations, Pending Payments -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- RSVP Summary -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+<h2 class="font-fraunces text-headline-h3 text-on-surface">RSVP summary</h2>
+<span class="text-caption-medium font-caption-medium text-primary">54% confirmed</span>
+</div>
+<div class="mt-4">
+<div class="flex justify-between items-center text-caption font-caption text-secondary mb-1">
+<span>640 replied</span>
+<span>540 pending</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 54%;"></div>
+</div>
+</div>
+<!-- Breakdown per event with clean bars -->
+<div class="mt-5 space-y-3 font-caption text-[13px]">
+<div>
+<div class="flex justify-between text-secondary mb-1">
+<span>Haldi</span>
+<span class="font-medium text-on-surface">420 guests</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 25%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-secondary mb-1">
+<span>Mehendi</span>
+<span class="font-medium text-on-surface">510 guests</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 32%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-secondary mb-1">
+<span>Sangeet</span>
+<span class="font-medium text-on-surface">860 guests</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 52%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-secondary mb-1">
+<span>Pelli (Wedding)</span>
+<span class="font-medium text-on-surface">1,540 guests</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 85%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-secondary mb-1">
+<span>Reception</span>
+<span class="font-medium text-on-surface">1,820 guests</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 95%;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-5 border-t border-surface-variant mt-6 flex items-center justify-between text-caption-medium font-caption-medium">
+<a class="text-primary hover:text-[#5E1730]" href="#">Send reminders</a>
+<a class="text-secondary hover:text-on-surface" href="#">Download headcount</a>
+</div>
+</div>
+<!-- Invitations -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+<h2 class="font-fraunces text-headline-h3 text-on-surface">Invitations</h2>
+<span class="font-label-badge text-label-badge text-secondary">Dispatch tracking</span>
+</div>
+<div class="grid grid-cols-2 gap-3 mt-4">
+<div class="bg-surface-container p-3 rounded-lg border border-surface-variant/40">
+<span class="text-caption font-caption text-secondary block">Not sent</span>
+<span class="font-fraunces text-[20px] font-medium text-on-surface">210</span>
+</div>
+<div class="bg-surface-container p-3 rounded-lg border border-surface-variant/40">
+<span class="text-caption font-caption text-secondary block">Sent</span>
+<span class="font-fraunces text-[20px] font-medium text-primary">970</span>
+</div>
+<div class="bg-surface-container p-3 rounded-lg border border-surface-variant/40">
+<span class="text-caption font-caption text-secondary block">Link opened</span>
+<span class="font-fraunces text-[20px] font-medium text-[#2F7D5B]">812</span>
+</div>
+<div class="bg-surface-container p-3 rounded-lg border border-surface-variant/40">
+<span class="text-caption font-caption text-secondary block">WhatsApp queue</span>
+<span class="font-fraunces text-[20px] font-medium text-on-surface">97</span>
+</div>
+</div>
+<p class="font-caption text-caption text-secondary mt-5">
+          97 households lack email addresses. Broadcast invitation links directly via WhatsApp Business API gateway.
+        </p>
+</div>
+<div class="pt-5 border-t border-surface-variant mt-6 flex flex-col gap-2.5">
+<button class="w-full h-11 bg-primary-container hover:bg-primary text-on-primary font-caption-medium text-caption-medium rounded-[10px] transition-colors flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Send invitations</span>
+</button>
+<button class="w-full h-11 bg-surface-container-lowest border border-surface-variant hover:border-on-surface text-on-surface font-caption-medium text-caption-medium rounded-[10px] transition-colors flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>WhatsApp list</span>
+</button>
+</div>
+</div>
+<!-- Pending Payments -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+<h2 class="font-fraunces text-headline-h3 text-on-surface">Pending payments</h2>
+<span class="text-label-badge font-label-badge text-[#B42318] font-medium bg-red-50 px-2 py-0.5 rounded-full border border-red-200">₹6,90,000 total</span>
+</div>
+<div class="divide-y divide-surface-variant mt-3">
+<!-- Row 1 -->
+<div class="py-3 flex items-center justify-between">
+<div>
+<p class="font-caption-medium text-caption-medium text-on-surface font-medium">Bloom Decor</p>
+<p class="font-caption text-[12px] text-secondary">Stage &amp; Floral setup</p>
+</div>
+<div class="text-right">
+<span class="font-caption-medium text-caption-medium font-semibold text-on-surface">₹4,50,000</span>
+<p class="font-caption text-[12px] text-[#B42318] font-medium">Due 20 Jan</p>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="py-3 flex items-center justify-between">
+<div>
+<p class="font-caption-medium text-caption-medium text-on-surface font-medium">Royal Caterers</p>
+<p class="font-caption text-[12px] text-secondary">Beverages advance</p>
+</div>
+<div class="text-right">
+<span class="font-caption-medium text-caption-medium font-semibold text-on-surface">₹2,00,000</span>
+<p class="font-caption text-[12px] text-secondary">Due 25 Jan</p>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="py-3 flex items-center justify-between">
+<div>
+<p class="font-caption-medium text-caption-medium text-on-surface font-medium">DJ Beats</p>
+<p class="font-caption text-[12px] text-secondary">Sound equipment rental</p>
+</div>
+<div class="text-right">
+<span class="font-caption-medium text-caption-medium font-semibold text-on-surface">₹40,000</span>
+<p class="font-caption text-[12px] text-secondary">Due 26 Jan</p>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-5 border-t border-surface-variant mt-6">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>View expenses</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- 5. Three Cards Row: Gallery, Wedding Website, Wedding-Day Contacts -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Gallery -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+<h2 class="font-fraunces text-headline-h3 text-on-surface">Gallery</h2>
+<span class="material-symbols-outlined text-[20px] text-outline">photo_library</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-4">
+<div class="bg-surface-container p-3 rounded-lg">
+<span class="font-caption text-caption text-secondary block">Guest photos</span>
+<span class="font-fraunces text-[22px] font-medium text-on-surface">4,230</span>
+</div>
+<div class="bg-surface-container p-3 rounded-lg">
+<span class="font-caption text-caption text-secondary block">Professional</span>
+<span class="font-fraunces text-[22px] font-medium text-secondary">0</span>
+</div>
+</div>
+<div class="mt-4 p-3 rounded-lg bg-surface-container-low border border-surface-variant/40">
+<span class="font-overline text-[10px] uppercase text-outline block mb-1">Latest upload</span>
+<p class="font-caption text-[13px] text-on-surface font-medium leading-snug">
+            Sharma family added 14 photos to Sangeet
+          </p>
+<span class="font-caption text-[11px] text-secondary mt-0.5 block">1h ago</span>
+</div>
+</div>
+<div class="pt-5 border-t border-surface-variant mt-6 flex items-center justify-between font-caption-medium text-caption-medium">
+<a class="text-primary hover:text-[#5E1730]" href="#">Open gallery</a>
+<a class="text-secondary hover:text-on-surface" href="#">Event QR codes</a>
+</div>
+</div>
+<!-- Wedding Website -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+<h2 class="font-fraunces text-headline-h3 text-on-surface">Wedding website</h2>
+<span class="px-2.5 py-0.5 rounded-full text-label-badge font-label-badge bg-[#ECFDF3] text-[#027A48] border border-emerald-200 font-medium">Published</span>
+</div>
+<div class="mt-4">
+<span class="font-overline text-[11px] uppercase tracking-wider text-secondary">Public portal url</span>
+<div class="mt-1.5 p-2.5 bg-surface-container rounded-lg border border-surface-variant flex items-center justify-between">
+<span class="font-caption text-[13px] text-on-surface font-medium truncate select-all">makemymarriage.app/w/lk-2028</span>
+<button class="text-secondary hover:text-on-surface ml-2" onclick="navigator.clipboard?.writeText('https://makemymarriage.app/w/lk-2028')" title="Copy URL" type="button">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<button class="flex-1 py-2 px-3 bg-surface-container-lowest border border-surface-variant rounded-[10px] text-caption-medium font-caption-medium text-on-surface hover:border-on-surface transition-colors flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">link</span>
+<span>Copy link</span>
+</button>
+<button class="flex-1 py-2 px-3 bg-[#25D366]/10 text-[#075E54] border border-[#25D366]/30 rounded-[10px] text-caption-medium font-caption-medium hover:bg-[#25D366]/20 transition-colors flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</button>
+</div>
+<div class="mt-4 pt-3 border-t border-surface-variant flex items-center justify-between font-caption text-caption text-secondary">
+<span>Livestream</span>
+<span class="text-on-surface font-medium">2 of 6 events set</span>
+</div>
+</div>
+<div class="pt-4 border-t border-surface-variant mt-4">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>Configure site settings</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Wedding-Day Contacts -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+<h2 class="font-fraunces text-headline-h3 text-on-surface">Wedding-day contacts</h2>
+<span class="text-label-badge font-label-badge text-secondary">Direct line</span>
+</div>
+<div class="divide-y divide-surface-variant mt-2">
+<div class="py-2.5 flex items-center justify-between">
+<div>
+<p class="font-caption-medium text-caption-medium text-on-surface font-medium">Rajesh Verma</p>
+<p class="font-caption text-[12px] text-secondary">Caterer Lead</p>
+</div>
+<a class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors" href="tel:+919876543210" title="Call">
+<span class="material-symbols-outlined text-[16px]">call</span>
+</a>
+</div>
+<div class="py-2.5 flex items-center justify-between">
+<div>
+<p class="font-caption-medium text-caption-medium text-on-surface font-medium">Ananya Rao</p>
+<p class="font-caption text-[12px] text-secondary">Decorator &amp; Florals</p>
+</div>
+<a class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors" href="tel:+919876543211" title="Call">
+<span class="material-symbols-outlined text-[16px]">call</span>
+</a>
+</div>
+<div class="py-2.5 flex items-center justify-between">
+<div>
+<p class="font-caption-medium text-caption-medium text-on-surface font-medium">Studio Memory</p>
+<p class="font-caption text-[12px] text-secondary">Photographer Head</p>
+</div>
+<a class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors" href="tel:+919876543212" title="Call">
+<span class="material-symbols-outlined text-[16px]">call</span>
+</a>
+</div>
+<div class="py-2.5 flex items-center justify-between">
+<div>
+<p class="font-caption-medium text-caption-medium text-on-surface font-medium">Sunil Reddy</p>
+<p class="font-caption text-[12px] text-secondary">Venue Manager (ITC)</p>
+</div>
+<a class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors" href="tel:+919876543213" title="Call">
+<span class="material-symbols-outlined text-[16px]">call</span>
+</a>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-surface-variant mt-2">
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center justify-between group" href="#">
+<span>View all contacts</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- 6. Recent Activity (Full Width Card) -->
+<div class="w-full bg-surface-container-lowest border border-surface-variant rounded-[14px] p-6 shadow-sm">
+<div class="flex items-center justify-between pb-4 border-b border-surface-variant">
+<div>
+<h2 class="font-fraunces text-headline-h3 text-on-surface">Recent activity</h2>
+<span class="font-caption text-caption text-secondary">Real-time audit log of team actions and guest confirmations</span>
+</div>
+<a class="font-caption-medium text-caption-medium text-primary hover:text-[#5E1730] flex items-center gap-1" href="#">
+<span>View full activity log</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="divide-y divide-surface-variant mt-2">
+<!-- Activity 1 -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-[#F4E8EC] text-primary flex items-center justify-center font-caption-medium text-caption-medium font-semibold shrink-0">
+          P
+        </div>
+<div class="flex-1 min-w-0 flex items-center justify-between gap-4">
+<p class="font-body-default text-caption-medium text-on-surface truncate">
+<strong class="font-medium">Priya</strong> completed “Order return gifts”
+          </p>
+<span class="font-caption text-caption text-secondary whitespace-nowrap">2h ago</span>
+</div>
+</div>
+<!-- Activity 2 -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-[#E9E1DD] text-on-surface flex items-center justify-center font-caption-medium text-caption-medium font-semibold shrink-0">
+          R
+        </div>
+<div class="flex-1 min-w-0 flex items-center justify-between gap-4">
+<p class="font-body-default text-caption-medium text-on-surface truncate">
+<strong class="font-medium">Ramesh Sharma family</strong> RSVP'd for Pelli (4 guests)
+          </p>
+<span class="font-caption text-caption text-secondary whitespace-nowrap">3h ago</span>
+</div>
+</div>
+<!-- Activity 3 -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-[#F4E8EC] text-primary flex items-center justify-center font-caption-medium text-caption-medium font-semibold shrink-0">
+          V
+        </div>
+<div class="flex-1 min-w-0 flex items-center justify-between gap-4">
+<p class="font-body-default text-caption-medium text-on-surface truncate">
+<strong class="font-medium">Venu</strong> added expense ₹45,000 Decor
+          </p>
+<span class="font-caption text-caption text-secondary whitespace-nowrap">yesterday</span>
+</div>
+</div>
+<!-- Activity 4 -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-[#E9E1DD] text-on-surface flex items-center justify-center font-caption-medium text-caption-medium font-semibold shrink-0">
+          K
+        </div>
+<div class="flex-1 min-w-0 flex items-center justify-between gap-4">
+<p class="font-body-default text-caption-medium text-on-surface truncate">
+<strong class="font-medium">Karthik</strong> uploaded seating layout for Reception
+          </p>
+<span class="font-caption text-caption text-secondary whitespace-nowrap">1d ago</span>
+</div>
+</div>
+<!-- Activity 5 -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-[#E8E2DA] text-on-surface flex items-center justify-center font-caption-medium text-caption-medium font-semibold shrink-0">
+          K
+        </div>
+<div class="flex-1 min-w-0 flex items-center justify-between gap-4">
+<p class="font-body-default text-caption-medium text-on-surface truncate">
+            Invitation link opened by <strong class="font-medium">Kapoor family</strong>
+</p>
+<span class="font-caption text-caption text-secondary whitespace-nowrap">2d ago</span>
+</div>
+</div>
+<!-- Activity 6 -->
+<div class="py-3.5 flex items-center gap-4 hover:bg-surface-container-low transition-colors px-2 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-[#F4E8EC] text-primary flex items-center justify-center font-caption-medium text-caption-medium font-semibold shrink-0">
+          S
+        </div>
+<div class="flex-1 min-w-0 flex items-center justify-between gap-4">
+<p class="font-body-default text-caption-medium text-on-surface truncate">
+            Photographer access key generated for <strong class="font-medium">Studio Memory</strong>
+</p>
+<span class="font-caption text-caption text-secondary whitespace-nowrap">3d ago</span>
+</div>
+</div>
+</div>
+</div>
+</div></div></main></div></body></html>

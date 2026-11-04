@@ -59,6 +59,11 @@ Weights: regular (400) for text, medium (500) for buttons, links, active nav and
 - **Text link:** `accent`, medium weight, `accent-hover` on hover.
 - **Monogram:** "LK" in Fraunces inside a thin (1px) `accent` circle. Text and CSS only, no image.
 - **Navigation item:** `small` text, 44px tall. Active: `accent-tint` background with `accent` text. Unavailable: `text-muted` with a "Soon" caption, not a link.
+- **Card** (`components/ui/Card.tsx`): the card style above with 24px padding, a Fraunces `heading` title, an optional muted note on the right, and an optional footer row above a `border` rule. The footer's **card link** is a text link with a → arrow, or `text-muted` with "Soon" when its page doesn't exist yet.
+- **Stat:** `small` muted label, value in Fraunces `title`, optional `small` muted detail.
+- **Progress bar:** 8px tall, fully rounded, `border` track with an `accent` fill (or a status colour). Announced to screen readers as a percentage with a label.
+- **Badge:** pill (`rounded-full`), `caption` medium text, 1px border. Neutral is `text-muted` on `border`; accent is `accent` on `accent-tint`; status badges use `success`, `warning` or `danger` text with a 30% border of the same colour and no fill.
+- **Empty state (in a card):** centred medium title, optional `small` muted line, optional action.
 - **Focus:** every interactive element shows a 2px `accent` outline on keyboard focus (`focus-visible`).
 
 ## Layout

@@ -17,6 +17,8 @@ const modules = [
   "gallery",
   "notifications",
   "activity",
+  // Owns no collections; composes the others (docs/decisions.md, decision 42).
+  "dashboard",
 ];
 
 const message =
