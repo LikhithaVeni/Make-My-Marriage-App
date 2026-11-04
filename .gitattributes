@@ -1,0 +1,8 @@
+# Always LF in the working tree, on every OS: Prettier expects LF, and Git's
+# core.autocrlf=true on Windows would otherwise check files out as CRLF.
+* text=auto eol=lf
+
+# Binary files.
+*.png binary
+*.jpg binary
+*.ico binary
