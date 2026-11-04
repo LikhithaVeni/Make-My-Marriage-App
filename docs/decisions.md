@@ -106,3 +106,13 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
 44. **No real data reaches the dashboard before auth.** `/dashboard` has no login yet, so anyone with a Preview URL can open it. It shows only sample data (fake names, and phone numbers in the unassigned `+91 00000` range so call buttons ring nobody) until auth protects it; `getDashboard()` switches to real data only after that.
 45. **The new-wedding checklist.** The PRD's empty-state checklist (key flow F1: invite members, add events, add tasks, add guests) is a "Get started" card under the countdown. Each step ticks itself off from the dashboard totals, so `totals` gains `members` (organisers, including the viewer). The card disappears once all four are done. The other cards show their own empty states meanwhile. While the dashboard uses sample data, `/dashboard?sample=empty` shows a brand-new wedding and, in development only, `/dashboard?sample=error` the error state ("Couldn't load the dashboard" with Try again); the parameter goes away with the sample data.
 46. **The Admin storage figure is deferred to Phase 3.** System Design's dashboard shows Admins their storage used against the free-tier limit, and the dashboard response already carries `storage.usedBytes`, but nothing displays it yet: storage only grows once photo uploads exist (Phase 3). It will show with the gallery, probably in the sidebar as in the Stitch design.
+
+## Landing page (November 2026)
+
+47. **The landing page follows Stitch's `landing-page-desktop` and `landing-page-mobile`, with its copy corrected to what the PRD and System Design actually promise.**
+    - The hero's dashboard picture is a static illustration whose figures match the dashboard sample, never live data: the page is public.
+    - Photos: "original raw resolution" and "without compression" are dropped; System Design resizes photos in the browser to about 2,000px.
+    - Guests receive their link by WhatsApp or email (PRD), not SMS. RSVP is per event with a headcount; there are no dietary notes.
+    - Family team: roles give access to tasks, expenses, vendors and guests; there are no budgets (decision 39).
+    - Dropped because nothing backs them: the "Privacy" footer link (no privacy page yet), the fake `kalis-era.workspace/live` address, and the mobile bottom tab bar ("Overview, Suites, Concierge, Inquire").
+    - Icons are inline SVG, not Google's Material Symbols font, so the page makes no requests to Google (decision 28). No drop shadows (design system: cards have none).
