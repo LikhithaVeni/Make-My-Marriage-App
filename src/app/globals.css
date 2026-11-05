@@ -17,6 +17,9 @@
   --color-success: #386a50;
   --color-warning: #98651b;
   --color-danger: #a23a3a;
+  /* Illustration only: never for text or status (docs/design-system.md). */
+  --color-marigold: #e8a838;
+  --color-marigold-deep: #c9761e;
 
   --text-*: initial;
   --text-display: 48px;
