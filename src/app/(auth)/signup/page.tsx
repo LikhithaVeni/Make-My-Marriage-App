@@ -1,25 +1,43 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Monogram } from "@/components/brand/Monogram";
+import { SignupForm } from "@/components/auth/SignupForm";
+import { cardSurface } from "@/components/ui/Card";
+
+export const metadata: Metadata = { title: "Sign up · Make My Marriage" };
+
+const linkClass =
+  "rounded-control font-medium text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-accent";
 
 export default function SignupPage() {
   return (
-    <main className="flex min-h-dvh items-center justify-center px-4 py-16">
-      <section className="w-full max-w-sm rounded-card border border-border bg-surface p-8 text-center">
-        <div className="flex justify-center">
-          <Monogram />
-        </div>
-        <h1 className="mt-4 font-display text-heading">Sign up</h1>
-        <p className="mt-2 text-small text-text-muted">
-          Signing up is coming soon.
+    <>
+      <section
+        aria-labelledby="signup-title"
+        className={`p-6 md:p-8 ${cardSurface}`}
+      >
+        <h1 id="signup-title" className="font-display text-title text-text">
+          Create your account
+        </h1>
+        <p className="mt-1 text-text-muted">
+          Start here, then set up your wedding and invite the family.
         </p>
-        <Link
-          href="/"
-          className="mt-6 inline-block rounded-control text-small font-medium text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          Back to home
-        </Link>
+        <div className="mt-6">
+          <SignupForm />
+        </div>
       </section>
-    </main>
+      <div className="mt-6 flex flex-col gap-3 text-center text-small text-text-muted">
+        <p>
+          Invited by your family? Use the link in your invite email instead, so
+          you join their wedding.
+        </p>
+        <p>
+          Already have an account?{" "}
+          <Link href="/login" className={linkClass}>
+            Log in
+          </Link>
+        </p>
+      </div>
+    </>
   );
 }

@@ -16,7 +16,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "KaLi's era · Make My Marriage",
+  title: "Make My Marriage",
   description:
     "A private space for the family to plan the wedding together: events, tasks, guests and photos.",
 };

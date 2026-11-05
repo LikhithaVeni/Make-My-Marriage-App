@@ -1,6 +1,6 @@
 # Design system
 
-The visual foundation for Make My Marriage, branded **KaLi's era**. Every colour, font size and corner radius in the app comes from this page. The tokens live in `src/app/globals.css` (Tailwind `@theme`), which removes Tailwind's default colours, font sizes and radii. Anything not listed here isn't available until it's added here first.
+The visual foundation for **Make My Marriage**, the product. Each wedding inside it has its own title (the first is "KaLi's era") and monogram; see decision 48. Every colour, font size and corner radius in the app comes from this page. The tokens live in `src/app/globals.css` (Tailwind `@theme`), which removes Tailwind's default colours, font sizes and radii. Anything not listed here isn't available until it's added here first.
 
 ## Colour
 
@@ -57,13 +57,16 @@ Weights: regular (400) for text, medium (500) for buttons, links, active nav and
 - **Primary button:** `accent` background, `surface` text, 44px tall, `accent-hover` on hover. Use one per view.
 - **Secondary button:** `surface` background, 1px `accent` border, `accent` text, `accent-tint` on hover.
 - **Text link:** `accent`, medium weight, `accent-hover` on hover.
-- **Monogram:** "LK" in Fraunces inside a thin (1px) `accent` circle. Text and CSS only, no image.
+- **Wordmark (product):** "Make My Marriage" in Fraunces, medium, `accent`. Used on public pages: landing, sign up, log in.
+- **Monogram (wedding):** the couple's initials ("LK" for KaLi's era) in Fraunces inside a thin (1px) `accent` circle. Text and CSS only, no image.
 - **Navigation item:** `small` text, 44px tall. Active: `accent-tint` background with `accent` text. Unavailable: `text-muted` with a "Soon" caption, not a link.
 - **Card** (`components/ui/Card.tsx`): the card style above with 24px padding, a Fraunces `heading` title, an optional muted note on the right, and an optional footer row above a `border` rule. The footer's **card link** is a text link with a → arrow, or `text-muted` with "Soon" when its page doesn't exist yet.
 - **Stat:** `small` muted label, value in Fraunces `title`, optional `small` muted detail.
 - **Progress bar:** 8px tall, fully rounded, `border` track with an `accent` fill (or a status colour). Announced to screen readers as a percentage with a label.
 - **Badge:** pill (`rounded-full`), `caption` medium text, 1px border. Neutral is `text-muted` on `border`; accent is `accent` on `accent-tint`; status badges use `success`, `warning` or `danger` text with a 30% border of the same colour and no fill.
 - **Empty state (in a card):** centred medium title, optional `small` muted line, optional action.
+- **Text field** (`components/ui/TextField.tsx`): `small` medium label above, 44px input with `rounded-control` and a 1px `border` (`danger` when invalid), `accent` focus ring, and a `small` hint (`text-muted`) or error (`danger`) below, linked for screen readers. Password fields add a 44px show/hide button.
+- **Form alert:** a `rounded-control` box with a 30% `danger` border, a `danger` icon and title, and a muted line of help. No fill.
 - **Focus:** every interactive element shows a 2px `accent` outline on keyboard focus (`focus-visible`).
 
 ## Layout
