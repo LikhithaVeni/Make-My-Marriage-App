@@ -65,6 +65,8 @@ Weights: regular (400) for text, medium (500) for buttons, links, active nav and
 - **Progress bar:** 8px tall, fully rounded, `border` track with an `accent` fill (or a status colour). Announced to screen readers as a percentage with a label.
 - **Badge:** pill (`rounded-full`), `caption` medium text, 1px border. Neutral is `text-muted` on `border`; accent is `accent` on `accent-tint`; status badges use `success`, `warning` or `danger` text with a 30% border of the same colour and no fill.
 - **Empty state (in a card):** centred medium title, optional `small` muted line, optional action.
+- **Text field** (`components/ui/TextField.tsx`): `small` medium label above, 44px input with `rounded-control` and a 1px `border` (`danger` when invalid), `accent` focus ring, and a `small` hint (`text-muted`) or error (`danger`) below, linked for screen readers. Password fields add a 44px show/hide button.
+- **Form alert:** a `rounded-control` box with a 30% `danger` border, a `danger` icon and title, and a muted line of help. No fill.
 - **Focus:** every interactive element shows a 2px `accent` outline on keyboard focus (`focus-visible`).
 
 ## Layout

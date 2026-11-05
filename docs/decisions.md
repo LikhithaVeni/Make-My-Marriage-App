@@ -117,3 +117,13 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
     - Dropped because nothing backs them: the "Privacy" footer link (no privacy page yet), the fake `kalis-era.workspace/live` address, and the mobile bottom tab bar ("Overview, Suites, Concierge, Inquire").
     - Icons are inline SVG, not Google's Material Symbols font, so the page makes no requests to Google (decision 28). No drop shadows (design system: cards have none).
 48. **"Make My Marriage" is the product; "KaLi's era" is a wedding.** The PRD names the product Make My Marriage, and F1 has a visitor sign up and then create a wedding with a title (for us, "KaLi's era"). The scaffold had treated KaLi's era as the app's brand; that is corrected here. Public pages (landing, sign up, log in) carry the **Make My Marriage** wordmark, the landing page's main action is **Create your wedding** (→ sign up) with **Log in** beside it, and its dashboard picture is labelled as an example wedding. Inside the app, the sidebar and mobile menu still show "KaLi's era" and its LK monogram; they switch to the signed-in wedding's own title and initials once the Create wedding step exists. The landing page itself is not in the PRD's screen list; it was added at the owner's request as the intro before sign up.
+
+## Sign up and log in (November 2026)
+
+49. **Sign up and log in share Stitch's log-in layout** (`log-in-*` screens): the product's intro on the left, the form on the right; on phones the intro shrinks to the wordmark above the form. Stitch has no sign-up design, so sign up reuses the log-in layout.
+    - Branded Make My Marriage (decision 48), not "KaLi's era · by Make My Marriage".
+    - **No "Keep me signed in".** Every session lasts 30 days and slides while in use (System Design), so the checkbox would change nothing. Stitch's "30-day session", "256-bit encrypted space", "Executive suite" and "Concierge" are dropped as unbacked claims.
+    - Field rules come from API Design (name required; password 10–128 characters and not the email) and live in `src/lib/auth-rules.ts`, shared by the forms and, later, the API, so the two can't disagree.
+    - A wrong email or password shows one message for both (API Design), an already-registered email shows "Log in instead" (PRD F1), and a locked account says it is locked for 15 minutes.
+    - After signing up or logging in, an unverified account goes to `/verify-email`, a verified one with no wedding to `/wedding/new`, and everyone else to `/dashboard` (PRD F1). Until the auth API exists, the forms say "Accounts aren't switched on yet."
+    - "Forgot password?" shows "Soon" until the reset email exists (it needs Resend).
