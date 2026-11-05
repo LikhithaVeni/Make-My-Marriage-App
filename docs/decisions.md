@@ -120,10 +120,11 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
 
 ## Sign up and log in (November 2026)
 
-49. **Sign up and log in share Stitch's log-in layout** (`log-in-*` screens): the product's intro on the left, the form on the right; on phones the intro shrinks to the wordmark above the form. Stitch has no sign-up design, so sign up reuses the log-in layout.
+49. **Sign up and log in follow Stitch's log-in layout** (`log-in-*` screens) **dressed like the landing page**: the landing header, cream background, the landing's intro on the left and the form card on the right; on phones the intro is hidden so the form sits under the header. Stitch has no sign-up design, so sign up reuses the log-in layout. The header's section links point to `/#features` etc. so they work from these pages too.
     - Branded Make My Marriage (decision 48), not "KaLi's era · by Make My Marriage".
     - **No "Keep me signed in".** Every session lasts 30 days and slides while in use (System Design), so the checkbox would change nothing. Stitch's "30-day session", "256-bit encrypted space", "Executive suite" and "Concierge" are dropped as unbacked claims.
     - Field rules come from API Design (name required; password 10–128 characters and not the email) and live in `src/lib/auth-rules.ts`, shared by the forms and, later, the API, so the two can't disagree.
     - A wrong email or password shows one message for both (API Design), an already-registered email shows "Log in instead" (PRD F1), and a locked account says it is locked for 15 minutes.
-    - After signing up or logging in, an unverified account goes to `/verify-email`, a verified one with no wedding to `/wedding/new`, and everyone else to `/dashboard` (PRD F1). Until the auth API exists, the forms say "Accounts aren't switched on yet."
+    - After signing up or logging in, an unverified account goes to `/verify` (System Design's `(auth)/verify`; without a token it says "check your email", with one it verifies), a verified one with no wedding to `/wedding/new` (the docs name the Create wedding screen but not its path), and everyone else to `/dashboard` (PRD F1). Until the auth API exists, the forms say "Accounts aren't switched on yet."
+    - Verify and reset tokens are stored in `authTokens` as Database Design specifies; System Design's module table calls the collection `passwordResets`, an older name.
     - "Forgot password?" shows "Soon" until the reset email exists (it needs Resend).

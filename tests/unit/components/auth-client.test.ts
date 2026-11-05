@@ -17,9 +17,7 @@ const session = (overrides: Partial<AuthSession> = {}): AuthSession => ({
 describe("pathAfterAuth (PRD flow F1)", () => {
   it("sends unverified accounts to verify their email first", () => {
     const user = { ...session().user, emailVerified: false };
-    expect(pathAfterAuth(session({ user, wedding: null }))).toBe(
-      "/verify-email",
-    );
+    expect(pathAfterAuth(session({ user, wedding: null }))).toBe("/verify");
   });
 
   it("sends a verified user with no wedding to create one", () => {

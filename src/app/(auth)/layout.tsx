@@ -1,43 +1,56 @@
-import Link from "next/link";
+import { LandingHeader } from "@/components/landing/LandingHeader";
 
-import { Wordmark } from "@/components/brand/Wordmark";
+const promises = [
+  "Every ceremony, task and vendor in one place",
+  "The couple and both families plan together",
+  "Guest lists, payments and photos stay private",
+];
 
 /**
- * Sign up and log in share the Stitch login layout: the product's intro on
- * the left, the form on the right. On phones the intro shrinks to a header
- * above the form.
+ * Sign up and log in look like the landing page: the same header, the
+ * product's intro on the left and the form card on the right. On phones the
+ * intro is hidden so the form sits right under the header.
  */
 export default function AuthLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="min-h-dvh md:p-6 lg:p-10">
-      <div className="mx-auto grid min-h-dvh max-w-6xl grid-rows-[auto_1fr] overflow-hidden md:min-h-[calc(100dvh-3rem)] md:rounded-card md:border md:border-border lg:min-h-[calc(100dvh-5rem)] lg:grid-cols-2 lg:grid-rows-1">
-        <aside className="flex flex-col border-b border-border bg-surface px-4 py-5 md:px-12 md:py-10 lg:border-r lg:border-b-0">
-          <Link
-            href="/"
-            className="self-start rounded-control focus-visible:outline-2 focus-visible:outline-accent"
-          >
-            <Wordmark />
-          </Link>
-          <div className="my-auto hidden py-12 lg:block">
-            <div className="h-px w-10 bg-border" />
-            <p className="mt-6 font-display text-title text-text">
-              From Haldi to Reception, nothing slips through.
-            </p>
-            <p className="mt-4 max-w-sm text-text-muted">
-              A private workspace where the couple and their families plan the
-              wedding together: events, tasks, guests, money and memories.
-            </p>
-          </div>
-          <p className="hidden text-caption text-text-muted lg:block">
-            © 2026 Make My Marriage
+    <>
+      <LandingHeader />
+      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-8 md:px-8 md:py-16 lg:grid-cols-2 lg:py-20">
+        <div className="hidden min-w-0 lg:block">
+          <p className="text-caption font-medium tracking-wider text-accent uppercase">
+            Private wedding workspace
           </p>
-        </aside>
-        <main className="flex items-start justify-center px-4 py-8 md:items-center md:px-12">
-          <div className="w-full max-w-md">{children}</div>
-        </main>
+          <p className="mt-4 font-display text-display text-text">
+            From Haldi to Reception, nothing slips through.
+          </p>
+          <p className="mt-4 max-w-lg text-text-muted">
+            Make My Marriage is one private place where the couple and their
+            families plan the wedding together.
+          </p>
+          <ul className="mt-8 flex flex-col gap-3">
+            {promises.map((promise) => (
+              <li key={promise} className="flex items-center gap-3 text-text">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-5 shrink-0 text-accent"
+                >
+                  <path d="m5 12 5 5 9-10" />
+                </svg>
+                {promise}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <main className="mx-auto w-full max-w-md lg:mr-0">{children}</main>
       </div>
-    </div>
+    </>
   );
 }

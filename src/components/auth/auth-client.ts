@@ -12,7 +12,7 @@ export interface AuthSession {
  * email first, then a user with no wedding creates one, then the dashboard.
  */
 export function pathAfterAuth(session: AuthSession): string {
-  if (!session.user.emailVerified) return "/verify-email";
+  if (!session.user.emailVerified) return "/verify";
   if (!session.wedding) return "/wedding/new";
   return "/dashboard";
 }

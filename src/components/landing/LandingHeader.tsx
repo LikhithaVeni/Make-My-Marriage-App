@@ -4,9 +4,9 @@ import { Wordmark } from "@/components/brand/Wordmark";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 
 const sections = [
-  { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "For guests", href: "#for-guests" },
+  { label: "Features", href: "/#features" },
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "For guests", href: "/#for-guests" },
 ];
 
 const linkClass =
