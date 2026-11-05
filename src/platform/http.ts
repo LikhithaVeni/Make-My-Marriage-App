@@ -38,6 +38,19 @@ export function ok<T>(data: T, options: ResponseOptions = {}) {
   return json({ data }, options.status ?? 200, options);
 }
 
+/** 204 with no body, e.g. after logging out. */
+export function noContent(options: ResponseOptions = {}) {
+  const response = new NextResponse(null, {
+    status: 204,
+    headers: options.headers,
+  });
+  response.headers.set(
+    REQUEST_ID_HEADER,
+    options.requestId ?? createRequestId(),
+  );
+  return response;
+}
+
 export function list<T>(data: T[], page: Page, options: ResponseOptions = {}) {
   return json({ data, page }, options.status ?? 200, options);
 }

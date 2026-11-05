@@ -3,7 +3,13 @@ import { ApiError } from "@/lib/api-client";
 /** What signup and login return (docs/API Design v1.md, "Signup" and "Login"). */
 export interface AuthSession {
   user: { id: string; name: string; email: string; emailVerified: boolean };
-  wedding: { id: string; title: string } | null;
+  wedding: {
+    id: string;
+    title: string;
+    date: string;
+    slug: string;
+    monogram: string;
+  } | null;
   role: "ADMIN" | "MANAGER" | "PHOTOGRAPHER" | null;
 }
 
@@ -11,10 +17,23 @@ export interface AuthSession {
  * Where to go once signed in (PRD flow F1): unverified accounts confirm their
  * email first, then a user with no wedding creates one, then the dashboard.
  */
-export function pathAfterAuth(session: AuthSession): string {
+export function pathAfterAuth(
+  session: AuthSession,
+  next?: string | null,
+): string {
   if (!session.user.emailVerified) return "/verify";
   if (!session.wedding) return "/wedding/new";
-  return "/dashboard";
+  return safeNext(next) ?? "/dashboard";
+}
+
+/**
+ * A page to return to after logging in, from `/login?next=…`. Only paths on
+ * this site: "//evil.example" or "https://…" would send the user elsewhere.
+ */
+export function safeNext(next?: string | null): string | null {
+  if (!next || !next.startsWith("/") || next.startsWith("//")) return null;
+  if (next.includes("\\")) return null;
+  return next;
 }
 
 export interface AlertMessage {

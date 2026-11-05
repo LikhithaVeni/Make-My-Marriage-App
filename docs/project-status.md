@@ -15,13 +15,68 @@ branch), **Next**, **Later**.
 | Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1    | 2026-11-04 |
 | Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2      | 2026-11-05 |
 | Permission checks and rate limits (platform)   | In progress | `feature/foundation-platform` | 2026-11-05 |
-| Accounts: database, sign-up and log-in API     | Next        | —                             | —          |
-| Dashboard only after login (`proxy.ts`)        | Later       | —                             | —          |
-| Create wedding (`/wedding/new`)                | Later       | —                             | —          |
-| Email verification and forgot password         | Later       | —                             | —          |
+| Accounts: database, sign-up and log-in API     | In progress | `feature/auth-api`            | 2026-11-05 |
+| Dashboard only after login (`proxy.ts`)        | In progress | `feature/auth-api`            | 2026-11-06 |
+| Create wedding (`/wedding/new`)                | In progress | `feature/auth-api`            | 2026-11-06 |
+| Email verification and forgot password         | In progress | `feature/auth-api`            | 2026-11-06 |
 | Landing page: features, how it works, footer   | Later       | —                             | —          |
 
 ## Log
+
+### 2026-11-06: The app is protected (In progress)
+
+- Logged-out visitors are sent to log in and brought back afterwards;
+  unverified users go to verify, users without a wedding to Create wedding.
+- Log out in the sidebar and mobile menu, beside the user's name.
+- Manual test in Edge of every auth flow (sign up, verify, log in, lockout,
+  rate limit, forgot and reset, create wedding, log out): all pass. One bug
+  found and fixed on the way (an old address error hid "This address is free").
+- End-to-end tests log in with a seeded account in their own database.
+- **Known:** the dashboard's cards, including the countdown, still show the
+  sample wedding.
+- Decision 58.
+
+### 2026-11-06: Forgot and reset password (In progress)
+
+- "Forgot password?" on log in opens `/forgot`; the emailed link
+  `/reset?token=…` sets a new password, logs out every other device and
+  logs in. Links work once, for an hour, and only the newest counts.
+- Emails print in the server terminal until Resend is set up.
+- Decision 57.
+
+### 2026-11-06: Create wedding (In progress)
+
+- `/wedding/new`: the PRD's setup fields (bride, groom, wedding name, date,
+  city, website address, tagline, description); the address is checked while
+  typing, with suggestions when taken. The cover image waits for photo
+  storage.
+- `POST /api/v1/wedding` creates the wedding and the Admin membership in one
+  transaction; `GET /api/v1/wedding/slug-available` checks an address.
+- Log-in now remembers the user's wedding; the sidebar shows its name and
+  monogram.
+- **Still open:** the dashboard isn't protected yet and still shows sample
+  data.
+- Decision 56.
+
+### 2026-11-05: Accounts API (In progress)
+
+- `src/modules/auth`: users, sessions and authTokens models; sign-up,
+  log-in, log-out and current-user logic. Passwords use bcrypt (cost 12);
+  sessions are 32 random bytes stored as a SHA-256 hash, 30 days, sliding at
+  most once a day; 5 wrong passwords lock the account for 15 minutes.
+- Routes: `POST /api/v1/auth/signup`, `/login`, `/logout` and
+  `GET /api/v1/auth/me`, with the `mmm_session` cookie, the CSRF header and
+  per-IP rate limits.
+- Sign-up "sends" the verification email by printing it in the server
+  terminal (decision 51).
+- **Email verification:** `/verify` asks a signed-in user to check their inbox
+  (with "Resend email", at most 3 an hour, and "Log out"); the emailed link
+  `/verify?token=…` confirms the email once, within 24 hours. Routes
+  `POST /api/v1/auth/verify` and `/verify/resend`.
+- **Connected to MongoDB Atlas** (free cluster MMM, Mumbai). All 19 database
+  tests pass against it; sign-up and log-in work in the browser.
+- Decisions 51–53.
+- Also on this branch: the Make My Marriage logo (linked rings with shine lines, decision 54) and a drawn mandap illustration with "what's waiting" information on log in and sign up (decision 55).
 
 ### 2026-11-05: Permission checks and rate limits (In progress)
 
@@ -86,12 +141,8 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Accounts:**
-   - connect MongoDB (needs `MONGODB_URI` in `.env.local`);
-   - users, sessions and authTokens;
-   - sign-up, log-in, log-out and current-user API routes.
-2. **Protect the app:** the dashboard opens only after login.
-3. **Create wedding:** then the dashboard shows the signed-in wedding.
+1. **Members and invites:** invite family as Admin or Manager (needs Resend).
+2. **Dashboard on the real wedding:** replace the sample data as events, tasks and money arrive.
 
 ## Roadmap
 
@@ -111,15 +162,19 @@ owner's request, so the family could see the look early.
 
 ## Temporary until a later feature
 
-| What                                                                 | Goes away with                    |
-| -------------------------------------------------------------------- | --------------------------------- |
-| Dashboard shows sample data                                          | Events, tasks, expenses and so on |
-| Sidebar and mobile menu always show "KaLi's era" and the LK monogram | Create wedding                    |
-| Sign-up and log-in forms say "Accounts aren't switched on yet."      | Accounts API                      |
-| "Forgot password?" shows "Soon"                                      | Email (Resend)                    |
-| Anyone can open `/dashboard` without logging in                      | Protect the app (`proxy.ts`)      |
+| What                                                            | Goes away with                    |
+| --------------------------------------------------------------- | --------------------------------- |
+| Dashboard shows sample data                                     | Events, tasks, expenses and so on |
+| Sign-up and log-in forms say "Accounts aren't switched on yet." | Accounts API                      |
 
 ## Housekeeping
+
+- **Production indexes:** Mongoose builds indexes only outside production
+  (decision 25); Database Design's setup script that creates them (unique
+  email, slug and tokens, TTLs) is still to be written before the first
+  deploy.
+- **CI test database:** add `MONGODB_TEST_URI` as a GitHub secret so CI runs
+  the database and logged-in end-to-end tests.
 
 - **Rotate the Stitch API key.** It was shared in a chat. The key lives only
   in the user-level Claude settings and must never be committed.
