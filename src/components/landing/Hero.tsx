@@ -1,11 +1,15 @@
+import Link from "next/link";
+
 import { cardSurface } from "@/components/ui/Card";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 
-// An illustration of the dashboard, not live data: the landing page is public,
-// so it must never show a real wedding (docs/decisions.md, decision 47). The
-// figures match the dashboard's sample so the two pages tell the same story.
+// An illustration of an example wedding's dashboard, not live data: the
+// landing page is public, so it must never show a real wedding (docs/decisions.md,
+// decisions 47 and 48). The figures match the dashboard's sample.
 const preview = {
+  wedding: "KaLi's era",
+  date: "28 Jan 2028",
   daysLeft: 451,
   tasksDone: 31,
   tasksTotal: 82,
@@ -28,11 +32,16 @@ function DashboardPreview() {
         <span className="size-2 rounded-full bg-border" />
         <span className="size-2 rounded-full bg-border" />
         <span className="size-2 rounded-full bg-border" />
-        <span className="ml-auto text-caption text-text-muted">Dashboard</span>
+        <span className="ml-auto text-caption text-text-muted">
+          Example wedding
+        </span>
       </div>
       <div className="mt-4 flex flex-col gap-3 rounded-control bg-bg p-3">
         <div className={`p-4 ${cardSurface}`}>
-          <p className="font-display text-heading text-text">
+          <p className="text-caption font-medium tracking-wider text-text-muted uppercase">
+            {preview.wedding} · {preview.date}
+          </p>
+          <p className="mt-1 font-display text-heading text-text">
             {preview.daysLeft} days to go
           </p>
           <p className="mt-1 text-caption text-text-muted">
@@ -98,7 +107,7 @@ export function Hero() {
     >
       <div className="min-w-0">
         <p className="text-caption font-medium tracking-wider text-accent uppercase">
-          KaLi&apos;s era · 28 January 2028
+          Private wedding workspace
         </p>
         <h1
           id="hero-title"
@@ -107,15 +116,25 @@ export function Hero() {
           From Haldi to Reception, nothing slips through.
         </h1>
         <p className="mt-4 max-w-lg text-text-muted">
-          One private workspace for our family to plan every event, guest, rupee
+          Make My Marriage is one private place where the couple and their
+          families plan the wedding together: every event, task, guest, rupee
           and memory, so the wedding day feels easy.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href="/dashboard">Open dashboard</ButtonLink>
+          <ButtonLink href="/signup">Create your wedding</ButtonLink>
           <ButtonLink href="#how-it-works" variant="secondary">
             See how it works
           </ButtonLink>
         </div>
+        <p className="mt-4 text-small text-text-muted">
+          Already planning?{" "}
+          <Link
+            href="/login"
+            className="rounded-control font-medium text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            Log in
+          </Link>
+        </p>
       </div>
       <DashboardPreview />
     </section>

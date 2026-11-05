@@ -1,6 +1,6 @@
 # Design system
 
-The visual foundation for Make My Marriage, branded **KaLi's era**. Every colour, font size and corner radius in the app comes from this page. The tokens live in `src/app/globals.css` (Tailwind `@theme`), which removes Tailwind's default colours, font sizes and radii. Anything not listed here isn't available until it's added here first.
+The visual foundation for **Make My Marriage**, the product. Each wedding inside it has its own title (the first is "KaLi's era") and monogram; see decision 48. Every colour, font size and corner radius in the app comes from this page. The tokens live in `src/app/globals.css` (Tailwind `@theme`), which removes Tailwind's default colours, font sizes and radii. Anything not listed here isn't available until it's added here first.
 
 ## Colour
 
@@ -57,7 +57,8 @@ Weights: regular (400) for text, medium (500) for buttons, links, active nav and
 - **Primary button:** `accent` background, `surface` text, 44px tall, `accent-hover` on hover. Use one per view.
 - **Secondary button:** `surface` background, 1px `accent` border, `accent` text, `accent-tint` on hover.
 - **Text link:** `accent`, medium weight, `accent-hover` on hover.
-- **Monogram:** "LK" in Fraunces inside a thin (1px) `accent` circle. Text and CSS only, no image.
+- **Wordmark (product):** "Make My Marriage" in Fraunces, medium, `accent`. Used on public pages: landing, sign up, log in.
+- **Monogram (wedding):** the couple's initials ("LK" for KaLi's era) in Fraunces inside a thin (1px) `accent` circle. Text and CSS only, no image.
 - **Navigation item:** `small` text, 44px tall. Active: `accent-tint` background with `accent` text. Unavailable: `text-muted` with a "Soon" caption, not a link.
 - **Card** (`components/ui/Card.tsx`): the card style above with 24px padding, a Fraunces `heading` title, an optional muted note on the right, and an optional footer row above a `border` rule. The footer's **card link** is a text link with a → arrow, or `text-muted` with "Soon" when its page doesn't exist yet.
 - **Stat:** `small` muted label, value in Fraunces `title`, optional `small` muted detail.
