@@ -128,3 +128,10 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
     - After signing up or logging in, an unverified account goes to `/verify` (System Design's `(auth)/verify`; without a token it says "check your email", with one it verifies), a verified one with no wedding to `/wedding/new` (the docs name the Create wedding screen but not its path), and everyone else to `/dashboard` (PRD F1). Until the auth API exists, the forms say "Accounts aren't switched on yet."
     - Verify and reset tokens are stored in `authTokens` as Database Design specifies; System Design's module table calls the collection `passwordResets`, an older name.
     - "Forgot password?" shows "Soon" until the reset email exists (it needs Resend).
+
+## Platform (November 2026)
+
+50. **`authorize` takes the module's policy as an argument:** `authorize(session, guestsPolicy, "guests.delete")` rather than System Design's `authorize(ctx, 'guests.delete')`. A single list of every action would make `platform/` import every module, the wrong way round for the module boundary; passing the policy keeps `platform/` independent and still type-checks the action name.
+    - It applies API Design's caller rules in order: no session → 401 UNAUTHENTICATED, unverified email → 403 EMAIL_NOT_VERIFIED, no wedding → 403 NO_WEDDING, role not allowed → 403 FORBIDDEN. An action missing from a policy allows nobody.
+    - Rate limits use a fixed window per key ("login:ip:1.2.3.4"), counted with one atomic MongoDB update. The wait goes in `details.retryAfterSeconds`, which the error helper also sends as the `Retry-After` header.
+    - Decision 10 planned these with auth; they were built just before it, so the auth work can start from them.

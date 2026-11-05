@@ -48,5 +48,11 @@ export function errorResponse(err: unknown, options: ResponseOptions = {}) {
   if (status >= 500) {
     console.error(`[${requestId}]`, err);
   }
-  return json(body, status, { ...options, requestId });
+  const response = json(body, status, { ...options, requestId });
+  // 429 RATE_LIMITED and 423 ACCOUNT_LOCKED say how long to wait.
+  const retryAfter = body.error.details?.retryAfterSeconds;
+  if (typeof retryAfter === "number") {
+    response.headers.set("Retry-After", String(retryAfter));
+  }
+  return response;
 }

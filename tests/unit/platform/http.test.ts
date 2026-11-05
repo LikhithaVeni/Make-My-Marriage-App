@@ -89,6 +89,18 @@ describe("errorResponse", () => {
     });
   });
 
+  it("sets Retry-After from details.retryAfterSeconds", () => {
+    const response = errorResponse(
+      new AppError("RATE_LIMITED", 429, "Too many attempts.", {
+        retryAfterSeconds: 90,
+      }),
+      { requestId },
+    );
+
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("90");
+  });
+
   it("does not log expected errors", () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
 
