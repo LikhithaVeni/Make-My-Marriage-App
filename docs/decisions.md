@@ -127,4 +127,58 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
     - A wrong email or password shows one message for both (API Design), an already-registered email shows "Log in instead" (PRD F1), and a locked account says it is locked for 15 minutes.
     - After signing up or logging in, an unverified account goes to `/verify` (System Design's `(auth)/verify`; without a token it says "check your email", with one it verifies), a verified one with no wedding to `/wedding/new` (the docs name the Create wedding screen but not its path), and everyone else to `/dashboard` (PRD F1). Until the auth API exists, the forms say "Accounts aren't switched on yet."
     - Verify and reset tokens are stored in `authTokens` as Database Design specifies; System Design's module table calls the collection `passwordResets`, an older name.
-    - "Forgot password?" shows "Soon" until the reset email exists (it needs Resend).
+    - "Forgot password?" showed "Soon" until password reset was built (decision 57).
+
+## Platform (November 2026)
+
+50. **`authorize` takes the module's policy as an argument:** `authorize(session, guestsPolicy, "guests.delete")` rather than System Design's `authorize(ctx, 'guests.delete')`. A single list of every action would make `platform/` import every module, the wrong way round for the module boundary; passing the policy keeps `platform/` independent and still type-checks the action name.
+    - It applies API Design's caller rules in order: no session → 401 UNAUTHENTICATED, unverified email → 403 EMAIL_NOT_VERIFIED, no wedding → 403 NO_WEDDING, role not allowed → 403 FORBIDDEN. An action missing from a policy allows nobody.
+    - Rate limits use a fixed window per key ("login:ip:1.2.3.4"), counted with one atomic MongoDB update. The wait goes in `details.retryAfterSeconds`, which the error helper also sends as the `Retry-After` header.
+    - Decision 10 planned these with auth; they were built just before it, so the auth work can start from them.
+
+## Accounts (November 2026)
+
+51. **Emails are printed in the server terminal until Resend is set up.** In development, `sendEmail` (`src/platform/email.ts`) prints the recipient, subject and text, so the verification link can be opened by hand; in production it logs that nothing was sent. Real sending through Resend replaces it with email verification and password reset. Agreed with the owner so sign-up can be tested before an email account exists.
+52. **Tests that need MongoDB run against `MONGODB_TEST_URI`** and are skipped when it is empty. The test database is dropped at the start of each run. mongodb-memory-server was tried first, but its Windows MongoDB download is about 780 MB, too heavy for every machine and CI run.
+53. **Auth API details the docs leave open:**
+    - The CSRF header is `X-Requested-With: mmm`, as API Design's header table says; the client had been sending `fetch`. Without it a mutation answers 403 FORBIDDEN.
+    - The fifth wrong password in a row already answers 423 ACCOUNT_LOCKED (with `Retry-After`), and the counter restarts after the lock. A correct password during the lock is still refused.
+    - An unknown email is checked against a dummy bcrypt hash, so it takes as long to reject as a wrong password and the two can't be told apart.
+    - The session cookie is `Secure` in production only: development runs on plain http.
+    - Signup and login count against the per-IP limit before the body is validated, so malformed requests are limited too.
+    - `wedding` in the auth responses stays `null` until Create wedding exists.
+
+## Brand (November 2026)
+
+54. **Make My Marriage has a logo:** two linked oval wedding rings with shine lines above them (from the owner's sketch), in a filled maroon circle beside the name (owner's request). Stitch has logos only for the KaLi's era wedding, so this one is new. The circle is filled so it can't be mistaken for a wedding's monogram, which is initials in a thin outlined circle. It is inline SVG in `Wordmark.tsx`, drawn in design-system colours.
+55. **Log in and sign up have drawn illustrations and a few lines on what's waiting** (owner's request; the owner chose drawings over photos). The artwork is inline SVG in `src/components/art/MandapScene.tsx`: a mandap with a kalash, two lit diyas and the logo's linked rings. It needs two illustration-only colours, `marigold` and `marigold-deep`, added to the design system and never used for text or status. A first version also had marigold garlands and mango leaves; the owner found them too busy, so they were removed.
+    - From 1024px the left column is a card with the mandap and, on log in, what's waiting (today's tasks, payments due, the countdown); on sign up, the three steps (account, wedding, invite the family) and PRD highlights. On phones the card is hidden, so the form stays near the top.
+    - Every line names something the PRD plans; nothing promises what the app won't do.
+    - Each page now renders both columns itself (`AuthShowcase` plus its form), so the two pages can say different things; the layout keeps only the header and the grid.
+
+## Create wedding (November 2026)
+
+56. **Create wedding (`/wedding/new`, `POST /api/v1/wedding`, `GET /api/v1/wedding/slug-available`)** follows PRD F1 and API Design, with these choices:
+    - **The cover image waits for photo storage** (Phase 3, decision 46); every other PRD field is on the form. The wedding name starts as "<groom> weds <bride>" and the web address follows it, until the user types their own. The address is checked as they type, and a taken one offers three free alternatives (year, city, then a number), as PRD F1 asks.
+    - The wedding and the creator's ADMIN membership are written in **one transaction**. The user's existing sessions are pointed at the wedding straight away, so no new log-in is needed.
+    - **Auth doesn't import the wedding module** (the wedding module depends on auth, System Design). Log-in and session loading take a `membershipOf` lookup that the wedding module supplies; `src/lib/session.ts` (`readSession`, cached per request) wires them for pages and route handlers.
+    - `/auth/me` and log-in return `wedding.monogram`, the couple's initials (bride first, "LK"), an additive field (API Design allows additive fields in v1). The app's sidebar and mobile menu show the signed-in wedding's name and monogram; logged-out visitors still see the example "KaLi's era" until the app is protected.
+    - The page sits in its own `(setup)` group with a header showing only the logo and Log out, since the user has no app menu yet.
+    - Database tests each use their own database (`<MONGODB_TEST_URI>_<file>`), run one file at a time when a remote test database is set, and retry a slow first connection.
+
+57. **Forgot and reset password (`/forgot`, `/reset?token=…`, `POST /api/v1/auth/forgot` and `/reset`)** follow API Design and Database Design:
+    - `/forgot` always answers the same ("if an account exists…", 202), so it can't reveal who has an account. Rate limited per IP like log-in.
+    - A reset link works once, for 1 hour, and asking again makes earlier links stop working ("newer reset", Database Design).
+    - Saving a new password applies the sign-up rules (10–128 characters, not the email), ends every session of the user (System Design) and logs them in here. It also clears a lockout, and confirms an unverified email, since the link proves the address.
+    - Until Resend is set up, the reset email is printed in the server terminal like the verification email (decision 51).
+    - Confirm email, forgot and reset share one centred card (`AuthCard`).
+
+## Protecting the app (November 2026)
+
+58. **Only members of a wedding can open the app.** Two layers, as the Next.js docs advise:
+    - `src/proxy.ts` is a quick first check on the organiser pages (System Design's `(app)` list plus `/wedding/new`): with no `mmm_session` cookie it redirects to `/login?next=<page>`.
+    - The `(app)` layout checks the session itself: logged out → log in, unverified → verify, no wedding → Create wedding. `/wedding/new` checks the same way.
+    - After logging in, a fully set-up user returns to `next`, but only a path on this site (`safeNext` refuses `//…`, `https://…` and backslashes), so the link can't send people to another website.
+    - Visiting log in or sign up while logged in goes straight on to where the user belongs.
+    - **Log out** sits at the bottom of the sidebar and the mobile menu, beside the user's name; the logged-out visitor no longer sees the example "KaLi's era".
+    - End-to-end tests seed their own database (`<MONGODB_TEST_URI>_e2e`) with one verified organiser and a wedding, point the app at it, and log in through the API. Without `MONGODB_TEST_URI` the tests that need an account are skipped, which is the case in CI until it gets a test database.

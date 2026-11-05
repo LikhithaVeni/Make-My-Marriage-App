@@ -1,5 +1,14 @@
 import { expect, test } from "@playwright/test";
 
+import { E2E_DB_URI } from "./support/e2e-db";
+import { logIn } from "./support/login";
+
+test.skip(!E2E_DB_URI, "needs MONGODB_TEST_URI for a seeded account");
+
+test.beforeEach(async ({ request }) => {
+  await logIn(request);
+});
+
 test("GET /dashboard renders every Phase 1 card", async ({ request }) => {
   const response = await request.get("/dashboard");
 
@@ -15,6 +24,9 @@ test("GET /dashboard renders every Phase 1 card", async ({ request }) => {
   ]) {
     expect(html).toContain(heading);
   }
+  // The signed-in wedding heads the menu.
+  expect(html).toContain("E2E weds Test");
+  expect(html).toContain("Log out");
 });
 
 test("the checklist shows only for a new wedding", async ({ request }) => {

@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 
 import { Monogram } from "@/components/brand/Monogram";
+import { AccountFooter } from "@/components/layout/AccountFooter";
+import { useWeddingBrand } from "@/components/layout/wedding-brand";
 import { NavLinks } from "@/components/layout/NavLinks";
 
 // Matches Tailwind's `md` breakpoint (768px), where the sidebar takes over.
@@ -16,6 +18,7 @@ const iconButtonClass =
  * <dialog>, which provides focus trapping, Esc to close and the backdrop.
  */
 export function MobileNav() {
+  const brand = useWeddingBrand();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const close = () => dialogRef.current?.close();
 
@@ -67,8 +70,10 @@ export function MobileNav() {
       >
         <div className="flex h-full flex-col">
           <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border px-4">
-            <Monogram />
-            <span className="font-display font-medium">KaLi&apos;s era</span>
+            <Monogram initials={brand.monogram} />
+            <span className="truncate font-display font-medium">
+              {brand.title}
+            </span>
             <button
               type="button"
               aria-label="Close menu"
@@ -91,6 +96,7 @@ export function MobileNav() {
           <div className="flex flex-1 flex-col overflow-y-auto pt-4">
             <NavLinks onNavigate={close} />
           </div>
+          <AccountFooter userName={brand.userName} />
         </div>
       </dialog>
     </>

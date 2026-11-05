@@ -42,7 +42,7 @@ export async function postJson<T>(path: string, body: unknown): Promise<T> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Requested-With": "fetch",
+        "X-Requested-With": "mmm",
       },
       body: JSON.stringify(body),
       credentials: "same-origin",
@@ -73,5 +73,6 @@ export async function postJson<T>(path: string, body: unknown): Promise<T> {
       response.status,
     );
   }
-  return (payload as { data: T }).data;
+  // 204 No Content (e.g. logging out) has no body and no data.
+  return (payload as { data: T } | null)?.data as T;
 }

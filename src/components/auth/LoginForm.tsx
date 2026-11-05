@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 
@@ -19,7 +20,7 @@ import { FormAlert } from "./FormAlert";
 type Field = "email" | "password";
 
 /** Email and password log in (PRD, "Signup and login"). */
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string | null }) {
   const router = useRouter();
   const [values, setValues] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<Field, string | null>>>(
@@ -57,7 +58,8 @@ export function LoginForm() {
         email: values.email.trim(),
         password: values.password,
       });
-      router.push(pathAfterAuth(session));
+      router.push(pathAfterAuth(session, next));
+      router.refresh();
     } catch (error) {
       setAlert(authAlert(error));
       setPending(false);
@@ -86,10 +88,12 @@ export function LoginForm() {
         onChange={(event) => update("password", event.target.value)}
         error={errors.password}
         labelAside={
-          // Forgot password needs email, so it arrives with Resend (auth step F).
-          <span className="text-small text-text-muted">
-            Forgot password? <span className="text-caption">Soon</span>
-          </span>
+          <Link
+            href="/forgot"
+            className="rounded-control text-small font-medium text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            Forgot password?
+          </Link>
         }
       />
       <button

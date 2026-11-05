@@ -4,19 +4,21 @@ The visual foundation for **Make My Marriage**, the product. Each wedding inside
 
 ## Colour
 
-| Token          | Value     | Tailwind example           | Use                                                     |
-| -------------- | --------- | -------------------------- | ------------------------------------------------------- |
-| `bg`           | `#FAF7F2` | `bg-bg`                    | Ivory page background                                   |
-| `surface`      | `#FFFFFF` | `bg-surface`               | Cards, sidebar, top bar, menus; text on accent buttons  |
-| `text`         | `#2D2423` | `text-text`                | Primary text                                            |
-| `text-muted`   | `#776B68` | `text-text-muted`          | Secondary text, hints, unavailable items                |
-| `border`       | `#E8DFD9` | `border-border`            | Card, input and divider borders                         |
-| `accent`       | `#7A263A` | `bg-accent`, `text-accent` | Brand maroon: primary buttons, links, active nav, focus |
-| `accent-hover` | `#642033` | `hover:bg-accent-hover`    | Hovered primary buttons and links                       |
-| `accent-tint`  | `#F4E9EC` | `bg-accent-tint`           | Active nav item, hovered secondary buttons and rows     |
-| `success`      | `#386A50` | `text-success`             | Positive status (Completed, Paid, Attending)            |
-| `warning`      | `#98651B` | `text-warning`             | Caution status (Pending, due soon)                      |
-| `danger`       | `#A23A3A` | `text-danger`              | Errors, Overdue, destructive actions                    |
+| Token           | Value     | Tailwind example           | Use                                                     |
+| --------------- | --------- | -------------------------- | ------------------------------------------------------- |
+| `bg`            | `#FAF7F2` | `bg-bg`                    | Ivory page background                                   |
+| `surface`       | `#FFFFFF` | `bg-surface`               | Cards, sidebar, top bar, menus; text on accent buttons  |
+| `text`          | `#2D2423` | `text-text`                | Primary text                                            |
+| `text-muted`    | `#776B68` | `text-text-muted`          | Secondary text, hints, unavailable items                |
+| `border`        | `#E8DFD9` | `border-border`            | Card, input and divider borders                         |
+| `accent`        | `#7A263A` | `bg-accent`, `text-accent` | Brand maroon: primary buttons, links, active nav, focus |
+| `accent-hover`  | `#642033` | `hover:bg-accent-hover`    | Hovered primary buttons and links                       |
+| `accent-tint`   | `#F4E9EC` | `bg-accent-tint`           | Active nav item, hovered secondary buttons and rows     |
+| `success`       | `#386A50` | `text-success`             | Positive status (Completed, Paid, Attending)            |
+| `warning`       | `#98651B` | `text-warning`             | Caution status (Pending, due soon)                      |
+| `danger`        | `#A23A3A` | `text-danger`              | Errors, Overdue, destructive actions                    |
+| `marigold`      | `#E8A838` | `fill-marigold`            | Illustrations only: diya flames, the kalash             |
+| `marigold-deep` | `#C9761E` | `fill-marigold-deep`       | Illustrations only: diya bowls, shine lines             |
 
 **Contrast (WCAG 2.2, measured).**
 
@@ -24,6 +26,7 @@ The visual foundation for **Make My Marriage**, the product. Each wedding inside
 - `text-muted` passes AA on `bg` (4.8:1) and `surface` (5.1:1), but **not on `accent-tint` (4.3:1)**, so don't put muted text on a tinted background.
 - `success`, `warning` and `danger` pass AA on `bg` and `surface`. `warning` falls short on `accent-tint` (4.2:1).
 - Status colours are for text, icons and borders; don't use them as large background fills.
+- `marigold` and `marigold-deep` are for illustrations only (the drawings on log in and sign up). They don't meet text contrast, so never use them for text, icons that carry meaning, or status.
 
 ## Typography
 
@@ -57,7 +60,7 @@ Weights: regular (400) for text, medium (500) for buttons, links, active nav and
 - **Primary button:** `accent` background, `surface` text, 44px tall, `accent-hover` on hover. Use one per view.
 - **Secondary button:** `surface` background, 1px `accent` border, `accent` text, `accent-tint` on hover.
 - **Text link:** `accent`, medium weight, `accent-hover` on hover.
-- **Wordmark (product):** "Make My Marriage" in Fraunces, medium, `accent`. Used on public pages: landing, sign up, log in.
+- **Wordmark (product):** the logo, then "Make My Marriage" in Fraunces, medium, `accent`. The logo is two linked oval rings with five short shine lines fanned above them, drawn as a 1.75px `surface` line inside a filled 36px `accent` circle. Inline SVG, no image file. Used on public pages: landing, sign up, log in.
 - **Monogram (wedding):** the couple's initials ("LK" for KaLi's era) in Fraunces inside a thin (1px) `accent` circle. Text and CSS only, no image.
 - **Navigation item:** `small` text, 44px tall. Active: `accent-tint` background with `accent` text. Unavailable: `text-muted` with a "Soon" caption, not a link.
 - **Card** (`components/ui/Card.tsx`): the card style above with 24px padding, a Fraunces `heading` title, an optional muted note on the right, and an optional footer row above a `border` rule. The footer's **card link** is a text link with a → arrow, or `text-muted` with "Soon" when its page doesn't exist yet.
