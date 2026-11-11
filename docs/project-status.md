@@ -9,21 +9,34 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status      | Branch / PR                   | Updated    |
-| ---------------------------------------------- | ----------- | ----------------------------- | ---------- |
-| Foundation scaffold                            | Done        | `dev` (first commits)         | 2026-11-03 |
-| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1    | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2      | 2026-11-05 |
-| Permission checks and rate limits (platform)   | In progress | `feature/foundation-platform` | 2026-11-05 |
-| Accounts: database, sign-up and log-in API     | In progress | `feature/auth-api`            | 2026-11-05 |
-| Dashboard only after login (`proxy.ts`)        | In progress | `feature/auth-api`            | 2026-11-06 |
-| Create wedding (`/wedding/new`)                | In progress | `feature/auth-api`            | 2026-11-06 |
-| Email verification and forgot password         | In progress | `feature/auth-api`            | 2026-11-06 |
-| Landing page: features, how it works, footer   | Later       | —                             | —          |
+| Feature                                        | Status      | Branch / PR                | Updated    |
+| ---------------------------------------------- | ----------- | -------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)      | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1 | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2   | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
+| Landing page knows who's signed in             | In progress | `feature/landing-session`  | 2026-11-11 |
+| Landing page: features, how it works, footer   | Later       | —                          | —          |
 
 ## Log
 
-### 2026-11-06: The app is protected (In progress)
+### 2026-11-11: Landing page knows who's signed in (In progress)
+
+- A signed-in visitor sees their name and **Go to dashboard** (or **Continue
+  setup** before verifying or creating a wedding) instead of Log in and Sign
+  up, in the header and the hero. Public pages still load when the database
+  can't be reached.
+- Code review fixes: the browser's session cookie now slides with use
+  (it expired 30 days after logging in, decision 60); the header button hides
+  on the page it would open; unexpected session errors are logged; an
+  end-to-end test covers the landing page logged out and logged in.
+- Decisions 59–60.
+
+### 2026-11-06: The app is protected (Done, PR #3)
 
 - Logged-out visitors are sent to log in and brought back afterwards;
   unverified users go to verify, users without a wedding to Create wedding.
@@ -36,7 +49,7 @@ branch), **Next**, **Later**.
   sample wedding.
 - Decision 58.
 
-### 2026-11-06: Forgot and reset password (In progress)
+### 2026-11-06: Forgot and reset password (Done, PR #3)
 
 - "Forgot password?" on log in opens `/forgot`; the emailed link
   `/reset?token=…` sets a new password, logs out every other device and
@@ -44,7 +57,7 @@ branch), **Next**, **Later**.
 - Emails print in the server terminal until Resend is set up.
 - Decision 57.
 
-### 2026-11-06: Create wedding (In progress)
+### 2026-11-06: Create wedding (Done, PR #3)
 
 - `/wedding/new`: the PRD's setup fields (bride, groom, wedding name, date,
   city, website address, tagline, description); the address is checked while
@@ -58,7 +71,7 @@ branch), **Next**, **Later**.
   data.
 - Decision 56.
 
-### 2026-11-05: Accounts API (In progress)
+### 2026-11-05: Accounts API (Done, PR #3)
 
 - `src/modules/auth`: users, sessions and authTokens models; sign-up,
   log-in, log-out and current-user logic. Passwords use bcrypt (cost 12);
@@ -78,7 +91,7 @@ branch), **Next**, **Later**.
 - Decisions 51–53.
 - Also on this branch: the Make My Marriage logo (linked rings with shine lines, decision 54) and a drawn mandap illustration with "what's waiting" information on log in and sign up (decision 55).
 
-### 2026-11-05: Permission checks and rate limits (In progress)
+### 2026-11-05: Permission checks and rate limits (Done, PR #3)
 
 - `src/platform/rbac.ts`: `authorize(session, policy, action)` applies API
   Design's caller rules in order: 401 UNAUTHENTICATED, 403

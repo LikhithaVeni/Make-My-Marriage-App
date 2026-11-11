@@ -3,6 +3,9 @@ import Link from "next/link";
 import { Wordmark } from "@/components/brand/Wordmark";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 
+import { AccountActions } from "./AccountActions";
+import { landingAccount } from "./landing-account";
+
 const sections = [
   { label: "Features", href: "/#features" },
   { label: "How it works", href: "/#how-it-works" },
@@ -12,8 +15,12 @@ const sections = [
 const linkClass =
   "rounded-control px-3 py-2 text-small text-text-muted hover:text-text focus-visible:outline-2 focus-visible:outline-accent";
 
-/** Landing page header: product name, section links (from 768px), Log in and Sign up. */
-export function LandingHeader() {
+/**
+ * Landing page header: product name, section links (from 768px), then Log in
+ * and Sign up, or, for a signed-in visitor, their name and a button back in.
+ */
+export async function LandingHeader() {
+  const account = await landingAccount();
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-surface">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 md:px-8">
@@ -36,18 +43,22 @@ export function LandingHeader() {
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-1 md:ml-0">
-          <Link
-            href="/login"
-            className={`${linkClass} min-h-11 content-center`}
-          >
-            Log in
-          </Link>
-          {/* On phones the hero's own Sign up button is just below. */}
-          <div className="hidden sm:block">
-            <ButtonLink href="/signup">Sign up</ButtonLink>
+        {account ? (
+          <AccountActions account={account} />
+        ) : (
+          <div className="ml-auto flex items-center gap-1 md:ml-0">
+            <Link
+              href="/login"
+              className={`${linkClass} min-h-11 content-center`}
+            >
+              Log in
+            </Link>
+            {/* On phones the hero's own Sign up button is just below. */}
+            <div className="hidden sm:block">
+              <ButtonLink href="/signup">Sign up</ButtonLink>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );
