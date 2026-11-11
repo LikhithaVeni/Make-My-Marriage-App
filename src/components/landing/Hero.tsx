@@ -4,6 +4,8 @@ import { cardSurface } from "@/components/ui/Card";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 
+import type { LandingAccount } from "./landing-account";
+
 // An illustration of an example wedding's dashboard, not live data: the
 // landing page is public, so it must never show a real wedding (docs/decisions.md,
 // decisions 47 and 48). The figures match the dashboard's sample.
@@ -98,8 +100,11 @@ function DashboardPreview() {
   );
 }
 
-/** Headline, the two calls to action and a picture of the dashboard. */
-export function Hero() {
+/**
+ * Headline, the two calls to action and a picture of the dashboard. A
+ * signed-in visitor gets a button back into their wedding instead.
+ */
+export function Hero({ account }: { account: LandingAccount | null }) {
   return (
     <section
       aria-labelledby="hero-title"
@@ -121,20 +126,26 @@ export function Hero() {
           and memory, so the wedding day feels easy.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href="/signup">Create your wedding</ButtonLink>
+          {account ? (
+            <ButtonLink href={account.href}>{account.label}</ButtonLink>
+          ) : (
+            <ButtonLink href="/signup">Create your wedding</ButtonLink>
+          )}
           <ButtonLink href="#how-it-works" variant="secondary">
             See how it works
           </ButtonLink>
         </div>
-        <p className="mt-4 text-small text-text-muted">
-          Already planning?{" "}
-          <Link
-            href="/login"
-            className="rounded-control font-medium text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-accent"
-          >
-            Log in
-          </Link>
-        </p>
+        {!account && (
+          <p className="mt-4 text-small text-text-muted">
+            Already planning?{" "}
+            <Link
+              href="/login"
+              className="rounded-control font-medium text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              Log in
+            </Link>
+          </p>
+        )}
       </div>
       <DashboardPreview />
     </section>
