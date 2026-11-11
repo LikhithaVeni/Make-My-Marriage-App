@@ -38,6 +38,19 @@ export function ok<T>(data: T, options: ResponseOptions = {}) {
   return json({ data }, options.status ?? 200, options);
 }
 
+/** 204 with no body, e.g. after logging out. */
+export function noContent(options: ResponseOptions = {}) {
+  const response = new NextResponse(null, {
+    status: 204,
+    headers: options.headers,
+  });
+  response.headers.set(
+    REQUEST_ID_HEADER,
+    options.requestId ?? createRequestId(),
+  );
+  return response;
+}
+
 export function list<T>(data: T[], page: Page, options: ResponseOptions = {}) {
   return json({ data, page }, options.status ?? 200, options);
 }
@@ -48,5 +61,11 @@ export function errorResponse(err: unknown, options: ResponseOptions = {}) {
   if (status >= 500) {
     console.error(`[${requestId}]`, err);
   }
-  return json(body, status, { ...options, requestId });
+  const response = json(body, status, { ...options, requestId });
+  // 429 RATE_LIMITED and 423 ACCOUNT_LOCKED say how long to wait.
+  const retryAfter = body.error.details?.retryAfterSeconds;
+  if (typeof retryAfter === "number") {
+    response.headers.set("Retry-After", String(retryAfter));
+  }
+  return response;
 }

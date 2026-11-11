@@ -7,7 +7,7 @@ interface TextFieldProps extends Omit<
   "id" | "type"
 > {
   label: string;
-  type?: "text" | "email" | "password";
+  type?: "text" | "email" | "password" | "date";
   /** Shown under the field in red; also marks the field invalid. */
   error?: string | null;
   /** Shown under the field when there is no error, e.g. "At least 10 characters". */

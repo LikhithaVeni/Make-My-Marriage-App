@@ -4,12 +4,19 @@ import {
   authAlert,
   type AuthSession,
   pathAfterAuth,
+  safeNext,
 } from "@/components/auth/auth-client";
 import { ApiError } from "@/lib/api-client";
 
 const session = (overrides: Partial<AuthSession> = {}): AuthSession => ({
   user: { id: "u1", name: "Venu", email: "v@example.com", emailVerified: true },
-  wedding: { id: "w1", title: "KaLi's era" },
+  wedding: {
+    id: "w1",
+    title: "KaLi's era",
+    date: "2028-01-28",
+    slug: "kalis-era",
+    monogram: "LK",
+  },
   role: "ADMIN",
   ...overrides,
 });
@@ -28,6 +35,32 @@ describe("pathAfterAuth (PRD flow F1)", () => {
 
   it("sends everyone else to the dashboard", () => {
     expect(pathAfterAuth(session())).toBe("/dashboard");
+  });
+
+  it("returns to the page asked for, once fully set up", () => {
+    expect(pathAfterAuth(session(), "/tasks?mine=1")).toBe("/tasks?mine=1");
+    expect(
+      pathAfterAuth(session({ wedding: null, role: null }), "/tasks"),
+    ).toBe("/wedding/new");
+  });
+});
+
+describe("safeNext", () => {
+  it("keeps paths on this site", () => {
+    expect(safeNext("/dashboard")).toBe("/dashboard");
+  });
+
+  it("refuses anything that could leave the site", () => {
+    for (const next of [
+      "https://evil.example",
+      "//evil.example",
+      "/\\evil.example",
+      "dashboard",
+      "",
+      null,
+    ]) {
+      expect(safeNext(next)).toBeNull();
+    }
   });
 });
 
