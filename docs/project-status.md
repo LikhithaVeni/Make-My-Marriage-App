@@ -9,23 +9,23 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status      | Branch / PR                      | Updated    |
-| ---------------------------------------------- | ----------- | -------------------------------- | ---------- |
-| Foundation scaffold                            | Done        | `dev` (first commits)            | 2026-11-03 |
-| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1       | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2         | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4 | 2026-11-11 |
-| Members and invites                            | In progress | `feature/members`                | 2026-11-11 |
-| Landing page: features, how it works, footer   | Later       | —                                | —          |
+| Feature                                        | Status | Branch / PR                      | Updated    |
+| ---------------------------------------------- | ------ | -------------------------------- | ---------- |
+| Foundation scaffold                            | Done   | `dev` (first commits)            | 2026-11-03 |
+| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1       | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2         | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4 | 2026-11-11 |
+| Members and invites                            | Done   | `feature/members`, PR #5         | 2026-11-13 |
+| Landing page: features, how it works, footer   | Later  | —                                | —          |
 
 ## Log
 
-### 2026-11-11: Members and invites (In progress)
+### 2026-11-13: Members and invites (Done, PR #5)
 
 - **Settings → Wedding members** (Admin only): invite family by email as Admin
   or Manager with a relation ("Bride's mother"); members and pending invites;
