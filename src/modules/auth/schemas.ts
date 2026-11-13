@@ -53,5 +53,25 @@ export const resetSchema = z.object({
   password: z.string().min(1, "Choose a password").max(256),
 });
 
+/**
+ * PATCH /auth/me: a new name, a new password (with the current one), or
+ * both. The password rules need the account's email, so the service checks
+ * them.
+ */
+export const updateAccountSchema = z
+  .object({
+    name: z
+      .string()
+      .superRefine(rule(nameError))
+      .transform((value) => value.trim())
+      .optional(),
+    currentPassword: z.string().max(256).optional(),
+    newPassword: z.string().max(256).optional(),
+  })
+  .refine(
+    (value) => value.name !== undefined || value.newPassword !== undefined,
+    { message: "Nothing to change" },
+  );
+
 export type SignupInput = z.output<typeof signupSchema>;
 export type LoginInput = z.output<typeof loginSchema>;

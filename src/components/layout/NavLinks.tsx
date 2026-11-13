@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useWeddingBrand } from "@/components/layout/wedding-brand";
+
 interface NavItem {
   label: string;
   href: string;
@@ -30,10 +32,12 @@ const mainItems: NavItem[] = [
   { label: "Activity", href: "/activity", available: false },
 ];
 
+// Admin only (PRD screens: Settings is for Admins), so it isn't shown to
+// Managers at all.
 const settingsItem: NavItem = {
   label: "Settings",
   href: "/settings",
-  available: false,
+  available: true,
 };
 
 /** The most specific item whose href matches the current path. */
@@ -81,6 +85,7 @@ function NavEntry({
 
 export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const current = activeHref(usePathname());
+  const { role } = useWeddingBrand();
 
   return (
     <nav aria-label="Main" className="flex flex-1 flex-col gap-4 px-3 pb-4">
@@ -95,15 +100,17 @@ export function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           </li>
         ))}
       </ul>
-      <ul className="mt-auto border-t border-border pt-4">
-        <li>
-          <NavEntry
-            item={settingsItem}
-            active={settingsItem.href === current}
-            onNavigate={onNavigate}
-          />
-        </li>
-      </ul>
+      {role === "ADMIN" && (
+        <ul className="mt-auto border-t border-border pt-4">
+          <li>
+            <NavEntry
+              item={settingsItem}
+              active={settingsItem.href === current}
+              onNavigate={onNavigate}
+            />
+          </li>
+        </ul>
+      )}
     </nav>
   );
 }

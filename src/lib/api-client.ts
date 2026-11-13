@@ -35,16 +35,34 @@ interface ErrorPayload {
 }
 
 /** POSTs JSON and returns the response's `data`, or throws an ApiError. */
-export async function postJson<T>(path: string, body: unknown): Promise<T> {
+export function postJson<T>(path: string, body: unknown): Promise<T> {
+  return sendJson<T>("POST", path, body);
+}
+
+/** PATCHes JSON and returns the response's `data`, or throws an ApiError. */
+export function patchJson<T>(path: string, body: unknown): Promise<T> {
+  return sendJson<T>("PATCH", path, body);
+}
+
+/** DELETEs a resource (204 No Content), or throws an ApiError. */
+export function deleteJson(path: string): Promise<void> {
+  return sendJson<void>("DELETE", path, undefined);
+}
+
+async function sendJson<T>(
+  method: "POST" | "PATCH" | "DELETE",
+  path: string,
+  body: unknown,
+): Promise<T> {
   let response: Response;
   try {
     response = await fetch(path, {
-      method: "POST",
+      method,
       headers: {
         "Content-Type": "application/json",
         "X-Requested-With": "mmm",
       },
-      body: JSON.stringify(body),
+      body: body === undefined ? undefined : JSON.stringify(body),
       credentials: "same-origin",
     });
   } catch {

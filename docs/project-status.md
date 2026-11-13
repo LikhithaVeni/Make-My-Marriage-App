@@ -9,22 +9,46 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status      | Branch / PR                | Updated    |
-| ---------------------------------------------- | ----------- | -------------------------- | ---------- |
-| Foundation scaffold                            | Done        | `dev` (first commits)      | 2026-11-03 |
-| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1 | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2   | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
-| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3  | 2026-11-11 |
-| Landing page knows who's signed in             | In progress | `feature/landing-session`  | 2026-11-11 |
-| Landing page: features, how it works, footer   | Later       | —                          | —          |
+| Feature                                        | Status      | Branch / PR                      | Updated    |
+| ---------------------------------------------- | ----------- | -------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)            | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1       | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2         | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4 | 2026-11-11 |
+| Members and invites                            | In progress | `feature/members`                | 2026-11-11 |
+| Landing page: features, how it works, footer   | Later       | —                                | —          |
 
 ## Log
 
-### 2026-11-11: Landing page knows who's signed in (In progress)
+### 2026-11-11: Members and invites (In progress)
+
+- **Settings → Wedding members** (Admin only): invite family by email as Admin
+  or Manager with a relation ("Bride's mother"); members and pending invites;
+  resend, cancel, change role, remove (with a confirm step).
+- **Invite link** `/invite/<token>`: shows who invited whom to which wedding;
+  sign up with the invited email (locked) or log in, then join. Joining
+  confirms the email. Wrong account, used, expired and cancelled links each
+  get their own message.
+- Rules from the PRD: one wedding per person, at least one Admin always,
+  role changes and removals log the member out at once, links work once for
+  7 days. Managers can't see Settings or the members API.
+- Tested: 12 database tests against Atlas (including two Admins demoting or
+  removing each other at the same instant), 5 permanent end-to-end tests
+  (`tests/e2e/members.spec.ts`), and 28 checks in Edge on desktop and phone
+  (invite, join, Manager limits, role change, remove, Leave, expired, wrong
+  account, already in a wedding, cancelled). Invite emails print in the
+  server terminal until Resend.
+- Matched to two new Stitch designs generated for these pages (decision 62).
+- Auth review fixes: **Your account** page (change name or password) and the
+  verification link now logs you in, as PRD F1 says (decision 63).
+- Decisions 61–63.
+
+### 2026-11-11: Landing page knows who's signed in (Done, PR #4)
 
 - A signed-in visitor sees their name and **Go to dashboard** (or **Continue
   setup** before verifying or creating a wedding) instead of Log in and Sign
@@ -154,8 +178,11 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Members and invites:** invite family as Admin or Manager (needs Resend).
-2. **Dashboard on the real wedding:** replace the sample data as events, tasks and money arrive.
+1. **Events:** Haldi to Reception with date, time, venue and dress code
+   (PRD "Events"; next in System Design's Phase 1 order).
+2. **Email through Resend:** verification, reset and invite emails reach real
+   inboxes instead of the server terminal.
+3. **Dashboard on the real wedding:** replace the sample data as events, tasks and money arrive.
 
 ## Roadmap
 

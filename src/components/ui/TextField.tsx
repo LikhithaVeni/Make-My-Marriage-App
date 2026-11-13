@@ -17,7 +17,7 @@ interface TextFieldProps extends Omit<
 }
 
 const inputClass =
-  "h-11 w-full rounded-control border bg-surface px-3.5 text-body text-text placeholder:text-text-muted focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent";
+  "h-11 w-full rounded-control border bg-surface px-3.5 text-body text-text placeholder:text-text-muted read-only:bg-bg read-only:text-text-muted focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent";
 
 /**
  * A labelled input (docs/design-system.md, "Text field"): 44px tall, the error

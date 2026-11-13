@@ -1,6 +1,6 @@
-// Mongoose schemas and indexes for weddings and memberships (docs/Database
-// Design v1.md); invites arrive with member invitations. Private to the
-// wedding module: other code must not import this file.
+// Mongoose schemas and indexes for weddings, memberships and invites
+// (docs/Database Design v1.md). Private to the wedding module: other code
+// must not import this file.
 import type { Model, Mongoose, Types } from "mongoose";
 
 import type { Role } from "@/platform/rbac";
@@ -37,9 +37,29 @@ export interface MembershipDoc {
   invitedBy?: Types.ObjectId;
 }
 
+export type InviteStatus = "PENDING" | "ACCEPTED" | "CANCELLED" | "EXPIRED";
+
+export interface InviteDoc {
+  _id: Types.ObjectId;
+  weddingId: Types.ObjectId;
+  /** Lowercase. */
+  email: string;
+  name: string;
+  role: "ADMIN" | "MANAGER";
+  relationLabel?: string;
+  /** SHA-256 of the link's token; the token itself is never stored. */
+  tokenHash: string;
+  status: InviteStatus;
+  expiresAt: Date;
+  invitedBy: Types.ObjectId;
+  acceptedBy?: Types.ObjectId;
+  createdAt?: Date;
+}
+
 export interface WeddingModels {
   Wedding: Model<WeddingDoc>;
   Membership: Model<MembershipDoc>;
+  Invite: Model<InviteDoc>;
 }
 
 /** Registers the models on first use, from the Mongoose instance connectDb loaded. */
@@ -107,5 +127,31 @@ export function weddingModels(mongoose: Mongoose): WeddingModels {
       "memberships",
     );
 
-  return { Wedding, Membership };
+  const inviteSchema = new Schema<InviteDoc>(
+    {
+      weddingId: { type: ObjectId, required: true, ref: "Wedding" },
+      email: { type: String, required: true, lowercase: true, trim: true },
+      name: { type: String, required: true, trim: true },
+      role: { type: String, required: true, enum: ["ADMIN", "MANAGER"] },
+      relationLabel: String,
+      tokenHash: { type: String, required: true, unique: true },
+      status: {
+        type: String,
+        required: true,
+        enum: ["PENDING", "ACCEPTED", "CANCELLED", "EXPIRED"],
+        default: "PENDING",
+      },
+      expiresAt: { type: Date, required: true },
+      invitedBy: { type: ObjectId, required: true, ref: "User" },
+      acceptedBy: { type: ObjectId, ref: "User" },
+    },
+    { timestamps: true },
+  );
+  inviteSchema.index({ weddingId: 1, status: 1 });
+
+  const Invite =
+    (mongoose.models.Invite as Model<InviteDoc> | undefined) ??
+    mongoose.model<InviteDoc>("Invite", inviteSchema, "invites");
+
+  return { Wedding, Membership, Invite };
 }

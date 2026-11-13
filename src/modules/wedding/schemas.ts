@@ -2,6 +2,7 @@
 // "Create wedding"; fields from the PRD's "Wedding setup").
 import { z } from "zod";
 
+import { emailError, nameError } from "@/lib/auth-rules";
 import { todayInKolkata } from "@/lib/format";
 
 export const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]{1,38})[a-z0-9]$/;
@@ -44,4 +45,55 @@ export const createWeddingSchema = z.object({
   tagline: z.string().trim().max(120, "Use at most 120 characters").optional(),
 });
 
+/** Roles an Admin can give through an invite (the photographer is separate). */
+export const organiserRole = z.enum(["ADMIN", "MANAGER"], {
+  error: "Choose Admin or Manager",
+});
+
+const relationLabel = z
+  .string()
+  .trim()
+  .max(60, "Use at most 60 characters")
+  .transform((value) => value || undefined)
+  .optional();
+
+/** POST /invites (API Design "Invite and accept"). */
+export const inviteSchema = z.object({
+  name: z
+    .string()
+    .superRefine((value, ctx) => {
+      const message = nameError(value);
+      if (message) ctx.addIssue({ code: "custom", message });
+    })
+    .transform((value) => value.trim()),
+  email: z
+    .string()
+    .superRefine((value, ctx) => {
+      const message = emailError(value);
+      if (message) ctx.addIssue({ code: "custom", message });
+    })
+    .transform((value) => value.trim().toLowerCase()),
+  role: organiserRole,
+  relationLabel,
+});
+
+/**
+ * PATCH /members/{userId}: a new role, a new relation label, or both. An
+ * empty label clears it.
+ */
+export const updateMemberSchema = z
+  .object({
+    role: organiserRole.optional(),
+    relationLabel: z
+      .string()
+      .trim()
+      .max(60, "Use at most 60 characters")
+      .optional(),
+  })
+  .refine((value) => value.role || value.relationLabel !== undefined, {
+    message: "Nothing to change",
+  });
+
 export type CreateWeddingInput = z.output<typeof createWeddingSchema>;
+export type InviteInput = z.output<typeof inviteSchema>;
+export type UpdateMemberInput = z.output<typeof updateMemberSchema>;

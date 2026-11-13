@@ -8,12 +8,15 @@ export interface WeddingBrand {
   monogram: string;
   /** The signed-in person's name, beside Log out. */
   userName: string;
+  /** Their role in the wedding; Settings shows for Admins only. */
+  role: "ADMIN" | "MANAGER" | "PHOTOGRAPHER";
 }
 
 const BrandContext = createContext<WeddingBrand>({
   title: "",
   monogram: "",
   userName: "",
+  role: "MANAGER",
 });
 
 /** Shares the brand with client parts of the shell, such as the mobile menu. */
