@@ -49,6 +49,7 @@ export const config = {
     "/settings/:path*",
     "/activity/:path*",
     "/notifications/:path*",
+    "/account",
     "/wedding/new",
   ],
 };

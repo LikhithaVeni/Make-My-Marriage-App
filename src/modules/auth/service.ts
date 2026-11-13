@@ -155,7 +155,10 @@ async function sendVerificationEmail(user: UserDoc, now: Date) {
  * for 24 hours: 404 NOT_FOUND for an unknown link, 410 TOKEN_USED or
  * TOKEN_EXPIRED otherwise.
  */
-export async function verifyEmail(token: string, now = new Date()) {
+export async function verifyEmail(
+  token: string,
+  now = new Date(),
+): Promise<string> {
   const { User } = await models();
   const record = await findUsableToken("VERIFY_EMAIL", token, now);
   await claimToken(record._id, now);
@@ -163,6 +166,24 @@ export async function verifyEmail(token: string, now = new Date()) {
     { _id: record.userId, emailVerifiedAt: null },
     { $set: { emailVerifiedAt: now } },
   );
+  return record.userId.toString();
+}
+
+/**
+ * Starts a session for a user without a password, after something else
+ * proved who they are: following their verification link logs them in
+ * (PRD F1: "user clicks the link → logged in").
+ */
+export async function logInUser(
+  userId: string,
+  client: ClientInfo,
+  now = new Date(),
+  membershipOf: MembershipLookup = noMembership,
+): Promise<StartedSession> {
+  const { User } = await models();
+  const user = await User.findById(userId);
+  if (!user) throw new AppError("NOT_FOUND", 404, "This link isn't valid.");
+  return startSession(user, client, now, await membershipOf(userId));
 }
 
 /** An emailed link's token record, if it can still be used. */
@@ -298,6 +319,7 @@ export async function signup(
   input: SignupInput,
   client: ClientInfo,
   now = new Date(),
+  { sendVerification = true }: { sendVerification?: boolean } = {},
 ): Promise<StartedSession> {
   const { User } = await models();
   if (await User.exists({ email: input.email })) throw emailTaken();
@@ -315,7 +337,7 @@ export async function signup(
     throw err;
   }
 
-  await sendVerificationEmail(user, now);
+  if (sendVerification) await sendVerificationEmail(user, now);
   return startSession(user, client, now);
 }
 
@@ -438,4 +460,106 @@ export async function getCurrentSession(
     result: toResult(user, membership),
     extendedTo,
   };
+}
+
+/** A user as other modules may see them: no password or login details. */
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+}
+
+function toProfile(user: UserDoc): UserProfile {
+  return {
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    emailVerified: Boolean(user.emailVerifiedAt),
+  };
+}
+
+/** The user with this (lowercase) email, if any. */
+export async function findUserByEmail(
+  email: string,
+): Promise<UserProfile | null> {
+  const { User } = await models();
+  const user = await User.findOne({ email: email.trim().toLowerCase() });
+  return user ? toProfile(user) : null;
+}
+
+/** Profiles for a list of user ids, e.g. a wedding's members. */
+export async function findUsersByIds(ids: string[]): Promise<UserProfile[]> {
+  const { User } = await models();
+  return (await User.find({ _id: { $in: ids } })).map(toProfile);
+}
+
+/**
+ * Logs a user out everywhere, e.g. after their role changes or they are
+ * removed from a wedding, so it applies on their next request (System
+ * Design).
+ */
+export async function endSessionsOf(userId: string): Promise<void> {
+  const { Session } = await models();
+  await Session.deleteMany({ userId });
+}
+
+/** Confirms a user's email, e.g. when they accept an invite sent to it. */
+export async function markEmailVerified(
+  userId: string,
+  now = new Date(),
+): Promise<void> {
+  const { User } = await models();
+  await User.updateOne(
+    { _id: userId, emailVerifiedAt: null },
+    { $set: { emailVerifiedAt: now } },
+  );
+}
+
+/**
+ * Changes the signed-in user's name, password, or both (API Design
+ * `PATCH /auth/me`). A new password needs the current one and follows the
+ * sign-up rules; it then logs out every other device and keeps this one.
+ */
+export async function updateAccount(
+  userId: string,
+  currentToken: string,
+  input: { name?: string; currentPassword?: string; newPassword?: string },
+): Promise<UserProfile> {
+  const { Session, User } = await models();
+  const user = await User.findById(userId);
+  if (!user)
+    throw new AppError("UNAUTHENTICATED", 401, "Please log in to continue.");
+
+  const set: Record<string, unknown> = {};
+  if (input.name !== undefined) set.name = input.name;
+
+  if (input.newPassword !== undefined) {
+    if (
+      !input.currentPassword ||
+      !(await bcrypt.compare(input.currentPassword, user.passwordHash))
+    ) {
+      throw new AppError("VALIDATION_FAILED", 400, "Some fields are invalid.", {
+        fields: { currentPassword: "That isn't your current password" },
+      });
+    }
+    const problem = newPasswordError(input.newPassword, user.email);
+    if (problem) {
+      throw new AppError("VALIDATION_FAILED", 400, "Some fields are invalid.", {
+        fields: { newPassword: problem },
+      });
+    }
+    set.passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_COST);
+  }
+
+  if (Object.keys(set).length > 0) {
+    await User.updateOne({ _id: user._id }, { $set: set });
+  }
+  if (input.newPassword !== undefined) {
+    await Session.deleteMany({
+      userId: user._id,
+      idHash: { $ne: sha256(currentToken) },
+    });
+  }
+  return toProfile((await User.findById(user._id))!);
 }

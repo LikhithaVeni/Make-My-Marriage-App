@@ -96,7 +96,7 @@ export function MobileNav() {
           <div className="flex flex-1 flex-col overflow-y-auto pt-4">
             <NavLinks onNavigate={close} />
           </div>
-          <AccountFooter userName={brand.userName} />
+          <AccountFooter userName={brand.userName} onNavigate={close} />
         </div>
       </dialog>
     </>

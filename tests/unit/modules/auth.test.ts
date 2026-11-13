@@ -4,6 +4,7 @@ import {
   getCurrentSession,
   login,
   loginSchema,
+  logInUser,
   logout,
   requestPasswordReset,
   resendVerificationEmail,
@@ -11,6 +12,7 @@ import {
   SESSION_TTL_MS,
   signup,
   signupSchema,
+  updateAccount,
   verifyEmail,
 } from "@/modules/auth";
 
@@ -372,6 +374,79 @@ describe.skipIf(!TEST_DB_URI)("password reset", () => {
     await resetPassword(token!, "gita-password-2", client);
     await expect(
       login({ email, password: "gita-password-2" }, client),
+    ).resolves.toBeTruthy();
+  });
+});
+
+describe.skipIf(!TEST_DB_URI)("the verification link logs in (PRD F1)", () => {
+  it("says whose email it confirmed, and that person can be logged in", async () => {
+    const { started, token } = await signupWithLink(
+      "Anjali",
+      "anjali@example.com",
+    );
+    expect(await verifyEmail(token)).toBe(started.result.user.id);
+
+    const onPhone = await logInUser(started.result.user.id, client);
+    const session = await getCurrentSession(onPhone.token);
+    expect(session?.result.user).toMatchObject({
+      email: "anjali@example.com",
+      emailVerified: true,
+    });
+  });
+});
+
+describe.skipIf(!TEST_DB_URI)("changing your name or password", () => {
+  it("changes the name without a password", async () => {
+    const { started } = await signupWithLink("Bhavana", "bhavana@example.com");
+    const user = await updateAccount(started.result.user.id, started.token, {
+      name: "Bhavana Rao",
+    });
+    expect(user.name).toBe("Bhavana Rao");
+  });
+
+  it("needs the current password, applies the rules, and logs out other devices only", async () => {
+    const { started } = await signupWithLink("Chitra", "chitra@example.com");
+    const id = started.result.user.id;
+    const other = await login(
+      { email: "chitra@example.com", password: "a-long-password" },
+      client,
+    );
+
+    await expect(
+      updateAccount(id, started.token, {
+        currentPassword: "not-my-password",
+        newPassword: "a-new-long-password",
+      }),
+    ).rejects.toMatchObject({
+      code: "VALIDATION_FAILED",
+      details: { fields: { currentPassword: expect.any(String) } },
+    });
+    await expect(
+      updateAccount(id, started.token, {
+        currentPassword: "a-long-password",
+        newPassword: "short",
+      }),
+    ).rejects.toMatchObject({
+      details: { fields: { newPassword: expect.any(String) } },
+    });
+
+    await updateAccount(id, started.token, {
+      currentPassword: "a-long-password",
+      newPassword: "a-new-long-password",
+    });
+    expect(await getCurrentSession(started.token)).not.toBeNull();
+    expect(await getCurrentSession(other.token)).toBeNull();
+    await expect(
+      login(
+        { email: "chitra@example.com", password: "a-long-password" },
+        client,
+      ),
+    ).rejects.toMatchObject({ code: "INVALID_CREDENTIALS" });
+    await expect(
+      login(
+        { email: "chitra@example.com", password: "a-new-long-password" },
+        client,
+      ),
     ).resolves.toBeTruthy();
   });
 });

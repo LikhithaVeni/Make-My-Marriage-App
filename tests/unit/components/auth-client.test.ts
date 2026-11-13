@@ -45,6 +45,18 @@ describe("pathAfterAuth (PRD flow F1)", () => {
   });
 });
 
+describe("pathAfterAuth with an invite link (PRD F2)", () => {
+  it("returns to the invite before verify or Create wedding", () => {
+    const user = { ...session().user, emailVerified: false };
+    expect(
+      pathAfterAuth(
+        session({ user, wedding: null, role: null }),
+        "/invite/abc",
+      ),
+    ).toBe("/invite/abc");
+  });
+});
+
 describe("safeNext", () => {
   it("keeps paths on this site", () => {
     expect(safeNext("/dashboard")).toBe("/dashboard");

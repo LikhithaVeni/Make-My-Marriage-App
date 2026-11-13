@@ -16,13 +16,14 @@ export default async function AppLayout({
   const session = await readSession();
   if (!session) redirect("/login");
   if (!session.context.emailVerified) redirect("/verify");
-  const { wedding, user } = session.result;
+  const { wedding, user, role } = session.result;
   if (!wedding) redirect("/wedding/new");
 
   const brand = {
     title: wedding.title,
     monogram: wedding.monogram,
     userName: user.name,
+    role: role ?? "MANAGER",
   };
   return (
     <WeddingBrandProvider brand={brand}>

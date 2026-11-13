@@ -25,10 +25,24 @@ import { FormAlert } from "./FormAlert";
 type Field = "name" | "email" | "password";
 const fields: Field[] = ["name", "email", "password"];
 
-/** Create an account to start a new wedding (PRD flow F1, step 1). */
-export function SignupForm() {
+/** An invite being accepted (PRD F2, step 3): its email can't be changed. */
+export interface SignupInvite {
+  token: string;
+  email: string;
+  name: string;
+}
+
+/**
+ * Create an account to start a new wedding (PRD flow F1, step 1), or, with
+ * an invite, to join one (F2, step 3).
+ */
+export function SignupForm({ invite }: { invite?: SignupInvite }) {
   const router = useRouter();
-  const [values, setValues] = useState({ name: "", email: "", password: "" });
+  const [values, setValues] = useState({
+    name: invite?.name ?? "",
+    email: invite?.email ?? "",
+    password: "",
+  });
   const [errors, setErrors] = useState<Partial<Record<Field, string | null>>>(
     {},
   );
@@ -61,12 +75,16 @@ export function SignupForm() {
 
     setPending(true);
     try {
-      const session = await postJson<AuthSession>("/api/v1/auth/signup", {
+      const path = invite
+        ? `/api/v1/auth/signup?invite=${encodeURIComponent(invite.token)}`
+        : "/api/v1/auth/signup";
+      const session = await postJson<AuthSession>(path, {
         name: values.name.trim(),
         email: values.email.trim(),
         password: values.password,
       });
       router.push(pathAfterAuth(session));
+      router.refresh();
     } catch (error) {
       // PRD F1: an email that's already registered → "Log in instead".
       if (error instanceof ApiError && error.code === "EMAIL_TAKEN") {
@@ -89,7 +107,11 @@ export function SignupForm() {
       {emailTaken && (
         <FormAlert title="This email already has an account.">
           <Link
-            href="/login"
+            href={
+              invite
+                ? `/login?next=${encodeURIComponent(`/invite/${invite.token}`)}`
+                : "/login"
+            }
             className="font-medium text-accent hover:text-accent-hover"
           >
             Log in instead
@@ -113,6 +135,8 @@ export function SignupForm() {
         value={values.email}
         onChange={(event) => update("email", event.target.value)}
         error={errors.email}
+        readOnly={Boolean(invite)}
+        hint={invite ? "The invite was sent to this email." : undefined}
       />
       <TextField
         label="Password"
@@ -130,7 +154,11 @@ export function SignupForm() {
         aria-busy={pending}
         className={`${buttonClass()} mt-1 w-full`}
       >
-        {pending ? "Creating your account…" : "Create account"}
+        {pending
+          ? "Creating your account…"
+          : invite
+            ? "Create account and join"
+            : "Create account"}
       </button>
     </form>
   );

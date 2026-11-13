@@ -7,4 +7,6 @@ UI designs from the Google Stitch project "KaLi's Era Design System" (`775370148
 - `logos/`: two monogram app-icon concepts (not adopted; the brand mark is the text monogram in `design-system.md`).
 - `design-system.md`: Stitch's two style guides, as written.
 
-The current dashboard design is `dashboard-desktop-1440px-updated`. Stitch has no mobile dashboard, no empty state, and no signup, password or organiser pages other than the dashboard.
+The current dashboard design is `dashboard-desktop-1440px-updated`. Stitch has no mobile dashboard, no empty state, and no signup or password pages.
+
+Added on 11 November 2026, generated in the same project with the "Architectural Elegance" design system from prompts that give the app's real content and tokens (decision 62): `wedding-members-settings` (Settings → Wedding members) and `you-are-invited` (the invite link page). These two are Stitch's own screenshots at 2560px wide, not renders from code.

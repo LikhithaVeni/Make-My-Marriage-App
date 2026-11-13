@@ -21,9 +21,13 @@ export function pathAfterAuth(
   session: AuthSession,
   next?: string | null,
 ): string {
+  const safe = safeNext(next);
+  // Accepting an invite confirms the email and joins a wedding, so its page
+  // comes before verify and Create wedding (PRD F2).
+  if (safe?.startsWith("/invite/")) return safe;
   if (!session.user.emailVerified) return "/verify";
   if (!session.wedding) return "/wedding/new";
-  return safeNext(next) ?? "/dashboard";
+  return safe ?? "/dashboard";
 }
 
 /**
