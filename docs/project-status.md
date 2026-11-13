@@ -178,11 +178,13 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Events:** Haldi to Reception with date, time, venue and dress code
+1. **Email through Resend:** verification, password-reset and invite emails
+   reach real inboxes instead of the server terminal. Needed before the family
+   can use the app; agreed as the next step on 2026-11-13.
+2. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
-2. **Email through Resend:** verification, reset and invite emails reach real
-   inboxes instead of the server terminal.
-3. **Dashboard on the real wedding:** replace the sample data as events, tasks and money arrive.
+3. **Dashboard on the real wedding:** replace the sample data as events,
+   tasks and money arrive.
 
 ## Roadmap
 
