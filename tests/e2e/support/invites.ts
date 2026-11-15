@@ -82,6 +82,14 @@ export async function seedOtherWedding(): Promise<mongoose.Types.ObjectId> {
   return insertedId;
 }
 
+/** Confirms an account's email, as clicking the emailed link would. */
+export async function markEmailVerified(email: string): Promise<void> {
+  const database = await db();
+  await database
+    .collection("users")
+    .updateOne({ email }, { $set: { emailVerifiedAt: new Date() } });
+}
+
 export async function closeDb() {
   if (mongoose.connection.readyState === 1) await mongoose.disconnect();
 }

@@ -42,8 +42,10 @@ branch), **Next**, **Later**.
 - Tested: schema and database tests for saving, past dates, addresses and
   roles; an end-to-end test on its own wedding (Admin edits in the browser, a
   Manager can read but not change, CSRF, taken address). Checked at 360 px
-  and on desktop. All 159 unit and database tests and 16 end-to-end tests
-  pass.
+  and on desktop. New browser tests also cover the website address (taken,
+  suggested, free, saved) and Undo on Wedding details, and the Create
+  wedding form, whose address field is now shared. All 159 unit and
+  database tests and 17 end-to-end tests pass.
 - **Waiting for:** the owner's manual check in the browser (edit and save,
   an empty required field, a new website address, Create wedding still
   works), then the PR into `dev`.

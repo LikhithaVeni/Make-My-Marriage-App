@@ -112,9 +112,40 @@ test("an Admin edits the wedding's details; a Manager can only view them", async
   await save.click();
   await expect(page.getByText("Enter the city")).toBeVisible();
 
+  // Undo puts the saved values back.
+  await page.getByRole("button", { name: "Undo changes" }).click();
+  await expect(page.getByLabel("City")).toHaveValue("Madurai");
+  await expect(page.getByText("Enter the city")).toBeHidden();
+  await expect(save).toBeDisabled();
+
+  // A taken address is flagged while typing, with free ones offered.
+  const address = page.getByLabel("Website address");
+  await address.fill("e2e-weds-test");
+  await expect(page.getByText("This address is taken.")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /^e2e-weds-test-/ }).first(),
+  ).toBeVisible();
+
+  // A free one is saved, with a warning that old links stop working.
+  await address.fill("settings-weds-e2e");
+  await expect(page.getByText("This address is free.")).toBeVisible();
+  await expect(
+    page.getByText("Links to the old address will stop working."),
+  ).toBeVisible();
+  await save.click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Saved." }),
+  ).toBeVisible();
+  // Now it's the wedding's own address, so it needs no check.
+  await expect(page.getByText("This address is free.")).toBeHidden();
+
   // The Manager sees the saved details.
   expect(
     (await (await manager.get("/api/v1/wedding")).json()).data.wedding,
-  ).toMatchObject({ title: "Settings weds E2E", city: "Madurai" });
+  ).toMatchObject({
+    title: "Settings weds E2E",
+    city: "Madurai",
+    slug: "settings-weds-e2e",
+  });
   await manager.dispose();
 });
