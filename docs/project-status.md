@@ -37,10 +37,16 @@ branch), **Next**, **Later**.
   `PATCH /api/v1/wedding` (Admins).
 - The RSVP cutoff, upload cap and cover image wait for RSVP, the gallery and
   photo storage.
+- Create wedding and Wedding details now share the website address field
+  and its "is it free" check.
 - Tested: schema and database tests for saving, past dates, addresses and
   roles; an end-to-end test on its own wedding (Admin edits in the browser, a
   Manager can read but not change, CSRF, taken address). Checked at 360 px
-  and on desktop.
+  and on desktop. All 159 unit and database tests and 16 end-to-end tests
+  pass.
+- **Waiting for:** the owner's manual check in the browser (edit and save,
+  an empty required field, a new website address, Create wedding still
+  works), then the PR into `dev`.
 - Decision 66.
 
 ### 2026-11-15: Email through Gmail or Resend (Done, PR #6)
@@ -67,8 +73,16 @@ branch), **Next**, **Later**.
 ### 2026-11-13: Members and invites (Done, PR #5)
 
 - **Settings → Wedding members** (Admin only): invite family by email as Admin
-  or Manager with a relation ("Bride's mother"); members and pending invites;
-  resend, cancel, change role, remove (with a confirm step).
+  or Manager with a relation ("Bride's mother").
+  - **Pending invitations:** listed with role, relation, Pending or Expired,
+    the link's expiry and who sent it.
+  - **Revoke an invitation:** Cancel invite stops the link at once (no
+    confirm step, since it can be sent again). Resend gives a new link for 7
+    more days and stops the old one.
+  - **Change roles:** Make Admin or Make Manager; the member is logged out
+    so the new role applies.
+  - **Remove a member, or Leave the wedding,** each with a confirm step
+    ("Remove Meena?", "Leave this wedding?").
 - **Invite link** `/invite/<token>`: shows who invited whom to which wedding;
   sign up with the invited email (locked) or log in, then join. Joining
   confirms the email. Wrong account, used, expired and cancelled links each
@@ -80,8 +94,8 @@ branch), **Next**, **Later**.
   removing each other at the same instant), 5 permanent end-to-end tests
   (`tests/e2e/members.spec.ts`), and 28 checks in Edge on desktop and phone
   (invite, join, Manager limits, role change, remove, Leave, expired, wrong
-  account, already in a wedding, cancelled). Invite emails print in the
-  server terminal until Resend.
+  account, already in a wedding, cancelled). On 2026-11-15, with real email:
+  invite, resend, join, and remove checked again by the owner.
 - Matched to two new Stitch designs generated for these pages (decision 62).
 - Auth review fixes: **Your account** page (change name or password) and the
   verification link now logs you in, as PRD F1 says (decision 63).
@@ -256,5 +270,11 @@ owner's request, so the family could see the look early.
 
 - **Rotate the Stitch API key.** It was shared in a chat. The key lives only
   in the user-level Claude settings and must never be committed.
-- **Old branches:** `feature/dashboard`, `feature/landing` and
-  `feature/auth` are fully merged into `dev` and can be deleted.
+- **Resend key:** the Gmail app password and the Resend key were rotated on
+  2026-11-15 after being shared in a chat. The new Resend key has Full
+  access; swap it for a Sending access key, or clear `RESEND_API_KEY`,
+  since Gmail does the sending.
+- **Old branches:** `feature/foundation-platform`, `feature/dashboard`,
+  `feature/landing`, `feature/auth-api`, `feature/landing-session`,
+  `feature/members` and `feature/email` are fully merged into `dev` and can
+  be deleted on GitHub.
