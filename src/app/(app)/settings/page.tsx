@@ -17,9 +17,9 @@ const sections = [
   },
   {
     title: "Wedding details",
-    text: "Names, date, city, cover image, description and tagline.",
+    text: "Names, date, city, website address, description and tagline.",
     href: "/settings/wedding",
-    available: false,
+    available: true,
   },
   {
     title: "Photographer access",

@@ -1,7 +1,7 @@
 // Wedding business logic: creating a wedding, its members and their invites
 // (docs/API Design v1.md "Create wedding" and "Wedding, website and member
-// endpoints"; PRD F2 and "Member management"). Settings, website settings
-// and the photographer account arrive later. Callers outside this module
+// endpoints"; PRD F1, F2, "Wedding setup" and "Member management"). Website
+// settings and the photographer account arrive later. Callers outside this module
 // reach it only through index.ts.
 import "server-only";
 
@@ -9,6 +9,7 @@ import { createHash, randomBytes } from "node:crypto";
 
 import type { ClientSession } from "mongoose";
 
+import { todayInKolkata } from "@/lib/format";
 import { slugify, SLUG_MAX } from "@/lib/slug";
 import {
   attachWeddingToSessions,
@@ -34,8 +35,10 @@ import {
 import {
   type CreateWeddingInput,
   type InviteInput,
+  PAST_DATE_MESSAGE,
   SLUG_PATTERN,
   type UpdateMemberInput,
+  type UpdateWeddingInput,
 } from "./schemas";
 
 const DUPLICATE_KEY = 11000;
@@ -219,6 +222,100 @@ export async function createWedding(
     "ADMIN",
   );
   return { wedding: toView(created), role: "ADMIN" };
+}
+
+/** The caller's wedding (API Design `GET /wedding`). */
+export async function getWedding(ctx: WeddingContext): Promise<WeddingView> {
+  const { Wedding } = await models();
+  const wedding = await Wedding.findById(ctx.weddingId);
+  if (!wedding) {
+    throw new AppError("NOT_FOUND", 404, "This wedding doesn't exist.");
+  }
+  return toView(wedding);
+}
+
+/**
+ * Saves the setup fields an Admin changed (API Design `PATCH /wedding`).
+ * Only the fields sent are written, so two Admins editing different fields
+ * at once don't undo each other.
+ */
+export async function updateWedding(
+  ctx: WeddingContext,
+  input: UpdateWeddingInput,
+  now = new Date(),
+): Promise<WeddingView> {
+  const { Wedding } = await models();
+  const current = await Wedding.findById(ctx.weddingId);
+  if (!current) {
+    throw new AppError("NOT_FOUND", 404, "This wedding doesn't exist.");
+  }
+
+  // A new date can't be in the past; an unchanged one may be, after the day.
+  if (
+    input.date !== undefined &&
+    input.date !== current.date &&
+    input.date < todayInKolkata(now)
+  ) {
+    throw new AppError("VALIDATION_FAILED", 400, "Some fields are invalid.", {
+      fields: { date: PAST_DATE_MESSAGE },
+    });
+  }
+
+  const slugChanged = input.slug !== undefined && input.slug !== current.slug;
+  const slugTaken = async () =>
+    new AppError("SLUG_TAKEN", 409, "This web address is already taken.", {
+      suggestions: await suggestSlugs(input.slug!, [
+        (input.date ?? current.date).slice(0, 4),
+        input.city ?? current.city,
+      ]),
+    });
+  if (
+    slugChanged &&
+    (await Wedding.exists({ slug: input.slug, _id: { $ne: current._id } }))
+  ) {
+    throw await slugTaken();
+  }
+
+  const set: Partial<WeddingDoc> = {};
+  const unset: Record<string, ""> = {};
+  for (const field of [
+    "brideName",
+    "groomName",
+    "title",
+    "date",
+    "city",
+    "slug",
+  ] as const) {
+    if (input[field] !== undefined) set[field] = input[field];
+  }
+  if (input.description !== undefined) {
+    if (input.description) set.description = input.description;
+    else unset.description = "";
+  }
+  if (input.tagline !== undefined) {
+    set.tagline = input.tagline || DEFAULT_TAGLINE;
+  }
+
+  // The unique slug index must exist for a race to be caught below.
+  if (slugChanged) await Wedding.init();
+  let updated: WeddingDoc | null;
+  try {
+    updated = await Wedding.findByIdAndUpdate(
+      current._id,
+      { $set: set, ...(Object.keys(unset).length ? { $unset: unset } : {}) },
+      { returnDocument: "after", runValidators: true },
+    );
+  } catch (err) {
+    // Another wedding took the address between the check and the save.
+    if ((err as { code?: unknown }).code === DUPLICATE_KEY) {
+      throw await slugTaken();
+    }
+    throw err;
+  }
+  if (!updated) {
+    throw new AppError("NOT_FOUND", 404, "This wedding doesn't exist.");
+  }
+  return toView(updated);
 }
 
 // ---------------------------------------------------------------------------

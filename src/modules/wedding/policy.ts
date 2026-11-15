@@ -4,6 +4,10 @@
 import type { Policy } from "@/platform/rbac";
 
 export const weddingPolicy = {
+  // API Design `GET /wedding`; PRD: Managers view wedding details, only
+  // Admins edit them.
+  "wedding.view": ["ADMIN", "MANAGER", "PHOTOGRAPHER"],
+  "wedding.update": ["ADMIN"],
   "members.list": ["ADMIN"],
   "members.invite": ["ADMIN"],
   "members.update": ["ADMIN"],

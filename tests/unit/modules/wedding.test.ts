@@ -6,8 +6,13 @@ import {
   checkSlug,
   createWedding,
   createWeddingSchema,
+  getWedding,
   membershipOf,
+  updateWedding,
+  updateWeddingSchema,
+  weddingPolicy,
 } from "@/modules/wedding";
+import { authorize } from "@/platform/rbac";
 
 import { startTestDb, TEST_DB_URI } from "../helpers/test-db";
 
@@ -80,6 +85,43 @@ describe("createWeddingSchema", () => {
     });
     const fields = result.error?.issues.map((issue) => issue.path[0]);
     expect(fields).toEqual(expect.arrayContaining(["date", "slug"]));
+  });
+});
+
+describe("updateWeddingSchema", () => {
+  it("accepts any one field, trimmed", () => {
+    expect(updateWeddingSchema.parse({ city: " Vizag " })).toEqual({
+      city: "Vizag",
+    });
+  });
+
+  it("allows clearing the description and tagline, not a required field", () => {
+    expect(updateWeddingSchema.parse({ description: "", tagline: "" })).toEqual(
+      { description: "", tagline: "" },
+    );
+    const result = updateWeddingSchema.safeParse({ city: "  " });
+    expect(result.error?.issues[0]).toMatchObject({
+      path: ["city"],
+      message: "Enter the city",
+    });
+  });
+
+  it("leaves a past date to the service, which allows an unchanged one", () => {
+    expect(updateWeddingSchema.safeParse({ date: "2020-01-01" }).success).toBe(
+      true,
+    );
+    expect(updateWeddingSchema.safeParse({ date: "2020-02-30x" }).success).toBe(
+      false,
+    );
+  });
+
+  it("refuses an empty change and a malformed address", () => {
+    expect(updateWeddingSchema.safeParse({}).error?.issues[0]?.message).toBe(
+      "Nothing to change",
+    );
+    expect(updateWeddingSchema.safeParse({ slug: "No Spaces" }).success).toBe(
+      false,
+    );
   });
 });
 
@@ -168,5 +210,114 @@ describe.skipIf(!TEST_DB_URI)("createWedding", () => {
     await expect(
       createWedding(context, { ...kalisEra, slug: "arun-weds" }),
     ).rejects.toMatchObject({ code: "EMAIL_NOT_VERIFIED", httpStatus: 403 });
+  });
+});
+
+describe.skipIf(!TEST_DB_URI)("updateWedding", () => {
+  /** A verified Admin with their own wedding, as the routes would see them. */
+  async function adminOf(slug: string, email: string) {
+    const { token, context } = await verifiedUser("Admin", email);
+    await createWedding(context, { ...kalisEra, slug });
+    const current = (await getCurrentSession(token, undefined, membershipOf))!;
+    return {
+      token,
+      ctx: authorize(current.context, weddingPolicy, "wedding.update"),
+    };
+  }
+
+  it("saves only the fields sent, and the session sees the new name", async () => {
+    const { token, ctx } = await adminOf("edit-me", "edit.admin@example.com");
+
+    const updated = await updateWedding(ctx, {
+      title: "Likhitha & Kaushik",
+      brideName: "Likhitha M",
+      description: "Two families, one big week.",
+    });
+    expect(updated).toMatchObject({
+      title: "Likhitha & Kaushik",
+      brideName: "Likhitha M",
+      groomName: "Kaushik",
+      city: "Hyderabad",
+      slug: "edit-me",
+      description: "Two families, one big week.",
+    });
+    expect(await getWedding(ctx)).toEqual(updated);
+
+    const current = await getCurrentSession(token, undefined, membershipOf);
+    expect(current?.result.wedding).toMatchObject({
+      title: "Likhitha & Kaushik",
+      monogram: "LK",
+    });
+
+    // An empty description clears it; an empty tagline is the default again.
+    await updateWedding(ctx, { tagline: "request your presence" });
+    const cleared = await updateWedding(ctx, { description: "", tagline: "" });
+    expect(cleared.description).toBeNull();
+    expect(cleared.tagline).toBe("invite you to celebrate with us");
+  });
+
+  it("refuses a new past date but keeps an old one editable", async () => {
+    const { ctx } = await adminOf("after-the-day", "past.admin@example.com");
+    const afterTheWedding = new Date("2028-02-10T06:00:00Z");
+
+    // The wedding (28 Jan 2028) is over; other details can still change.
+    await expect(
+      updateWedding(
+        ctx,
+        { city: "Vizag", date: "2028-01-28" },
+        afterTheWedding,
+      ),
+    ).resolves.toMatchObject({ city: "Vizag", date: "2028-01-28" });
+
+    await expect(
+      updateWedding(ctx, { date: "2028-02-01" }, afterTheWedding),
+    ).rejects.toMatchObject({
+      code: "VALIDATION_FAILED",
+      httpStatus: 400,
+      details: { fields: { date: "The wedding date can't be in the past" } },
+    });
+  });
+
+  it("moves the website address, refusing one that's taken", async () => {
+    const { ctx } = await adminOf("old-address", "slug.admin@example.com");
+    await adminOf("someone-elses", "other.admin@example.com");
+
+    await expect(
+      updateWedding(ctx, { slug: "someone-elses" }),
+    ).rejects.toMatchObject({
+      code: "SLUG_TAKEN",
+      httpStatus: 409,
+      details: { suggestions: expect.arrayContaining(["someone-elses-2028"]) },
+    });
+
+    // Sending its own address again is fine.
+    await expect(
+      updateWedding(ctx, { slug: "old-address" }),
+    ).resolves.toMatchObject({ slug: "old-address" });
+
+    await expect(
+      updateWedding(ctx, { slug: "new-address" }),
+    ).resolves.toMatchObject({ slug: "new-address" });
+    expect(await checkSlug("old-address")).toMatchObject({ available: true });
+    expect(await checkSlug("new-address")).toMatchObject({ available: false });
+  });
+
+  it("is for Admins only", async () => {
+    const { token } = await adminOf("roles-check", "roles.admin@example.com");
+    const { context } = (await getCurrentSession(
+      token,
+      undefined,
+      membershipOf,
+    ))!;
+    expect(() =>
+      authorize(
+        { ...context, role: "MANAGER" },
+        weddingPolicy,
+        "wedding.update",
+      ),
+    ).toThrow(expect.objectContaining({ code: "FORBIDDEN" }));
+    expect(
+      authorize({ ...context, role: "MANAGER" }, weddingPolicy, "wedding.view"),
+    ).toMatchObject({ role: "MANAGER" });
   });
 });

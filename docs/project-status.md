@@ -9,22 +9,39 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status | Branch / PR                      | Updated    |
-| ---------------------------------------------- | ------ | -------------------------------- | ---------- |
-| Foundation scaffold                            | Done   | `dev` (first commits)            | 2026-11-03 |
-| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1       | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2         | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4 | 2026-11-11 |
-| Members and invites                            | Done   | `feature/members`, PR #5         | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6           | 2026-11-15 |
-| Landing page: features, how it works, footer   | Later  | —                                | —          |
+| Feature                                        | Status      | Branch / PR                      | Updated    |
+| ---------------------------------------------- | ----------- | -------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)            | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1       | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2         | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4 | 2026-11-11 |
+| Members and invites                            | Done        | `feature/members`, PR #5         | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6           | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | In progress | `feature/wedding-settings`       | 2026-11-15 |
+| Landing page: features, how it works, footer   | Later       | —                                | —          |
 
 ## Log
+
+### 2026-11-15: Wedding settings (In progress)
+
+- **Settings → Wedding details** (Admin only): change the couple's names,
+  wedding name, date, city, website address, tagline and description. Only
+  the changed fields are saved; a taken address offers free ones; a new date
+  can't be in the past. The sidebar's name and monogram follow at once.
+- `GET /api/v1/wedding` (Admins, Managers, photographer) and
+  `PATCH /api/v1/wedding` (Admins).
+- The RSVP cutoff, upload cap and cover image wait for RSVP, the gallery and
+  photo storage.
+- Tested: schema and database tests for saving, past dates, addresses and
+  roles; an end-to-end test on its own wedding (Admin edits in the browser, a
+  Manager can read but not change, CSRF, taken address). Checked at 360 px
+  and on desktop.
+- Decision 66.
 
 ### 2026-11-15: Email through Gmail or Resend (Done, PR #6)
 
@@ -200,9 +217,7 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Wedding settings:** `GET` and `PATCH /api/v1/wedding` and the
-   `/settings/wedding` page, so an Admin can edit the wedding's details (PRD
-   "Wedding setup, editable later"). The Settings page already links there.
+1. **Wedding settings:** finish and merge (manual check by the owner).
 2. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
 3. **Dashboard on the real wedding:** replace the sample data as events,
