@@ -4,8 +4,9 @@ import { E2E_DB_URI } from "./tests/e2e/support/e2e-db";
 
 const isCI = Boolean(process.env.CI);
 // `next dev` and `next start` read PORT too, so the app and the tests agree.
-// Set it when another app already uses port 3000.
-const port = process.env.PORT ?? "3000";
+// Not 3000: a running `pnpm dev` there uses the real database and real email,
+// and `reuseExistingServer` would test against it (decision 65).
+const port = process.env.PORT ?? "3100";
 const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
@@ -25,10 +26,20 @@ export default defineConfig({
     // database is down, which would stop every test from starting.
     url: `${baseURL}/`,
     reuseExistingServer: !isCI,
-    // Point the app at the e2e database, so tests never touch real data.
-    env: E2E_DB_URI
-      ? ({ ...process.env, MONGODB_URI: E2E_DB_URI } as Record<string, string>)
-      : undefined,
+    // Point the app at the e2e database, and switch email off: tests sign up
+    // made-up addresses, and real sends to them would bounce and hurt the
+    // sending domain's reputation (decision 64).
+    env: {
+      ...(process.env as Record<string, string>),
+      ...(E2E_DB_URI ? { MONGODB_URI: E2E_DB_URI } : {}),
+      PORT: port,
+      NEXT_PUBLIC_APP_URL: baseURL,
+      // Its own build folder, so it can run while `pnpm dev` does. CI builds
+      // into the default folder before `pnpm start`.
+      ...(isCI ? {} : { NEXT_DIST_DIR: ".next-e2e" }),
+      RESEND_API_KEY: "",
+      GMAIL_APP_PASSWORD: "",
+    },
     timeout: 120_000,
   },
 });

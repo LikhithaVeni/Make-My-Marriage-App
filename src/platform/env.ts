@@ -35,6 +35,16 @@ const serverEnvSchema = z.object({
   R2_SECRET_ACCESS_KEY: optional(z.string()),
   R2_BUCKET: optional(z.string()),
   RESEND_API_KEY: optional(z.string()),
+  // The sender of every email, e.g. "KaLi's era <hello@kalisera.in>". Its
+  // address must be on a domain verified in Resend; Resend's test sender
+  // onboarding@resend.dev only reaches the Resend account's own email.
+  RESEND_FROM_EMAIL: optional(z.string()),
+  // Sending through a Gmail account (decision 64): free, no domain, reaches
+  // anyone. The password is a Gmail "app password", never the account's own.
+  GMAIL_USER: optional(z.email("Must be an email address")),
+  GMAIL_APP_PASSWORD: optional(z.string()),
+  // The name emails come from, e.g. "KaLi's era". Optional.
+  EMAIL_FROM_NAME: optional(z.string().max(60)),
   JOB_SECRET: optional(secret),
   SESSION_SECRET: optional(secret),
 });
@@ -49,7 +59,8 @@ const services = {
     "R2_SECRET_ACCESS_KEY",
     "R2_BUCKET",
   ],
-  email: ["RESEND_API_KEY"],
+  email: ["RESEND_API_KEY", "RESEND_FROM_EMAIL"],
+  gmail: ["GMAIL_USER", "GMAIL_APP_PASSWORD"],
   jobs: ["JOB_SECRET"],
   session: ["SESSION_SECRET"],
 } as const satisfies Record<string, readonly (keyof ServerEnv)[]>;
