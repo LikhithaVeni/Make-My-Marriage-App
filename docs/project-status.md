@@ -21,9 +21,31 @@ branch), **Next**, **Later**.
 | Email verification and forgot password         | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
 | Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4 | 2026-11-11 |
 | Members and invites                            | Done   | `feature/members`, PR #5         | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6           | 2026-11-15 |
 | Landing page: features, how it works, footer   | Later  | —                                | —          |
 
 ## Log
+
+### 2026-11-15: Email through Gmail or Resend (Done, PR #6)
+
+- Verification, password-reset and invite emails are sent through a free
+  Gmail account with an app password (`GMAIL_USER`, `GMAIL_APP_PASSWORD`,
+  sender name `EMAIL_FROM_NAME`), or through Resend if Gmail isn't set up. No
+  domain is bought. Development still prints emails in the terminal. A failed
+  email is logged and never undoes the action.
+- Resend without a domain refused an invite to another address (it only
+  reaches the Resend account's own email), which is why Gmail is used.
+- Tested by hand with real inboxes: password reset, member invite, resend
+  invite and joining through the new link all work. Email links use
+  `NEXT_PUBLIC_APP_URL`, so it must match the port the app runs on.
+- End-to-end tests now start their own server on port 3100 instead of
+  reusing `pnpm dev` on 3000, which has the real database and email
+  (decision 65).
+- Tests never send real email. All 151 unit and database tests and 15
+  end-to-end tests pass.
+- **Not yet:** the email queue in the `jobs` collection (Database Design);
+  needed for bulk guest invitations in Phase 2.
+- Decisions 64–65.
 
 ### 2026-11-13: Members and invites (Done, PR #5)
 
@@ -178,9 +200,9 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Email through Resend:** verification, password-reset and invite emails
-   reach real inboxes instead of the server terminal. Needed before the family
-   can use the app; agreed as the next step on 2026-11-13.
+1. **Wedding settings:** `GET` and `PATCH /api/v1/wedding` and the
+   `/settings/wedding` page, so an Admin can edit the wedding's details (PRD
+   "Wedding setup, editable later"). The Settings page already links there.
 2. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
 3. **Dashboard on the real wedding:** replace the sample data as events,
@@ -204,10 +226,9 @@ owner's request, so the family could see the look early.
 
 ## Temporary until a later feature
 
-| What                                                            | Goes away with                    |
-| --------------------------------------------------------------- | --------------------------------- |
-| Dashboard shows sample data                                     | Events, tasks, expenses and so on |
-| Sign-up and log-in forms say "Accounts aren't switched on yet." | Accounts API                      |
+| What                        | Goes away with                    |
+| --------------------------- | --------------------------------- |
+| Dashboard shows sample data | Events, tasks, expenses and so on |
 
 ## Housekeeping
 

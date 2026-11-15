@@ -7,6 +7,9 @@ const serviceVariables = [
   "R2_SECRET_ACCESS_KEY",
   "R2_BUCKET",
   "RESEND_API_KEY",
+  "RESEND_FROM_EMAIL",
+  "GMAIL_USER",
+  "GMAIL_APP_PASSWORD",
   "JOB_SECRET",
   "SESSION_SECRET",
 ];
@@ -38,6 +41,7 @@ describe("server env", () => {
       "mongodb",
       "r2",
       "email",
+      "gmail",
       "jobs",
       "session",
     ] as const) {
