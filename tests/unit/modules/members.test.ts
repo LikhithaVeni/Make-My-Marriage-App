@@ -113,11 +113,17 @@ describe("members policy and invite schema", () => {
       weddingId: "w",
       role: "MANAGER" as const,
     };
-    for (const action of Object.keys(weddingPolicy)) {
-      expect(() =>
-        authorize(manager, weddingPolicy, action as keyof typeof weddingPolicy),
-      ).toThrow(AppError);
+    const adminOnly = Object.keys(weddingPolicy).filter(
+      (action) => action.startsWith("members.") || action === "wedding.update",
+    ) as (keyof typeof weddingPolicy)[];
+    expect(adminOnly).toHaveLength(5);
+    for (const action of adminOnly) {
+      expect(() => authorize(manager, weddingPolicy, action)).toThrow(AppError);
     }
+    // Managers may view the wedding's details (API Design `GET /wedding`).
+    expect(authorize(manager, weddingPolicy, "wedding.view").role).toBe(
+      "MANAGER",
+    );
   });
 
   it("lowercases the email and refuses the photographer role", () => {

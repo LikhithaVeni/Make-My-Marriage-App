@@ -5,12 +5,14 @@ export {
   checkSlug,
   createInvite,
   createWedding,
+  getWedding,
   listMembers,
   membershipOf,
   previewInvite,
   removeMember,
   resendInvite,
   updateMember,
+  updateWedding,
   type InvitePreview,
   type InviteView,
   type MemberView,
@@ -22,5 +24,10 @@ export {
   inviteSchema,
   slugSchema,
   updateMemberSchema,
+  updateWeddingSchema,
 } from "./schemas";
-export type { CreateWeddingInput, InviteInput } from "./schemas";
+export type {
+  CreateWeddingInput,
+  InviteInput,
+  UpdateWeddingInput,
+} from "./schemas";
