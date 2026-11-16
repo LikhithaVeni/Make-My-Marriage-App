@@ -119,3 +119,14 @@ export function authModels(mongoose: Mongoose): AuthModels {
 
   return { User, Session, AuthToken };
 }
+
+/**
+ * Builds the indexes declared above. Production runs with `autoIndex` off, so
+ * the setup script calls this (Database Design: "Indexes are declared in each
+ * module's model.ts and created by a setup script"). Existing indexes are left
+ * as they are, so it is safe to run again.
+ */
+export async function createAuthIndexes(mongoose: Mongoose): Promise<void> {
+  const { User, Session, AuthToken } = authModels(mongoose);
+  for (const model of [User, Session, AuthToken]) await model.createIndexes();
+}

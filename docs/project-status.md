@@ -9,24 +9,40 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status | Branch / PR                       | Updated    |
-| ---------------------------------------------- | ------ | --------------------------------- | ---------- |
-| Foundation scaffold                            | Done   | `dev` (first commits)             | 2026-11-03 |
-| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1        | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2          | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4  | 2026-11-11 |
-| Members and invites                            | Done   | `feature/members`, PR #5          | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6            | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`, PR #7 | 2026-11-16 |
-| Deployment (Vercel, Production from `main`)    | Done   | `feature/deploy`, PR #8           | 2026-11-16 |
-| Landing page: features, how it works, footer   | Later  | —                                 | —          |
+| Feature                                        | Status      | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
+| Database indexes in production (`db:indexes`)  | In progress | `fix/db-indexes`                  | 2026-11-16 |
+| Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
+
+### 2026-11-16: Database indexes in production (In progress)
+
+- Found while starting Events: production runs with `autoIndex` off and the
+  setup script Database Design names didn't exist, so the live database had
+  no unique or TTL indexes. Everyday use was still protected by the code's
+  own checks; two requests at the same instant could have made a duplicate,
+  and expired sessions and tokens weren't being deleted.
+- Added `pnpm db:indexes --database <name>`, built from each module's
+  `model.ts`. Tried on a test database in production mode: it built exactly
+  Database Design's indexes. A database test checks them; 161 unit and
+  database tests and 17 end-to-end tests pass.
+- **Waiting for:** running it on `mmm_prod` (the owner's approval), then the
+  PR into `dev`.
+- Decision 68.
 
 ### 2026-11-16: Deployment to Vercel (Done, PR #8)
 
@@ -264,11 +280,13 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Events:** Haldi to Reception with date, time, venue and dress code
+1. **Database indexes:** run `pnpm db:indexes --database mmm_prod`, then
+   merge.
+2. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
-2. **Dashboard on the real wedding:** replace the sample data as events,
+3. **Dashboard on the real wedding:** replace the sample data as events,
    tasks and money arrive.
-3. **Production housekeeping:** a production-only Atlas user, and an
+4. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap

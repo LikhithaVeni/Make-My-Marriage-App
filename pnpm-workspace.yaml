@@ -1,2 +1,4 @@
 allowBuilds:
   unrs-resolver: true
+  # tsx works with the prebuilt binary; the install script only checks it.
+  esbuild: false

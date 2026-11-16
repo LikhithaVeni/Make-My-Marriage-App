@@ -155,3 +155,14 @@ export function weddingModels(mongoose: Mongoose): WeddingModels {
 
   return { Wedding, Membership, Invite };
 }
+
+/**
+ * Builds the indexes declared above, for the setup script (production runs
+ * with `autoIndex` off; Database Design "Indexes"). Safe to run again.
+ */
+export async function createWeddingIndexes(mongoose: Mongoose): Promise<void> {
+  const { Wedding, Membership, Invite } = weddingModels(mongoose);
+  for (const model of [Wedding, Membership, Invite]) {
+    await model.createIndexes();
+  }
+}
