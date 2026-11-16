@@ -25,9 +25,22 @@ branch), **Next**, **Later**.
 | Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
 | Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
 | Database indexes in production (`db:indexes`)  | In progress | `fix/db-indexes`                  | 2026-11-16 |
+| Emailed links never use localhost on Vercel    | In progress | `fix/app-url`                     | 2026-11-16 |
 | Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
+
+### 2026-11-16: Emailed links never use localhost on Vercel (In progress)
+
+- An invite email reached the owner with a `localhost:3000` link. On Vercel
+  the app now ignores a localhost (or missing) `NEXT_PUBLIC_APP_URL` and uses
+  the deployment's own address; a trailing slash is dropped too. Unit tests
+  cover Production, Preview, a custom domain and local use.
+- Reminder: send family invites from the live site; invites sent from
+  `localhost:3000` go to the development database with localhost links.
+- **Next:** merge into `dev`, release to `main`, then send a test invite on
+  the live site and check its link.
+- Decision 69.
 
 ### 2026-11-16: Database indexes in production (In progress)
 
