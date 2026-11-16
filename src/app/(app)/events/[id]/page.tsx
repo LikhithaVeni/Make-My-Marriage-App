@@ -31,7 +31,7 @@ function Row({
   return (
     <div className="flex flex-col gap-1 py-4 first:pt-0 last:pb-0 sm:flex-row sm:gap-6">
       <dt className="shrink-0 text-small text-text-muted sm:w-40">{label}</dt>
-      <dd className="min-w-0 text-text">{children}</dd>
+      <dd className="min-w-0 wrap-anywhere text-text">{children}</dd>
     </div>
   );
 }

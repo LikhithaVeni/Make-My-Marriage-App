@@ -98,7 +98,10 @@ export function DeleteEventButton({
       aria-labelledby={`delete-${eventId}`}
       className="flex flex-col gap-3 rounded-control border border-danger/30 p-4"
     >
-      <p id={`delete-${eventId}`} className="font-medium text-text">
+      <p
+        id={`delete-${eventId}`}
+        className="font-medium wrap-anywhere text-text"
+      >
         {check.blocked ? `${name} can't be deleted yet` : `Delete ${name}?`}
       </p>
       {check.blocked ? (

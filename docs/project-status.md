@@ -49,6 +49,13 @@ branch), **Next**, **Later**.
 - Tested: schema, permission and database tests for creating, listing,
   editing, clearing, the time rules, other weddings and deleting; a browser
   test as Admin and Manager; checked at 360 px and on desktop.
+- QA pass: about 50 extra checks (bad and boundary input, February 30,
+  `javascript:` and fake YouTube links, injected fields, other weddings,
+  roles, CSRF, signed out, two Admins at once, a script in the name,
+  keyboard use, 404s, the Manager's view). It found one bug, fixed: an
+  80-character name with no spaces widened the page (865 px on a phone);
+  long text now wraps, and a browser test checks it. 179 unit and database
+  tests and 19 end-to-end tests pass.
 - **Waiting for:** the owner's check in the browser, then the PR into `dev`;
   after release, run `pnpm db:indexes --database mmm_prod` for the new
   `events` indexes.

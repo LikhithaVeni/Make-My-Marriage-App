@@ -175,3 +175,37 @@ test("an Admin plans the schedule; a Manager edits details only", async ({
   expect(gone!.status()).toBe(404);
   await manager.dispose();
 });
+
+test("long names wrap instead of widening the page on a phone", async ({
+  page,
+}) => {
+  const weddingId = await seedOtherWedding();
+  const email = "events.long.e2e@example.com";
+  const token = await seedInvite({ email, role: "ADMIN", weddingId });
+  await page.request.post(`/api/v1/auth/signup?invite=${token}`, {
+    headers: csrf,
+    data: { name: "Events Long", email, password: PASSWORD },
+  });
+  // Found in QA: an 80-character name with no spaces overflowed by 865 px.
+  const created = await page.request.post("/api/v1/events", {
+    headers: csrf,
+    data: {
+      name: "Mehendi".repeat(11) + "X",
+      startAt: "2028-01-26T19:00:00+05:30",
+      endAt: "2028-01-26T23:00:00+05:30",
+      venue: { name: "V".repeat(200), address: "A".repeat(500) },
+    },
+  });
+  const { id } = (await created.json()).data;
+
+  await page.setViewportSize({ width: 360, height: 800 });
+  for (const path of ["/events", `/events/${id}`, `/events/${id}/edit`]) {
+    await page.goto(path);
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(overflow, path).toBe(0);
+  }
+});

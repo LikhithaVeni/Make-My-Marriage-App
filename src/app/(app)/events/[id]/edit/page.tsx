@@ -24,7 +24,7 @@ export default async function EditEventPage(
       <main className="flex flex-1 flex-col gap-6 p-4 md:p-8">
         <Link
           href={`/events/${event.id}`}
-          className="self-start rounded-control text-small font-medium text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-accent"
+          className="self-start rounded-control text-small font-medium wrap-anywhere text-accent hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-accent"
         >
           ← {event.name}
         </Link>

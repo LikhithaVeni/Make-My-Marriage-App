@@ -74,7 +74,7 @@ export default async function EventsPage() {
                         <span className="shrink-0 text-small text-text-muted sm:w-56">
                           {formatTimeRange(event.startAt, event.endAt)}
                         </span>
-                        <span className="min-w-0">
+                        <span className="min-w-0 wrap-anywhere">
                           <span className="block font-medium text-accent">
                             {event.name}
                           </span>
