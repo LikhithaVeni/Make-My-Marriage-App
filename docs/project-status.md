@@ -54,8 +54,15 @@ branch), **Next**, **Later**.
   A long event name in the new "No tasks for …" message widened the event
   page on phones; empty-state titles now wrap. 192 unit and database tests
   and 20 end-to-end tests pass (three full runs in a row).
-- **Waiting for:** the owner's check, then the PR into `dev`; after release,
-  run `pnpm db:indexes --database mmm_prod` for the `tasks` indexes.
+- Owner's check on the local app: "Add task" showed "Something went
+  wrong." on `localhost:3000`. The same task saved on a fresh second dev
+  server (`localhost:3200`, same dev database): `POST /api/v1/tasks` 201,
+  then two status changes 200. The code was fine; the dev server on port
+  3000 had run for days across many branch switches and was stale. Restart
+  it (Ctrl + C, then `pnpm dev`).
+- **Waiting for:** the owner's check after restarting the dev server, then
+  the PR into `dev`; after release, run `pnpm db:indexes --database
+mmm_prod` for the `tasks` indexes.
 - Decision 71.
 
 ### 2026-11-17: Events (Done, PR #12)
@@ -351,11 +358,13 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Tasks:** per event or general, assignee, due date, priority, status,
-   overdue, My tasks (PRD "Tasks", key flow F3).
-2. **Notifications and jobs runner:** the bell, task-assigned notices and
+1. **Tasks:** restart the local dev server and check, merge, release, then
+   run `pnpm db:indexes --database mmm_prod`.
+2. **Next.js security notice:** check the advisory and upgrade Next.js on
+   its own branch.
+3. **Notifications and jobs runner:** the bell, task-assigned notices and
    emails through the job queue.
-3. **Production housekeeping:** a production-only Atlas user, and an
+4. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
@@ -382,10 +391,18 @@ owner's request, so the family could see the look early.
 
 ## Housekeeping
 
-- **Production indexes:** Mongoose builds indexes only outside production
-  (decision 25); Database Design's setup script that creates them (unique
-  email, slug and tokens, TTLs) is still to be written before the first
-  deploy.
+- **Production indexes:** done. `pnpm db:indexes --database mmm_prod`
+  (decision 68) builds every collection's indexes; run it after each release
+  that adds a collection or index (next: `tasks`).
+- **Next.js security notice:** on 2026-11-17 `next dev` printed that Next.js
+  16.4.3 is affected by a known security vulnerability and recommended
+  upgrading. Not acted on yet: check the advisory, then upgrade on its own
+  branch (a pinned version over two weeks old) and rerun every check.
+- **Local dev server:** after switching branches or many hours of running,
+  restart `pnpm dev` if pages or saves fail with "Something went wrong."
+  for no clear reason (seen on 2026-11-17). If `pnpm typecheck` fails inside
+  `.next/dev/types/`, that generated folder was corrupted while being
+  rewritten; delete it and the dev server rebuilds it.
 - **CI test database:** add `MONGODB_TEST_URI` as a GitHub secret so CI runs
   the database and logged-in end-to-end tests.
 
@@ -397,5 +414,7 @@ owner's request, so the family could see the look early.
   since Gmail does the sending.
 - **Old branches:** `feature/foundation-platform`, `feature/dashboard`,
   `feature/landing`, `feature/auth-api`, `feature/landing-session`,
-  `feature/members` and `feature/email` are fully merged into `dev` and can
-  be deleted on GitHub.
+  `feature/members`, `feature/email`, `feature/wedding-settings`,
+  `feature/deploy`, `docs/deployment-done`, `fix/db-indexes`, `fix/app-url`
+  and `feature/events` are fully merged into `dev` and can be deleted on
+  GitHub.
