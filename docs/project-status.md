@@ -24,13 +24,44 @@ branch), **Next**, **Later**.
 | Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
 | Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
 | Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
-| Database indexes in production (`db:indexes`)  | In progress | `fix/db-indexes`                  | 2026-11-16 |
-| Emailed links never use localhost on Vercel    | In progress | `fix/app-url`                     | 2026-11-16 |
+| Database indexes in production (`db:indexes`)  | Done        | `fix/db-indexes`, PR #9           | 2026-11-16 |
+| Emailed links never use localhost on Vercel    | Done        | `fix/app-url`, PR #10             | 2026-11-17 |
+| Events (`/events`)                             | In progress | `feature/events`                  | 2026-11-17 |
 | Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
 
-### 2026-11-16: Emailed links never use localhost on Vercel (In progress)
+### 2026-11-17: Events (In progress)
+
+- **Events** in the sidebar: the schedule grouped by day, earliest first,
+  in India time. Admins add events (name, start and end, which may be the
+  next day, muhurtham, venue and address, map link, dress code,
+  instructions for guests, livestream link) and delete them after a check
+  that lists what changes. Admins and Managers edit details; only Admins set
+  the livestream link. Without a map link, the event links to a Google Maps
+  search for the venue.
+- API: `GET`/`POST /events`, `GET`/`PATCH`/`DELETE /events/{id}`,
+  `GET /events/{id}/delete-check`. Indexes added to `pnpm db:indexes`.
+- The QR code, WhatsApp share, cover image, the event page's counts and
+  activity entries arrive with Gallery, Invitations, photo storage and the
+  features that own them; the dashboard's upcoming events stay on sample
+  data until "Dashboard on the real wedding".
+- Tested: schema, permission and database tests for creating, listing,
+  editing, clearing, the time rules, other weddings and deleting; a browser
+  test as Admin and Manager; checked at 360 px and on desktop.
+- QA pass: about 50 extra checks (bad and boundary input, February 30,
+  `javascript:` and fake YouTube links, injected fields, other weddings,
+  roles, CSRF, signed out, two Admins at once, a script in the name,
+  keyboard use, 404s, the Manager's view). It found one bug, fixed: an
+  80-character name with no spaces widened the page (865 px on a phone);
+  long text now wraps, and a browser test checks it. 179 unit and database
+  tests and 19 end-to-end tests pass.
+- **Waiting for:** the owner's check in the browser, then the PR into `dev`;
+  after release, run `pnpm db:indexes --database mmm_prod` for the new
+  `events` indexes.
+- Decision 70.
+
+### 2026-11-17: Emailed links never use localhost on Vercel (Done, PR #10)
 
 - An invite email reached the owner with a `localhost:3000` link. On Vercel
   the app now ignores a localhost (or missing) `NEXT_PUBLIC_APP_URL` and uses
@@ -38,11 +69,11 @@ branch), **Next**, **Later**.
   cover Production, Preview, a custom domain and local use.
 - Reminder: send family invites from the live site; invites sent from
   `localhost:3000` go to the development database with localhost links.
-- **Next:** merge into `dev`, release to `main`, then send a test invite on
-  the live site and check its link.
+- Released to `main` (PR #11). Checked by the owner on the live site: a new
+  invite's link uses the live address.
 - Decision 69.
 
-### 2026-11-16: Database indexes in production (In progress)
+### 2026-11-16: Database indexes in production (Done, PR #9)
 
 - Found while starting Events: production runs with `autoIndex` off and the
   setup script Database Design names didn't exist, so the live database had
@@ -53,8 +84,9 @@ branch), **Next**, **Later**.
   `model.ts`. Tried on a test database in production mode: it built exactly
   Database Design's indexes. A database test checks them; 161 unit and
   database tests and 17 end-to-end tests pass.
-- **Waiting for:** running it on `mmm_prod` (the owner's approval), then the
-  PR into `dev`.
+- Run on `mmm_prod` by the owner: all 7 collections got Database Design's
+  indexes, with no duplicate-key errors, so no duplicates had slipped in.
+  Released to `main` in PR #11.
 - Decision 68.
 
 ### 2026-11-16: Deployment to Vercel (Done, PR #8)
@@ -293,13 +325,11 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Database indexes:** run `pnpm db:indexes --database mmm_prod`, then
-   merge.
-2. **Events:** Haldi to Reception with date, time, venue and dress code
+1. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
-3. **Dashboard on the real wedding:** replace the sample data as events,
+2. **Dashboard on the real wedding:** replace the sample data as events,
    tasks and money arrive.
-4. **Production housekeeping:** a production-only Atlas user, and an
+3. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
