@@ -9,35 +9,47 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status      | Branch / PR                       | Updated    |
-| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
-| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
-| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
-| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
-| Deployment (Vercel, Production from `main`)    | In progress | `feature/deploy`                  | 2026-11-16 |
-| Landing page: features, how it works, footer   | Later       | —                                 | —          |
+| Feature                                        | Status | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ------ | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done   | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done   | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | Done   | `feature/deploy`, PR #8           | 2026-11-16 |
+| Landing page: features, how it works, footer   | Later  | —                                 | —          |
 
 ## Log
 
-### 2026-11-16: Deployment to Vercel (In progress)
+### 2026-11-16: Deployment to Vercel (Done, PR #8)
 
-- `main` created from `dev` and pushed; it is the Production branch.
-  Features still merge into `dev`; merging `dev` into `main` releases.
-- A production build passes locally.
-- **Next, in the owner's accounts:** Atlas production user, `mmm_prod`
-  database and Network Access `0.0.0.0/0`; new production secrets; Vercel
-  project (Production branch `main`, Node 24.x, region near Atlas) and its
-  environment variables; then the first deploy and a check (health, sign up
-  with a real email, create the wedding, invite).
+- **Live at https://make-my-marriage-app.vercel.app**, on Vercel's free
+  Hobby plan, functions in Mumbai (`bom1`), database `mmm_prod` on Atlas.
+- `main` is the Production branch (created from `dev`). Features still
+  merge into `dev`; a PR from `dev` into `main` releases.
+- Variables set: `MONGODB_URI`, `NEXT_PUBLIC_APP_URL` and the Gmail ones.
+  `SESSION_SECRET` and `JOB_SECRET` aren't used by any code yet, so they
+  wait for the job runner.
+- First deploy couldn't reach the database (`db: down`) until Atlas Network
+  Access allowed `0.0.0.0/0`.
+- Automated QA on the live site, creating no accounts and sending no email:
+  HTTPS redirect and HSTS, signed-out refusals, the CSRF header, sign-up
+  validation, wrong password, protected pages, 404 and bad invite links,
+  360 px, no browser errors. All passed.
+- Checked by the owner on the live site: sign up, the verification email
+  (link on the live address), Create wedding, Wedding details, and inviting
+  a member who joined.
+- **Follow-ups:** a production-only Atlas user (the first deploy reuses the
+  development one, on the separate `mmm_prod` database); an uptime monitor
+  on `/api/health`; a fake password-reset link could say it's invalid
+  before the form is filled in.
 - Decision 67.
 
 ### 2026-11-16: Wedding settings (Done, PR #7)
@@ -252,11 +264,12 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Deployment:** finish the Vercel setup and check the live site.
-2. **Events:** Haldi to Reception with date, time, venue and dress code
+1. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
-3. **Dashboard on the real wedding:** replace the sample data as events,
+2. **Dashboard on the real wedding:** replace the sample data as events,
    tasks and money arrive.
+3. **Production housekeeping:** a production-only Atlas user, and an
+   uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
 
