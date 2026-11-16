@@ -35,3 +35,4 @@ export {
 } from "./schemas";
 export type { LoginInput, SignupInput } from "./schemas";
 export { clearSessionCookie, SESSION_COOKIE, setSessionCookie } from "./cookie";
+export { createAuthIndexes } from "./model";

@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { Model, Mongoose } from "mongoose";
+
 import { connectDb } from "@/platform/db";
 import { AppError } from "@/platform/errors";
 
@@ -38,19 +40,13 @@ interface RateLimitDoc {
 
 const DUPLICATE_KEY = 11000;
 
-/**
- * One atomic update per request: inside an open window the count goes up,
- * otherwise a new window starts at 1. The upsert creates the first document;
- * two first requests racing on the unique key retry once.
- */
-const countInMongo: HitCounter = async (key, windowMs, now) => {
-  const mongoose = await connectDb();
-  // Registered as a model so its indexes are built (unique key, and a TTL
-  // that removes the document when its window ends); queried through the
-  // driver, because Mongoose refuses update pipelines by default.
-  const RateLimit =
-    mongoose.models.RateLimit ??
-    mongoose.model(
+// Registered as a model so its indexes are declared (unique key, and a TTL
+// that removes the document when its window ends); queried through the
+// driver, because Mongoose refuses update pipelines by default.
+function rateLimitModel(mongoose: Mongoose): Model<RateLimitDoc> {
+  return (
+    (mongoose.models.RateLimit as Model<RateLimitDoc> | undefined) ??
+    mongoose.model<RateLimitDoc>(
       "RateLimit",
       new mongoose.Schema<RateLimitDoc>({
         key: { type: String, required: true, unique: true },
@@ -58,7 +54,24 @@ const countInMongo: HitCounter = async (key, windowMs, now) => {
         windowEndsAt: { type: Date, required: true, expires: 0 },
       }),
       "rateLimits",
-    );
+    )
+  );
+}
+
+/** Builds the `rateLimits` indexes, for the setup script (decision 68). */
+export async function createRateLimitIndexes(
+  mongoose: Mongoose,
+): Promise<void> {
+  await rateLimitModel(mongoose).createIndexes();
+}
+
+/**
+ * One atomic update per request: inside an open window the count goes up,
+ * otherwise a new window starts at 1. The upsert creates the first document;
+ * two first requests racing on the unique key retry once.
+ */
+const countInMongo: HitCounter = async (key, windowMs, now) => {
+  const RateLimit = rateLimitModel(await connectDb());
 
   const open = { $gt: ["$windowEndsAt", now] };
   const update = [

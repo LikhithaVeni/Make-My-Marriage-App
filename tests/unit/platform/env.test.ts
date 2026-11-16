@@ -119,4 +119,59 @@ describe("public env", () => {
       parsePublicEnv({ NEXT_PUBLIC_APP_URL: "not a url" }, "development"),
     ).toThrow(/NEXT_PUBLIC_APP_URL/);
   });
+
+  it("drops a trailing slash, so links don't get a double slash", async () => {
+    const { parsePublicEnv } = await import("@/platform/public-env");
+
+    expect(
+      parsePublicEnv(
+        { NEXT_PUBLIC_APP_URL: "https://make-my-marriage-app.vercel.app/" },
+        "production",
+      ).appUrl,
+    ).toBe("https://make-my-marriage-app.vercel.app");
+  });
+
+  it("never emails localhost links from Vercel (decision 69)", async () => {
+    const { parsePublicEnv } = await import("@/platform/public-env");
+    const vercel = {
+      VERCEL_ENV: "production",
+      VERCEL_PROJECT_PRODUCTION_URL: "make-my-marriage-app.vercel.app",
+      VERCEL_BRANCH_URL: "mmm-git-dev.vercel.app",
+    };
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    // Pointing at localhost, or missing: Vercel's own address is used.
+    for (const NEXT_PUBLIC_APP_URL of [
+      "http://localhost:3000",
+      "http://127.0.0.1:3000/",
+      undefined,
+    ]) {
+      expect(
+        parsePublicEnv({ ...vercel, NEXT_PUBLIC_APP_URL }, "production").appUrl,
+      ).toBe("https://make-my-marriage-app.vercel.app");
+    }
+    expect(warn).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
+
+    // A real address (e.g. a custom domain later) is kept.
+    expect(
+      parsePublicEnv(
+        { ...vercel, NEXT_PUBLIC_APP_URL: "https://kalisera.in" },
+        "production",
+      ).appUrl,
+    ).toBe("https://kalisera.in");
+
+    // Preview deployments use their branch address.
+    expect(
+      parsePublicEnv({ ...vercel, VERCEL_ENV: "preview" }, "production").appUrl,
+    ).toBe("https://mmm-git-dev.vercel.app");
+
+    // Off Vercel (this computer, CI, e2e) localhost stays as set.
+    expect(
+      parsePublicEnv(
+        { NEXT_PUBLIC_APP_URL: "http://localhost:3100" },
+        "production",
+      ).appUrl,
+    ).toBe("http://localhost:3100");
+  });
 });

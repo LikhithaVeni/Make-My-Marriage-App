@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:indexes": "node --conditions=react-server --import tsx scripts/create-indexes.ts"
   },
   "dependencies": {
     "bcryptjs": "3.0.3",
@@ -41,6 +42,7 @@
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.3",
+    "tsx": "4.20.3",
     "typescript": "6.0.3",
     "vitest": "5.0.5"
   }

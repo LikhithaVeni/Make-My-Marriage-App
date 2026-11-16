@@ -9,25 +9,79 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status | Branch / PR                      | Updated    |
-| ---------------------------------------------- | ------ | -------------------------------- | ---------- |
-| Foundation scaffold                            | Done   | `dev` (first commits)            | 2026-11-03 |
-| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1       | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2         | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4 | 2026-11-11 |
-| Members and invites                            | Done   | `feature/members`, PR #5         | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6           | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`       | 2026-11-16 |
-| Landing page: features, how it works, footer   | Later  | —                                | —          |
+| Feature                                        | Status      | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
+| Database indexes in production (`db:indexes`)  | In progress | `fix/db-indexes`                  | 2026-11-16 |
+| Emailed links never use localhost on Vercel    | In progress | `fix/app-url`                     | 2026-11-16 |
+| Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
 
-### 2026-11-16: Wedding settings (Done, PR into `dev` open)
+### 2026-11-16: Emailed links never use localhost on Vercel (In progress)
+
+- An invite email reached the owner with a `localhost:3000` link. On Vercel
+  the app now ignores a localhost (or missing) `NEXT_PUBLIC_APP_URL` and uses
+  the deployment's own address; a trailing slash is dropped too. Unit tests
+  cover Production, Preview, a custom domain and local use.
+- Reminder: send family invites from the live site; invites sent from
+  `localhost:3000` go to the development database with localhost links.
+- **Next:** merge into `dev`, release to `main`, then send a test invite on
+  the live site and check its link.
+- Decision 69.
+
+### 2026-11-16: Database indexes in production (In progress)
+
+- Found while starting Events: production runs with `autoIndex` off and the
+  setup script Database Design names didn't exist, so the live database had
+  no unique or TTL indexes. Everyday use was still protected by the code's
+  own checks; two requests at the same instant could have made a duplicate,
+  and expired sessions and tokens weren't being deleted.
+- Added `pnpm db:indexes --database <name>`, built from each module's
+  `model.ts`. Tried on a test database in production mode: it built exactly
+  Database Design's indexes. A database test checks them; 161 unit and
+  database tests and 17 end-to-end tests pass.
+- **Waiting for:** running it on `mmm_prod` (the owner's approval), then the
+  PR into `dev`.
+- Decision 68.
+
+### 2026-11-16: Deployment to Vercel (Done, PR #8)
+
+- **Live at https://make-my-marriage-app.vercel.app**, on Vercel's free
+  Hobby plan, functions in Mumbai (`bom1`), database `mmm_prod` on Atlas.
+- `main` is the Production branch (created from `dev`). Features still
+  merge into `dev`; a PR from `dev` into `main` releases.
+- Variables set: `MONGODB_URI`, `NEXT_PUBLIC_APP_URL` and the Gmail ones.
+  `SESSION_SECRET` and `JOB_SECRET` aren't used by any code yet, so they
+  wait for the job runner.
+- First deploy couldn't reach the database (`db: down`) until Atlas Network
+  Access allowed `0.0.0.0/0`.
+- Automated QA on the live site, creating no accounts and sending no email:
+  HTTPS redirect and HSTS, signed-out refusals, the CSRF header, sign-up
+  validation, wrong password, protected pages, 404 and bad invite links,
+  360 px, no browser errors. All passed.
+- Checked by the owner on the live site: sign up, the verification email
+  (link on the live address), Create wedding, Wedding details, and inviting
+  a member who joined.
+- **Follow-ups:** a production-only Atlas user (the first deploy reuses the
+  development one, on the separate `mmm_prod` database); an uptime monitor
+  on `/api/health`; a fake password-reset link could say it's invalid
+  before the form is filled in.
+- Decision 67.
+
+### 2026-11-16: Wedding settings (Done, PR #7)
 
 - **Settings → Wedding details** (Admin only): change the couple's names,
   wedding name, date, city, website address, tagline and description. Only
@@ -239,11 +293,14 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Wedding settings:** merge the PR into `dev`.
+1. **Database indexes:** run `pnpm db:indexes --database mmm_prod`, then
+   merge.
 2. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
 3. **Dashboard on the real wedding:** replace the sample data as events,
    tasks and money arrive.
+4. **Production housekeeping:** a production-only Atlas user, and an
+   uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
 
