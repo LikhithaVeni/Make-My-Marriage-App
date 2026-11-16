@@ -8,6 +8,7 @@ export {
   getWedding,
   listMembers,
   membershipOf,
+  organisersOf,
   previewInvite,
   removeMember,
   resendInvite,
@@ -16,6 +17,7 @@ export {
   type InvitePreview,
   type InviteView,
   type MemberView,
+  type Organiser,
   type WeddingView,
 } from "./service";
 export { createWeddingIndexes } from "./model";

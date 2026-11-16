@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { ownVisitor } from "./support/client-ip";
 import { E2E_DB_URI } from "./support/e2e-db";
 import { closeDb, seedInvite, seedOtherWedding } from "./support/invites";
 
@@ -25,7 +26,7 @@ test("an Admin plans the schedule; a Manager edits details only", async ({
     const email = `events.${role.toLowerCase()}.e2e@example.com`;
     const token = await seedInvite({ email, role, weddingId });
     const response = await request.post(`/api/v1/auth/signup?invite=${token}`, {
-      headers: csrf,
+      headers: { ...csrf, ...ownVisitor() },
       data: { name: `Events ${role}`, email, password: PASSWORD },
     });
     expect(response.status()).toBe(201);
@@ -64,7 +65,9 @@ test("an Admin plans the schedule; a Manager edits details only", async ({
   await add.click();
 
   // The event's page shows it in India time, with a map link.
-  await expect(page).toHaveURL(/\/events\/[0-9a-f]{24}$/);
+  await expect(page).toHaveURL(/\/events\/[0-9a-f]{24}$/, {
+    timeout: 20_000,
+  });
   const eventUrl = page.url();
   await expect(
     page.getByRole("heading", { level: 1, name: "Sangeet" }),
@@ -183,7 +186,7 @@ test("long names wrap instead of widening the page on a phone", async ({
   const email = "events.long.e2e@example.com";
   const token = await seedInvite({ email, role: "ADMIN", weddingId });
   await page.request.post(`/api/v1/auth/signup?invite=${token}`, {
-    headers: csrf,
+    headers: { ...csrf, ...ownVisitor() },
     data: { name: "Events Long", email, password: PASSWORD },
   });
   // Found in QA: an 80-character name with no spaces overflowed by 865 px.

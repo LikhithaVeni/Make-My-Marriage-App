@@ -381,6 +381,44 @@ function isObjectId(id: string): boolean {
   return /^[0-9a-f]{24}$/i.test(id);
 }
 
+/** An Admin or Manager, as the task assignee picker shows them. */
+export interface Organiser {
+  id: string;
+  name: string;
+  relationLabel: string | null;
+}
+
+/**
+ * The wedding's Admins and Managers by name: the people a task can be
+ * assigned to (API Design `GET /tasks/assignees`: no emails, roles or
+ * invites). The photographer isn't one.
+ */
+export async function organisersOf(ctx: WeddingContext): Promise<Organiser[]> {
+  const { Membership } = await models();
+  const memberships = await Membership.find({
+    weddingId: ctx.weddingId,
+    role: { $in: ["ADMIN", "MANAGER"] },
+  });
+  const users = await findUsersByIds(
+    memberships.map((membership) => membership.userId.toString()),
+  );
+  const byId = new Map(users.map((user) => [user.id, user]));
+  return memberships
+    .flatMap((membership) => {
+      const user = byId.get(membership.userId.toString());
+      return user
+        ? [
+            {
+              id: user.id,
+              name: user.name,
+              relationLabel: membership.relationLabel ?? null,
+            },
+          ]
+        : [];
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "en-IN"));
+}
+
 /** Members (oldest first) and invites still waiting (newest first). */
 export async function listMembers(ctx: WeddingContext, now = new Date()) {
   const { Membership, Invite } = await models();
@@ -740,6 +778,14 @@ export async function updateMember(
 export async function removeMember(
   ctx: WeddingContext,
   userId: string,
+  /**
+   * Work other modules do in the same transaction, e.g. unassigning the
+   * member's tasks (Database Design "What happens on delete"; decision 71).
+   */
+  alsoRemove?: (
+    removed: { weddingId: string; userId: string },
+    session: ClientSession,
+  ) => Promise<void>,
 ): Promise<void> {
   if (!isObjectId(userId)) throw notMember();
   const { Membership } = await models();
@@ -758,6 +804,7 @@ export async function removeMember(
       if (admins <= 1) throw lastAdmin();
     }
     await Membership.deleteOne({ _id: membership._id }, { session });
+    await alsoRemove?.({ weddingId: ctx.weddingId, userId }, session);
   });
 
   await endSessionsOf(userId);

@@ -1,18 +1,9 @@
-import { Badge, type BadgeTone } from "@/components/ui/Badge";
+import { PRIORITY_LABELS } from "@/components/tasks/task-labels";
+import { Badge } from "@/components/ui/Badge";
 import { Card, CardLink } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDayMonth, formatDue } from "@/lib/format";
-import {
-  type Dashboard,
-  MY_TASKS_LIMIT,
-  type TaskPriority,
-} from "@/modules/dashboard";
-
-const priorities: Record<TaskPriority, { label: string; tone: BadgeTone }> = {
-  HIGH: { label: "High", tone: "accent" },
-  MEDIUM: { label: "Medium", tone: "warning" },
-  LOW: { label: "Low", tone: "neutral" },
-};
+import { type Dashboard, MY_TASKS_LIMIT } from "@/modules/dashboard";
 
 interface MyTasksCardProps {
   tasks: Dashboard["myTasks"];
@@ -43,7 +34,7 @@ export function MyTasksCard({ tasks, today, className }: MyTasksCardProps) {
         ) : undefined
       }
       footer={
-        <CardLink label="View all tasks" href="/tasks" available={false} />
+        <CardLink label="View my tasks" href="/tasks?assigneeId=me" available />
       }
     >
       {tasks.length === 0 ? (
@@ -54,7 +45,7 @@ export function MyTasksCard({ tasks, today, className }: MyTasksCardProps) {
       ) : (
         <ul className="divide-y divide-border">
           {tasks.map((task) => {
-            const priority = priorities[task.priority];
+            const priority = PRIORITY_LABELS[task.priority];
             return (
               <li
                 key={task.id}

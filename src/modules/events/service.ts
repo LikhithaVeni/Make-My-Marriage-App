@@ -7,6 +7,8 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
+import type { ClientSession } from "mongoose";
+
 import { connectDb } from "@/platform/db";
 import { AppError } from "@/platform/errors";
 import { getPublicEnv } from "@/platform/public-env";
@@ -117,6 +119,21 @@ async function findEvent(ctx: WeddingContext, id: string) {
   const event = await Event.findOne({ _id: id, weddingId: ctx.weddingId });
   if (!event) throw notFound();
   return event;
+}
+
+/** Every event's id and name, for tasks to check and show (decision 71). */
+export async function eventNamesOf(
+  ctx: WeddingContext,
+): Promise<{ id: string; name: string }[]> {
+  const { Event } = await models();
+  const events = await Event.find(
+    { weddingId: ctx.weddingId },
+    { name: 1 },
+  ).sort({ startAt: 1, sortOrder: 1, _id: 1 });
+  return events.map((event) => ({
+    id: event._id.toString(),
+    name: event.name,
+  }));
 }
 
 /** One event (API Design `GET /events/{id}`). */
@@ -230,45 +247,100 @@ export async function updateEvent(
 }
 
 /**
- * What deleting this event would change, or what blocks it (API Design
- * `GET /events/{id}/delete-check`). Tasks, expenses, photos and guests don't
- * exist yet, so nothing blocks a delete and nothing is unlinked; each of
- * those features adds its part here (decision 70).
+ * How a module whose records point at events takes part in deleting one
+ * (Database Design "What happens on delete"): it reports what blocks the
+ * delete and what it would unlink, and unlinks inside the delete's
+ * transaction. Route handlers pass them in, so events doesn't import those
+ * modules (decision 71).
  */
-export async function checkEventDelete(
+export interface EventLinks {
+  check(
+    ctx: WeddingContext,
+    eventId: string,
+  ): Promise<Partial<Omit<DeleteCheck, "blocked">>>;
+  unlink(
+    ctx: WeddingContext,
+    eventId: string,
+    session: ClientSession,
+  ): Promise<void>;
+}
+
+async function combinedCheck(
   ctx: WeddingContext,
-  id: string,
+  eventId: string,
+  links: EventLinks[],
 ): Promise<DeleteCheck> {
-  await findEvent(ctx, id);
-  return {
+  const check: DeleteCheck = {
     blocked: false,
     blockingTasks: [],
     blockingExpenses: [],
     willUnlink: { tasks: 0, paidExpenses: 0, photos: 0, guests: 0 },
   };
+  for (const part of await Promise.all(
+    links.map((link) => link.check(ctx, eventId)),
+  )) {
+    check.blockingTasks.push(...(part.blockingTasks ?? []));
+    check.blockingExpenses.push(...(part.blockingExpenses ?? []));
+    for (const key of Object.keys(
+      check.willUnlink,
+    ) as (keyof DeleteCheck["willUnlink"])[]) {
+      check.willUnlink[key] += part.willUnlink?.[key] ?? 0;
+    }
+  }
+  check.blocked =
+    check.blockingTasks.length > 0 || check.blockingExpenses.length > 0;
+  return check;
 }
 
-/** Deletes an event (Admin), unless something blocks it (409). */
+/**
+ * What deleting this event would change, or what blocks it (API Design
+ * `GET /events/{id}/delete-check`): In Progress tasks block it; To Do and
+ * Completed tasks become general tasks. Expenses, photos and guests add
+ * their parts when they exist (decision 70).
+ */
+export async function checkEventDelete(
+  ctx: WeddingContext,
+  id: string,
+  links: EventLinks[] = [],
+): Promise<DeleteCheck> {
+  await findEvent(ctx, id);
+  return combinedCheck(ctx, id, links);
+}
+
+const blockedError = (check: DeleteCheck) =>
+  new AppError(
+    "EVENT_HAS_ACTIVE_ITEMS",
+    409,
+    "Finish or move this event's active tasks and pending payments first.",
+    { tasks: check.blockingTasks, expenses: check.blockingExpenses },
+  );
+
+/**
+ * Deletes an event (Admin). The check runs again inside the transaction, so
+ * a task started meanwhile still blocks it (API Design), and linked records
+ * are unlinked in the same transaction.
+ */
 export async function deleteEvent(
   ctx: WeddingContext,
   id: string,
+  links: EventLinks[] = [],
 ): Promise<void> {
-  const check = await checkEventDelete(ctx, id);
-  if (check.blocked) {
-    throw new AppError(
-      "EVENT_HAS_ACTIVE_ITEMS",
-      409,
-      "Finish or move this event's active tasks and pending payments first.",
-      {
-        tasks: check.blockingTasks,
-        expenses: check.blockingExpenses,
-      },
-    );
+  const event = await findEvent(ctx, id);
+  const mongoose = await connectDb();
+  const { Event } = eventModels(mongoose);
+  const transaction = await mongoose.startSession();
+  try {
+    await transaction.withTransaction(async () => {
+      const check = await combinedCheck(ctx, id, links);
+      if (check.blocked) throw blockedError(check);
+      for (const link of links) await link.unlink(ctx, id, transaction);
+      const { deletedCount } = await Event.deleteOne(
+        { _id: event._id, weddingId: ctx.weddingId },
+        { session: transaction },
+      );
+      if (deletedCount === 0) throw notFound();
+    });
+  } finally {
+    await transaction.endSession();
   }
-  const { Event } = await models();
-  const { deletedCount } = await Event.deleteOne({
-    _id: id,
-    weddingId: ctx.weddingId,
-  });
-  if (deletedCount === 0) throw notFound();
 }

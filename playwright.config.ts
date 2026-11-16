@@ -16,6 +16,9 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
   reporter: isCI ? "github" : "list",
+  // Locally the dev server builds each page on its first visit, which can
+  // take several seconds while tests run side by side; CI tests a build.
+  expect: { timeout: isCI ? 5_000 : 10_000 },
   use: {
     baseURL,
   },

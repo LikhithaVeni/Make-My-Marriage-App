@@ -9,27 +9,54 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status | Branch / PR                       | Updated    |
-| ---------------------------------------------- | ------ | --------------------------------- | ---------- |
-| Foundation scaffold                            | Done   | `dev` (first commits)             | 2026-11-03 |
-| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1        | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2          | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4  | 2026-11-11 |
-| Members and invites                            | Done   | `feature/members`, PR #5          | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6            | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`, PR #7 | 2026-11-16 |
-| Deployment (Vercel, Production from `main`)    | Done   | `feature/deploy`, PR #8           | 2026-11-16 |
-| Database indexes in production (`db:indexes`)  | Done   | `fix/db-indexes`, PR #9           | 2026-11-16 |
-| Emailed links never use localhost on Vercel    | Done   | `fix/app-url`, PR #10             | 2026-11-17 |
-| Events (`/events`)                             | Done   | `feature/events`, PR #12          | 2026-11-17 |
-| Landing page: features, how it works, footer   | Later  | —                                 | —          |
+| Feature                                        | Status      | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
+| Database indexes in production (`db:indexes`)  | Done        | `fix/db-indexes`, PR #9           | 2026-11-16 |
+| Emailed links never use localhost on Vercel    | Done        | `fix/app-url`, PR #10             | 2026-11-17 |
+| Events (`/events`)                             | Done        | `feature/events`, PR #12          | 2026-11-17 |
+| Tasks (`/tasks`)                               | In progress | `feature/tasks`                   | 2026-11-17 |
+| Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
+
+### 2026-11-17: Tasks (In progress)
+
+- **Tasks** in the sidebar: All tasks, My tasks and Overdue, with filters
+  (status, priority, assignee, event, title search, sort). Admins and
+  Managers add tasks (title, event or general, assignee, due date,
+  priority, notes), move them To Do → In Progress → Completed in one tap,
+  edit and delete them. Overdue shows in red. Each event's page lists its
+  tasks and adds tasks to it.
+- Removing a member unassigns their tasks; deleting an event is blocked
+  while one of its tasks is In Progress, otherwise its tasks become general
+  tasks (one transaction each).
+- API: `GET`/`POST /tasks`, `GET`/`PATCH`/`DELETE /tasks/{id}`,
+  `GET /tasks/assignees`. Indexes added to `pnpm db:indexes`.
+- Notifying the assignee comes with notifications and the jobs runner (next).
+- Tested: schema, permission and database tests (filters, sorts, cursor
+  paging, overdue, statuses, other weddings, member removal, event delete);
+  a browser test as Admin and Manager; a QA pass (bad and boundary input,
+  other weddings, CSRF, injected fields, tampered cursors, 126 tasks paged
+  with no gaps, a script in the title, long titles at 360 px, keyboard).
+  A long event name in the new "No tasks for …" message widened the event
+  page on phones; empty-state titles now wrap. 192 unit and database tests
+  and 20 end-to-end tests pass (three full runs in a row).
+- **Waiting for:** the owner's check, then the PR into `dev`; after release,
+  run `pnpm db:indexes --database mmm_prod` for the `tasks` indexes.
+- Decision 71.
 
 ### 2026-11-17: Events (Done, PR #12)
 
