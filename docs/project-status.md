@@ -9,25 +9,38 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status | Branch / PR                      | Updated    |
-| ---------------------------------------------- | ------ | -------------------------------- | ---------- |
-| Foundation scaffold                            | Done   | `dev` (first commits)            | 2026-11-03 |
-| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1       | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2         | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4 | 2026-11-11 |
-| Members and invites                            | Done   | `feature/members`, PR #5         | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6           | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`       | 2026-11-16 |
-| Landing page: features, how it works, footer   | Later  | —                                | —          |
+| Feature                                        | Status      | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | In progress | `feature/deploy`                  | 2026-11-16 |
+| Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
 
-### 2026-11-16: Wedding settings (Done, PR into `dev` open)
+### 2026-11-16: Deployment to Vercel (In progress)
+
+- `main` created from `dev` and pushed; it is the Production branch.
+  Features still merge into `dev`; merging `dev` into `main` releases.
+- A production build passes locally.
+- **Next, in the owner's accounts:** Atlas production user, `mmm_prod`
+  database and Network Access `0.0.0.0/0`; new production secrets; Vercel
+  project (Production branch `main`, Node 24.x, region near Atlas) and its
+  environment variables; then the first deploy and a check (health, sign up
+  with a real email, create the wedding, invite).
+- Decision 67.
+
+### 2026-11-16: Wedding settings (Done, PR #7)
 
 - **Settings → Wedding details** (Admin only): change the couple's names,
   wedding name, date, city, website address, tagline and description. Only
@@ -239,7 +252,7 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Wedding settings:** merge the PR into `dev`.
+1. **Deployment:** finish the Vercel setup and check the live site.
 2. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
 3. **Dashboard on the real wedding:** replace the sample data as events,
