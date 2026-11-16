@@ -34,6 +34,11 @@ interface ErrorPayload {
   };
 }
 
+/** GETs JSON and returns the response's `data`, or throws an ApiError. */
+export function getJson<T>(path: string): Promise<T> {
+  return sendJson<T>("GET", path, undefined);
+}
+
 /** POSTs JSON and returns the response's `data`, or throws an ApiError. */
 export function postJson<T>(path: string, body: unknown): Promise<T> {
   return sendJson<T>("POST", path, body);
@@ -50,7 +55,7 @@ export function deleteJson(path: string): Promise<void> {
 }
 
 async function sendJson<T>(
-  method: "POST" | "PATCH" | "DELETE",
+  method: "GET" | "POST" | "PATCH" | "DELETE",
   path: string,
   body: unknown,
 ): Promise<T> {
@@ -58,10 +63,13 @@ async function sendJson<T>(
   try {
     response = await fetch(path, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "mmm",
-      },
+      headers:
+        method === "GET"
+          ? { Accept: "application/json" }
+          : {
+              "Content-Type": "application/json",
+              "X-Requested-With": "mmm",
+            },
       body: body === undefined ? undefined : JSON.stringify(body),
       credentials: "same-origin",
     });

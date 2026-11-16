@@ -119,6 +119,63 @@ export function kolkataDateOf(instant: string | Date): string {
   return kolkataDate.format(new Date(instant));
 }
 
+const kolkataClock = new Intl.DateTimeFormat("en-GB", {
+  timeZone: TIME_ZONE,
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/**
+ * An instant as a `datetime-local` value in Asia/Kolkata:
+ * "2028-01-26T08:00:00Z" → "2028-01-26T13:30". India has no daylight saving,
+ * so the offset is always +05:30.
+ */
+export function toKolkataInput(instant: string | Date): string {
+  const date = new Date(instant);
+  return `${kolkataDate.format(date)}T${kolkataClock.format(date)}`;
+}
+
+/**
+ * A `datetime-local` value read as Asia/Kolkata time, as an ISO instant with
+ * its offset: "2028-01-26T13:30" → "2028-01-26T13:30:00+05:30". Empty in,
+ * empty out.
+ */
+export function fromKolkataInput(local: string): string {
+  return local ? `${local}:00+05:30` : "";
+}
+
+const dayHeading = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "UTC",
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+/** "2028-01-26" → "Wednesday, 26 January 2028", for schedule headings. */
+export function formatDayHeading(date: string): string {
+  return dayHeading.format(calendarDate(date));
+}
+
+/**
+ * A time during an event that began at `startAt`, in Asia/Kolkata: "1:16 AM",
+ * with "(next day)" or the date when it falls on a later day (PRD: late-night
+ * muhurthams).
+ */
+export function formatTimeFrom(startAt: string, instant: string): string {
+  const day = kolkataDateOf(instant);
+  const days = daysBetween(kolkataDateOf(startAt), day);
+  const after =
+    days === 0 ? "" : days === 1 ? " (next day)" : ` (${formatDate(day)})`;
+  return `${formatTime(instant)}${after}`;
+}
+
+/** An event's times: "7:00 PM – 11:30 PM", or "… – 3:00 AM (next day)". */
+export function formatTimeRange(startAt: string, endAt: string): string {
+  return `${formatTime(startAt)} – ${formatTimeFrom(startAt, endAt)}`;
+}
+
 /** Today's date in Asia/Kolkata, the date the PRD's "overdue" is judged by. */
 export function todayInKolkata(now: Date = new Date()): string {
   return kolkataDateOf(now);

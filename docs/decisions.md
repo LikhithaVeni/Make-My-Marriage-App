@@ -247,3 +247,17 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
     - Off Vercel nothing changes: development uses localhost, and CI and the e2e tests set their own localhost address.
     - Vercel exposes its system variables to the server by default ("Automatically expose System Environment Variables"); links are built only on the server.
     - **Invites must be sent from the live site.** Invites sent from `localhost:3000` live in the development database and always carry localhost links, by design.
+
+70. **Events (`/events`; API `GET`/`POST /events`, `GET`/`PATCH`/`DELETE /events/{id}`, `GET /events/{id}/delete-check`)** follow PRD "Events", key flow F3 and API Design, with these choices:
+    - **Built now:** the schedule (grouped by day, earliest first), add (Admin), the event page, edit (Admins and Managers; the livestream link Admins only, `403 FORBIDDEN` if a Manager sends it), and delete (Admin) after the delete check, with a confirm step listing what changes.
+    - **Later, with the features that use them:** the QR code and `POST /events/{id}/upload-token` (Gallery; each event already gets its random `uploadToken`), the WhatsApp share link (Invitations), the cover image (photo storage, decision 56), the photographer's delivery link (photographer account), the event page's counts of tasks, expenses, invited households, attending people and photos (each from its feature), and activity-log entries (activity log). The dashboard's "Upcoming events" stays on sample data until "Dashboard on the real wedding".
+    - **Times:** the API takes ISO instants with an offset and returns UTC. Forms use `datetime-local` read as India time (+05:30; India has no daylight saving) and pages show India time, saying so. An event may end the next day ("(next day)" beside the time), as the PRD allows for late-night muhurthams.
+    - **Muhurtham must fall within the event** (not in the specs): a time outside it is almost always a typo, such as the wrong day. Past events are allowed (no spec), so a ceremony already held can be recorded.
+    - **Map link:** stored only when an organiser pastes one; otherwise the event shows a Google Maps search for "venue name, address", computed when shown, so it follows address edits (PRD "auto-generated from address if left empty"). The API returns the link in use plus `mapUrlCustom`. Only `http(s)` links are accepted.
+    - **Livestream:** an `https` link on `youtube.com` (any subdomain) or `youtu.be` (Database Design "Field rules").
+    - **Lengths** (Database Design: names ≤ 80, titles ≤ 200, notes ≤ 2,000): event name 80, venue name 200, venue address 500, dress code 200, instructions 2,000.
+    - **Order:** `startAt`, then `sortOrder` (the number of events when it was added), so events starting together keep the order they were added in. There is no reordering screen.
+    - **`uploadUrl`** is returned to Admins only, since the link lets anyone upload to the event's album.
+    - **`GET /events`** returns every event in one page (`{ data, page }` with `nextCursor: null`); a wedding has about ten.
+    - **Delete check:** tasks, expenses, photos and guests don't exist yet, so nothing blocks a delete and nothing is unlinked. Each of those features adds its part to `checkEventDelete` and to the delete, which becomes a transaction then (Database Design "What happens on delete").
+    - The photographer can read `GET /events` (API Design); the Events pages are for Admins and Managers, like the rest of the organiser app.
