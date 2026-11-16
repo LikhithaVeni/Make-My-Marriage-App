@@ -18,9 +18,7 @@ export function UpcomingEventsCard({
       title="Upcoming events"
       className={className}
       aside={events.length > 0 ? `Next ${events.length}` : undefined}
-      footer={
-        <CardLink label="View all events" href="/events" available={false} />
-      }
+      footer={<CardLink label="View all events" href="/events" available />}
     >
       {events.length === 0 ? (
         <EmptyState

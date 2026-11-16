@@ -129,3 +129,41 @@ describe("formatBytes", () => {
     expect(formatBytes(512)).toBe("512 B");
   });
 });
+
+describe("event times in Asia/Kolkata (decision 70)", () => {
+  it("round-trips a datetime-local value as India time", async () => {
+    const { fromKolkataInput, toKolkataInput } = await import("@/lib/format");
+    expect(fromKolkataInput("2028-01-26T19:00")).toBe(
+      "2028-01-26T19:00:00+05:30",
+    );
+    expect(fromKolkataInput("")).toBe("");
+    // 13:30 UTC is 7 pm in India, whatever this computer's time zone.
+    expect(toKolkataInput("2028-01-26T13:30:00.000Z")).toBe("2028-01-26T19:00");
+    // Past midnight UTC-wise stays on the Indian day.
+    expect(toKolkataInput("2028-01-26T20:00:00.000Z")).toBe("2028-01-27T01:30");
+    expect(toKolkataInput(new Date(fromKolkataInput("2028-01-26T00:05")))).toBe(
+      "2028-01-26T00:05",
+    );
+  });
+
+  it("shows a day heading and a time range, noting the next day", async () => {
+    const { formatDayHeading, formatTimeFrom, formatTimeRange } =
+      await import("@/lib/format");
+    expect(formatTimeFrom("2028-01-27T14:30:00Z", "2028-01-27T19:46:00Z")).toBe(
+      "1:16 AM (next day)",
+    );
+    expect(formatTimeFrom("2028-01-27T14:30:00Z", "2028-01-27T16:00:00Z")).toBe(
+      "9:30 PM",
+    );
+    expect(formatDayHeading("2028-01-26")).toBe("Wednesday, 26 January 2028");
+    expect(
+      formatTimeRange("2028-01-26T13:30:00Z", "2028-01-26T18:00:00Z"),
+    ).toBe("7:00 PM – 11:30 PM");
+    expect(
+      formatTimeRange("2028-01-26T13:30:00Z", "2028-01-26T21:30:00Z"),
+    ).toBe("7:00 PM – 3:00 AM (next day)");
+    expect(
+      formatTimeRange("2028-01-26T13:30:00Z", "2028-01-28T06:30:00Z"),
+    ).toBe("7:00 PM – 12:00 PM (28 Jan 2028)");
+  });
+});
