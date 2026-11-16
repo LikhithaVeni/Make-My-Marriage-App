@@ -115,6 +115,25 @@ describe("updateWeddingSchema", () => {
     );
   });
 
+  it("refuses a date that doesn't exist, allowing a leap day", () => {
+    for (const date of [
+      "2028-02-30",
+      "2027-02-29",
+      "2028-04-31",
+      "2028-13-01",
+    ]) {
+      expect(
+        updateWeddingSchema.safeParse({ date }).error?.issues[0]?.message,
+      ).toBe("Choose a real date");
+      expect(createWeddingSchema.safeParse({ ...kalisEra, date }).success).toBe(
+        false,
+      );
+    }
+    expect(updateWeddingSchema.safeParse({ date: "2028-02-29" }).success).toBe(
+      true,
+    );
+  });
+
   it("refuses an empty change and a malformed address", () => {
     expect(updateWeddingSchema.safeParse({}).error?.issues[0]?.message).toBe(
       "Nothing to change",

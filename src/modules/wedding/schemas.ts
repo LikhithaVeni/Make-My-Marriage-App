@@ -29,7 +29,15 @@ export const PAST_DATE_MESSAGE = "The wedding date can't be in the past";
 const weddingDate = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the wedding date")
-  .refine((date) => !Number.isNaN(Date.parse(date)), "Choose a real date");
+  // Date.parse accepts "2028-02-30" (rolling it to March 1), so the date
+  // must read back unchanged.
+  .refine((date) => {
+    const parsed = new Date(`${date}T00:00:00Z`);
+    return (
+      !Number.isNaN(parsed.getTime()) &&
+      parsed.toISOString().slice(0, 10) === date
+    );
+  }, "Choose a real date");
 
 // The PRD's "Wedding setup" fields, shared by creating and editing.
 const setupFields = {

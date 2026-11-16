@@ -9,25 +9,25 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status      | Branch / PR                      | Updated    |
-| ---------------------------------------------- | ----------- | -------------------------------- | ---------- |
-| Foundation scaffold                            | Done        | `dev` (first commits)            | 2026-11-03 |
-| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1       | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2         | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3        | 2026-11-11 |
-| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4 | 2026-11-11 |
-| Members and invites                            | Done        | `feature/members`, PR #5         | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6           | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | In progress | `feature/wedding-settings`       | 2026-11-15 |
-| Landing page: features, how it works, footer   | Later       | —                                | —          |
+| Feature                                        | Status | Branch / PR                      | Updated    |
+| ---------------------------------------------- | ------ | -------------------------------- | ---------- |
+| Foundation scaffold                            | Done   | `dev` (first commits)            | 2026-11-03 |
+| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1       | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2         | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3        | 2026-11-11 |
+| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4 | 2026-11-11 |
+| Members and invites                            | Done   | `feature/members`, PR #5         | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6           | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`       | 2026-11-16 |
+| Landing page: features, how it works, footer   | Later  | —                                | —          |
 
 ## Log
 
-### 2026-11-15: Wedding settings (In progress)
+### 2026-11-16: Wedding settings (Done, PR into `dev` open)
 
 - **Settings → Wedding details** (Admin only): change the couple's names,
   wedding name, date, city, website address, tagline and description. Only
@@ -44,11 +44,17 @@ branch), **Next**, **Later**.
   Manager can read but not change, CSRF, taken address). Checked at 360 px
   and on desktop. New browser tests also cover the website address (taken,
   suggested, free, saved) and Undo on Wedding details, and the Create
-  wedding form, whose address field is now shared. All 159 unit and
-  database tests and 17 end-to-end tests pass.
-- **Waiting for:** the owner's manual check in the browser (edit and save,
-  an empty required field, a new website address, Create wedding still
-  works), then the PR into `dev`.
+  wedding form, whose address field is now shared.
+- A QA pass found that an impossible date such as 30 February was accepted
+  (JavaScript rolls it over to 1 March); dates must now read back unchanged,
+  for Create wedding too. It also checked limits, bad input, a script in the
+  name, two Admins saving at once, two weddings taking one address, keyboard
+  use and 360 px. All 160 unit and database tests and 17 end-to-end tests
+  pass.
+- Checked by the owner in the browser on the test server (port 3100).
+- Small follow-ups: the Settings cards' links are all named "Open" for
+  screen readers; one end-to-end run of Create wedding failed once and
+  passed in the next 7 runs.
 - Decision 66.
 
 ### 2026-11-15: Email through Gmail or Resend (Done, PR #6)
@@ -233,7 +239,7 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Wedding settings:** finish and merge (manual check by the owner).
+1. **Wedding settings:** merge the PR into `dev`.
 2. **Events:** Haldi to Reception with date, time, venue and dress code
    (PRD "Events"; next in System Design's Phase 1 order).
 3. **Dashboard on the real wedding:** replace the sample data as events,
