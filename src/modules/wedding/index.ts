@@ -18,6 +18,7 @@ export {
   type MemberView,
   type WeddingView,
 } from "./service";
+export { createWeddingIndexes } from "./model";
 export { weddingPolicy } from "./policy";
 export {
   createWeddingSchema,
