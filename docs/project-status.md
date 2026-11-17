@@ -30,9 +30,32 @@ branch), **Next**, **Later**.
 | Tasks (`/tasks`)                               | Done        | `feature/tasks`, PR #14           | 2026-11-17 |
 | Next.js security upgrade (16.4.3 → 16.4.5)     | Done        | `fix/next-security`, PR #16       | 2026-11-17 |
 | Dashboard on real data                         | In progress | `feature/dashboard-real`          | 2026-11-17 |
+| Expenses (`/expenses`)                         | In progress | `feature/expenses`                | 2026-11-17 |
 | Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
+
+### 2026-11-17: Expenses (In progress)
+
+- **Expenses** in the sidebar: record what's spent or still due (amount in
+  rupees, date, event, optional task, category, description, paid by, Paid
+  or Pending with a due date), totals (spent, pending, per event, per
+  category), filters and sorts, Mark as paid in one tap, edit and delete.
+  Each event's page lists its expenses.
+- The dashboard's **Spent** tile and **Pending payments** card are now
+  real; payment rows open the expense.
+- An event with a Pending payment can't be deleted; Paid ones move under
+  "No event". Deleting a task keeps its expenses.
+- The vendor link comes with Vendors (next); receipts with file storage.
+- Tested: rupee parsing, schema, permission and database tests (filters,
+  sorts, paging, totals, the due-date rule, other weddings, event and task
+  deletes); a browser test as Admin and Manager including the dashboard; a
+  QA pass (bad and boundary amounts up to ₹10 crore, February 30, other
+  weddings, CSRF, injected fields, phone width). QA found two bugs, fixed:
+  big totals widened the event page on phones (card notes now wrap), and
+  overdue payments read "Overdue · Overdue".
+- Stacked on `feature/dashboard-real`: merge that first.
+- Decision 74.
 
 ### 2026-11-17: Dashboard on real data (In progress)
 
@@ -407,14 +430,15 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Dashboard on real data:** the owner's check, merge and release.
-2. **Expenses:** spending against events, tasks and vendors; switches on
-   pending payments and the spent total.
-3. **Vendors:** vendor list, booking, Find nearby; switches on the vendors
-   total and wedding-day contacts.
-4. **Activity log:** switches on recent activity.
-5. **Notifications and jobs runner:** the bell and task-assigned emails.
-6. **Production housekeeping:** a production-only Atlas user, and an
+1. **Dashboard on real data** and **Expenses:** the owner's check, merge
+   `feature/dashboard-real` then `feature/expenses`, release, then run
+   `pnpm db:indexes --database mmm_prod` for the `expenses` indexes.
+2. **Vendors:** vendor list, booking status, Find nearby, wedding-day
+   contacts; the vendor on expenses; switches on the vendors total and
+   wedding-day contacts.
+3. **Activity log:** switches on recent activity.
+4. **Notifications and jobs runner:** the bell and task-assigned emails.
+5. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap

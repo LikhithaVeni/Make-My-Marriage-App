@@ -1,4 +1,5 @@
 import { authorizeRequest } from "@/lib/session";
+import { unlinkTaskExpenses } from "@/modules/expenses";
 import {
   deleteTask,
   getTask,
@@ -54,7 +55,8 @@ export async function DELETE(
   try {
     requireCsrfHeader(request);
     const { ctx } = await authorizeRequest(tasksPolicy, "tasks.delete");
-    await deleteTask(ctx, (await params).id);
+    // Its expenses stay, without the link (Database Design).
+    await deleteTask(ctx, (await params).id, unlinkTaskExpenses);
     return noContent({ requestId, headers });
   } catch (err) {
     return errorResponse(err, { requestId, headers });

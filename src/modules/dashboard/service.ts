@@ -7,6 +7,7 @@ import "server-only";
 
 import { daysBetween, todayInKolkata } from "@/lib/format";
 import { eventOverview } from "@/modules/events";
+import { expenseSummary } from "@/modules/expenses";
 import { taskOverview } from "@/modules/tasks";
 import { getWedding, organisersOf } from "@/modules/wedding";
 import type { WeddingContext } from "@/platform/rbac";
@@ -19,11 +20,12 @@ export async function getDashboard(
   now = new Date(),
 ): Promise<Dashboard> {
   const today = todayInKolkata(now);
-  const [wedding, organisers, events, tasks] = await Promise.all([
+  const [wedding, organisers, events, tasks, expenses] = await Promise.all([
     getWedding(ctx),
     organisersOf(ctx),
     eventOverview(ctx, now),
     taskOverview(ctx, now, MY_TASKS_LIMIT),
+    expenseSummary(ctx),
   ]);
 
   return dashboardSchema.parse({
@@ -47,7 +49,16 @@ export async function getDashboard(
       people: null,
     },
     rsvp: null,
-    money: null,
+    // "Spent" is what's Paid; "pending" what's Pending (decision 39).
+    money: {
+      spentPaise: expenses.paidPaise,
+      pendingPaise: expenses.pendingPaise,
+      nextDue: expenses.nextDue && {
+        description: expenses.nextDue.description,
+        dueDate: expenses.nextDue.dueDate,
+      },
+      pendingPayments: expenses.pendingPayments,
+    },
     weddingDayContacts: null,
     recentActivity: null,
   } satisfies Dashboard);

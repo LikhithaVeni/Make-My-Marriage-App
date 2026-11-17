@@ -26,12 +26,13 @@ export function Card({ title, aside, footer, className, children }: CardProps) {
       aria-labelledby={id}
       className={`flex flex-col p-6 ${cardSurface} ${className ?? ""}`}
     >
-      <header className="flex items-start justify-between gap-4">
+      {/* The note wraps under the title when a phone is too narrow for both. */}
+      <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
         <h2 id={id} className="font-display text-heading text-text">
           {title}
         </h2>
         {aside && (
-          <div className="shrink-0 pt-1 text-small text-text-muted">
+          <div className="max-w-full shrink-0 pt-1 text-small text-text-muted">
             {aside}
           </div>
         )}

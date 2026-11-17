@@ -8,6 +8,7 @@ export {
   taskAssignees,
   taskEventLinks,
   taskOverview,
+  taskTitlesOf,
   unassignTasksOf,
   updateTask,
   type TaskOverview,

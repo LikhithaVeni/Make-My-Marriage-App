@@ -161,7 +161,7 @@ describe.skipIf(!TEST_DB_URI)("getDashboard (real data)", () => {
     admin = await adminWithWedding();
   }, 120_000);
 
-  it("shows a brand-new wedding: countdown, nothing added, the rest not built", async () => {
+  it("shows a brand-new wedding: countdown, nothing added, unbuilt parts null", async () => {
     const dashboard = await getDashboard(admin, NOW);
     expect(dashboard).toMatchObject({
       today: "2027-11-15",
@@ -183,7 +183,13 @@ describe.skipIf(!TEST_DB_URI)("getDashboard (real data)", () => {
         people: null,
       },
       rsvp: null,
-      money: null,
+      // Expenses exist: nothing spent or due yet (decision 74).
+      money: {
+        spentPaise: 0,
+        pendingPaise: 0,
+        nextDue: null,
+        pendingPayments: [],
+      },
       weddingDayContacts: null,
       recentActivity: null,
     });

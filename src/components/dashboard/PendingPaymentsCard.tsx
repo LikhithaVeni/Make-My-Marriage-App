@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Card, CardLink } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDue, formatRupees } from "@/lib/format";
@@ -55,30 +57,32 @@ export function PendingPaymentsCard({
           {payments.map((payment) => {
             const late = payment.dueDate < today;
             return (
-              <li
-                key={payment.id}
-                className="flex items-start justify-between gap-4 py-3"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-text">
-                    {payment.vendorName ?? payment.description}
-                  </p>
-                  {payment.vendorName && (
-                    <p className="text-small text-text-muted">
-                      {payment.description}
+              <li key={payment.id} className="py-1">
+                <Link
+                  href={`/expenses/${payment.id}`}
+                  className="-mx-3 flex items-start justify-between gap-4 rounded-control px-3 py-2 hover:bg-accent-tint focus-visible:outline-2 focus-visible:outline-accent"
+                >
+                  <div className="min-w-0 wrap-anywhere">
+                    <p className="font-medium text-text">
+                      {payment.vendorName ?? payment.description}
                     </p>
-                  )}
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="font-medium text-text">
-                    {formatRupees(payment.amountPaise)}
-                  </p>
-                  <p
-                    className={`text-small ${late ? "text-danger" : "text-text-muted"}`}
-                  >
-                    {formatDue(payment.dueDate, today)}
-                  </p>
-                </div>
+                    {payment.vendorName && (
+                      <p className="text-small text-text-muted">
+                        {payment.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="font-medium text-text">
+                      {formatRupees(payment.amountPaise)}
+                    </p>
+                    <p
+                      className={`text-small ${late ? "text-danger" : "text-text-muted"}`}
+                    >
+                      {formatDue(payment.dueDate, today)}
+                    </p>
+                  </div>
+                </Link>
               </li>
             );
           })}
