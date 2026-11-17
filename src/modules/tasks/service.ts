@@ -318,16 +318,36 @@ export async function updateTask(
 }
 
 /**
- * Deletes a task (Admin, Manager). Linked expenses keep their data (API
- * Design); expenses unset their `taskId` when they exist (decision 71).
+ * Deletes a task (Admin, Manager). Linked expenses keep their data but lose
+ * the link (API Design; Database Design "What happens on delete"), in the
+ * same transaction: the route passes expenses' part in (decision 74).
  */
 export async function deleteTask(
   ctx: WeddingContext,
   id: string,
+  alsoDelete?: (
+    deleted: { weddingId: string; taskId: string },
+    session: ClientSession,
+  ) => Promise<void>,
 ): Promise<void> {
   const task = await findTask(ctx, id);
-  const { Task } = await models();
-  await Task.deleteOne({ _id: task._id, weddingId: ctx.weddingId });
+  const mongoose = await connectDb();
+  const { Task } = taskModels(mongoose);
+  const transaction = await mongoose.startSession();
+  try {
+    await transaction.withTransaction(async () => {
+      await alsoDelete?.(
+        { weddingId: ctx.weddingId, taskId: task._id.toString() },
+        transaction,
+      );
+      await Task.deleteOne(
+        { _id: task._id, weddingId: ctx.weddingId },
+        { session: transaction },
+      );
+    });
+  } finally {
+    await transaction.endSession();
+  }
 }
 
 /** What the dashboard shows of tasks (decision 73). */
@@ -419,6 +439,27 @@ export async function taskOverview(
     }));
 
   return { counts, mine };
+}
+
+/**
+ * Every task's id, title and event, for expenses to check and show
+ * (decision 74).
+ */
+export async function taskTitlesOf(
+  ctx: WeddingContext,
+): Promise<{ id: string; title: string; eventId: string | null }[]> {
+  const { Task } = await models();
+  const tasks = await Task.find(
+    { weddingId: ctx.weddingId },
+    { title: 1, eventId: 1 },
+  )
+    .sort({ title: 1 })
+    .limit(MAX_TASKS);
+  return tasks.map((task) => ({
+    id: task._id.toString(),
+    title: task.title,
+    eventId: task.eventId?.toString() ?? null,
+  }));
 }
 
 /** The assignee picker: the wedding's Admins and Managers. */

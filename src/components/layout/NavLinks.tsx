@@ -20,7 +20,7 @@ const mainItems: NavItem[] = [
   { label: "Tasks", href: "/tasks", available: true },
   { label: "Guests", href: "/guests", available: false },
   { label: "Invitations", href: "/invitations", available: false },
-  { label: "Expenses", href: "/expenses", available: false },
+  { label: "Expenses", href: "/expenses", available: true },
   { label: "Vendors", href: "/vendors", available: false },
   {
     label: "Wedding-day contacts",

@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createAuthIndexes } from "@/modules/auth";
 import { createEventIndexes } from "@/modules/events";
+import { createExpenseIndexes } from "@/modules/expenses";
 import { createTaskIndexes } from "@/modules/tasks";
 import { createWeddingIndexes } from "@/modules/wedding";
 import { connectDb } from "@/platform/db";
@@ -53,6 +54,7 @@ describe.skipIf(!TEST_DB_URI)("index setup", () => {
       await createWeddingIndexes(mongoose);
       await createEventIndexes(mongoose);
       await createTaskIndexes(mongoose);
+      await createExpenseIndexes(mongoose);
       await createRateLimitIndexes(mongoose);
     }
 
@@ -70,6 +72,13 @@ describe.skipIf(!TEST_DB_URI)("index setup", () => {
       ["tokenHash:1 unique", "weddingId:1,status:1"].sort(),
     );
     expect(await indexesOf("weddings")).toEqual(["slug:1 unique"]);
+    expect(await indexesOf("expenses")).toEqual(
+      [
+        "weddingId:1,eventId:1,date:-1",
+        "weddingId:1,status:1,dueDate:1",
+        "weddingId:1,vendorId:1",
+      ].sort(),
+    );
     expect(await indexesOf("tasks")).toEqual(
       [
         "weddingId:1,assigneeId:1,status:1",

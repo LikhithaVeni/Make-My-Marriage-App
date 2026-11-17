@@ -1,5 +1,6 @@
 import { authorizeRequest } from "@/lib/session";
 import { checkEventDelete, eventsPolicy } from "@/modules/events";
+import { expenseEventLinks } from "@/modules/expenses";
 import { taskEventLinks } from "@/modules/tasks";
 import { errorResponse, ok } from "@/platform/http";
 import { createRequestId } from "@/platform/request-id";
@@ -15,7 +16,10 @@ export async function GET(
   try {
     const { ctx } = await authorizeRequest(eventsPolicy, "events.delete");
     return ok(
-      await checkEventDelete(ctx, (await params).id, [taskEventLinks]),
+      await checkEventDelete(ctx, (await params).id, [
+        taskEventLinks,
+        expenseEventLinks,
+      ]),
       {
         requestId,
         headers,

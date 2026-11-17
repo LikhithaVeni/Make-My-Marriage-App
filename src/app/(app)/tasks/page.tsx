@@ -13,6 +13,7 @@ import { ButtonLink, buttonClass } from "@/components/ui/ButtonLink";
 import { cardSurface } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { todayInKolkata } from "@/lib/format";
+import { toSearchParams } from "@/lib/search-params";
 import { eventNamesOf } from "@/modules/events";
 import {
   listTasks,
@@ -21,7 +22,7 @@ import {
   taskAssignees,
 } from "@/modules/tasks";
 
-import { tasksContext, toSearchParams } from "./task-access";
+import { tasksContext } from "./task-access";
 
 export const metadata: Metadata = {
   title: "Tasks · Make My Marriage",

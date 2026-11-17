@@ -26,6 +26,30 @@ export function formatRupees(paise: number): string {
   return format.format(paise / 100);
 }
 
+/**
+ * Rupees as typed into a form, as integer paise: "45,000" → 4500000,
+ * "1,50,000.5" → 15000050, "₹ 999.99" → 99999. Commas, spaces and a ₹ sign
+ * are ignored; at most two decimals. Anything else, including an empty or
+ * zero amount, is null.
+ */
+export function parseRupees(typed: string): number | null {
+  const plain = typed.replace(/[₹,\s]/g, "");
+  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(plain);
+  if (!match) return null;
+  const paise =
+    Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
+  return Number.isSafeInteger(paise) && paise > 0 ? paise : null;
+}
+
+/** Paise as a plain rupee figure for a form field: 4500050 → "45000.50". */
+export function paiseToInput(paise: number): string {
+  const rupees = Math.floor(paise / 100);
+  const rest = paise % 100;
+  return rest === 0
+    ? String(rupees)
+    : `${rupees}.${String(rest).padStart(2, "0")}`;
+}
+
 /** Compact amount for stat tiles: "₹18.5 L", "₹1.2 Cr"; below a lakh, as formatRupees. */
 export function formatRupeesShort(paise: number): string {
   const value = paise / 100;
