@@ -3,7 +3,9 @@ import Link from "next/link";
 
 import { DeleteEventButton } from "@/components/events/DeleteEventButton";
 import { TopBar } from "@/components/layout/TopBar";
+import { ExpenseList } from "@/components/expenses/ExpenseList";
 import { TaskList } from "@/components/tasks/TaskList";
+import { FindNearby } from "@/components/vendors/FindNearby";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -11,9 +13,11 @@ import {
   formatDayHeading,
   formatTimeFrom,
   formatTimeRange,
+  formatRupees,
   kolkataDateOf,
   todayInKolkata,
 } from "@/lib/format";
+import { listExpenses, listExpensesQuerySchema } from "@/modules/expenses";
 import { listTasks, listTasksQuerySchema } from "@/modules/tasks";
 
 import { can, eventOr404, eventsContext } from "../event-access";
@@ -50,10 +54,22 @@ export default async function EventPage(props: PageProps<"/events/[id]">) {
   const startDay = kolkataDateOf(event.startAt);
   // PRD "Event detail": the event's tasks (expenses, guests and photos
   // join as those features arrive).
-  const { tasks } = await listTasks(
-    ctx,
-    listTasksQuerySchema.parse({ eventId: event.id, limit: 100 }),
-  );
+  const [{ tasks }, { expenses }] = await Promise.all([
+    listTasks(
+      ctx,
+      listTasksQuerySchema.parse({ eventId: event.id, limit: 100 }),
+    ),
+    listExpenses(
+      ctx,
+      listExpensesQuerySchema.parse({ eventId: event.id, limit: 100 }),
+    ),
+  ]);
+  const spentPaise = expenses
+    .filter((expense) => expense.status === "PAID")
+    .reduce((sum, expense) => sum + expense.amountPaise, 0);
+  const pendingPaise = expenses
+    .filter((expense) => expense.status === "PENDING")
+    .reduce((sum, expense) => sum + expense.amountPaise, 0);
   const completed = tasks.filter((task) => task.status === "COMPLETED").length;
 
   return (
@@ -164,6 +180,71 @@ export default async function EventPage(props: PageProps<"/events/[id]">) {
               showEvent={false}
             />
           )}
+        </Card>
+
+        <Card
+          title="Expenses"
+          className="max-w-3xl"
+          aside={
+            expenses.length > 0 ? (
+              <span>
+                {formatRupees(spentPaise)} spent
+                {pendingPaise > 0 && (
+                  <span className="text-warning">
+                    {" "}
+                    · {formatRupees(pendingPaise)} pending
+                  </span>
+                )}
+              </span>
+            ) : undefined
+          }
+          footer={
+            <div className="flex flex-wrap items-center justify-between gap-3 py-2">
+              <ButtonLink
+                href={`/expenses/new?eventId=${event.id}`}
+                variant="secondary"
+              >
+                Add expense
+              </ButtonLink>
+              {expenses.length > 0 && (
+                <Link
+                  href={`/expenses?eventId=${event.id}`}
+                  className={`text-small ${linkClass}`}
+                >
+                  Filter in Expenses →
+                </Link>
+              )}
+            </div>
+          }
+        >
+          {expenses.length === 0 ? (
+            <EmptyState
+              title={`No expenses for ${event.name} yet`}
+              description="Record advances, balances still due and anything else spent."
+            />
+          ) : (
+            <ExpenseList
+              expenses={expenses}
+              today={todayInKolkata()}
+              showEvent={false}
+            />
+          )}
+        </Card>
+
+        <Card title="Find nearby" className="max-w-3xl">
+          <p className="mb-4 text-small wrap-anywhere text-text-muted">
+            Search Google Maps for a caterer, decorator or any other service
+            near {event.venue.name}, then save the one you choose under Vendors.
+          </p>
+          <FindNearby
+            events={[
+              {
+                id: event.id,
+                name: event.name,
+                venue: { name: event.venue.name, address: event.venue.address },
+              },
+            ]}
+          />
         </Card>
 
         {can(ctx.role, "events.delete") && (

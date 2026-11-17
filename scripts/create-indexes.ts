@@ -14,7 +14,9 @@ import { parseEnv } from "node:util";
 
 import { createAuthIndexes } from "@/modules/auth";
 import { createEventIndexes } from "@/modules/events";
+import { createExpenseIndexes } from "@/modules/expenses";
 import { createTaskIndexes } from "@/modules/tasks";
+import { createVendorIndexes } from "@/modules/vendors";
 import { createWeddingIndexes } from "@/modules/wedding";
 import { connectDb } from "@/platform/db";
 import { createRateLimitIndexes } from "@/platform/rate-limit";
@@ -48,6 +50,8 @@ async function main() {
     await createWeddingIndexes(mongoose);
     await createEventIndexes(mongoose);
     await createTaskIndexes(mongoose);
+    await createExpenseIndexes(mongoose);
+    await createVendorIndexes(mongoose);
     await createRateLimitIndexes(mongoose);
 
     const db = mongoose.connection.db!;

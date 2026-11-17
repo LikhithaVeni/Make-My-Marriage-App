@@ -1,12 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { gettingStartedItems } from "@/components/dashboard/GettingStartedCard";
-// Test-only reach into the module, for its sample data.
-// eslint-disable-next-line no-restricted-imports
 import {
   emptySampleDashboard,
   sampleDashboard,
-} from "@/modules/dashboard/sample";
+} from "../fixtures/dashboard-sample";
 
 const done = (dashboard: typeof sampleDashboard) =>
   gettingStartedItems(dashboard).map((item) => [item.label, item.done]);
@@ -37,5 +35,36 @@ describe("gettingStartedItems", () => {
       ["Add tasks", true],
       ["Add guests", false],
     ]);
+  });
+
+  it("offers each step to whoever can do it today (decision 73)", () => {
+    const early = {
+      ...emptySampleDashboard,
+      totals: {
+        ...emptySampleDashboard.totals,
+        households: null,
+        people: null,
+      },
+    };
+    const startable = (canInvite: boolean) =>
+      gettingStartedItems(early, { canInvite }).map((item) => [
+        item.label,
+        item.available,
+        item.href,
+      ]);
+    // Admins invite and add events; anyone adds tasks; guests come later.
+    expect(startable(true)).toEqual([
+      ["Invite family members", true, "/settings/members"],
+      ["Add events", true, "/events/new"],
+      ["Add tasks", true, "/tasks/new"],
+      ["Add guests", false, "/guests"],
+    ]);
+    expect(startable(false).map(([, available]) => available)).toEqual([
+      false,
+      false,
+      true,
+      false,
+    ]);
+    expect(done(early).at(-1)).toEqual(["Add guests", false]);
   });
 });

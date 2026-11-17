@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 
 import { CountdownCard } from "@/components/dashboard/CountdownCard";
@@ -9,23 +10,28 @@ import { TotalsRow } from "@/components/dashboard/TotalsRow";
 import { UpcomingEventsCard } from "@/components/dashboard/UpcomingEventsCard";
 import { WeddingDayContactsCard } from "@/components/dashboard/WeddingDayContactsCard";
 import { TopBar } from "@/components/layout/TopBar";
-import { getDashboard } from "@/modules/dashboard";
+import { readSession } from "@/lib/session";
+import { dashboardPolicy, getDashboard } from "@/modules/dashboard";
+import { authorize } from "@/platform/rbac";
 
-export default async function DashboardPage({
-  searchParams,
-}: PageProps<"/dashboard">) {
+/**
+ * The organisers' home (PRD "Dashboard"): every card from the signed-in
+ * wedding's real data; cards whose feature isn't built yet say what they
+ * come with (decision 73).
+ */
+export default async function DashboardPage() {
   // Render per request: the data and the "3 h ago" labels must be current,
   // never frozen at build time.
   await connection();
-  // While the dashboard shows sample data, ?sample=empty previews a brand-new
-  // wedding, and in development ?sample=error the error state (decision 45).
-  // Production ignores "error", so nobody can fill the logs with fake failures.
-  const { sample } = await searchParams;
-  const showError =
-    sample === "error" && process.env.NODE_ENV === "development";
-  const dashboard = await getDashboard({
-    sample: sample === "empty" ? "empty" : showError ? "error" : "full",
-  });
+  const session = await readSession();
+  // The photographer has their own upload area (API Design).
+  if (session?.result.role === "PHOTOGRAPHER") redirect("/photographer");
+  const ctx = authorize(
+    session?.context ?? null,
+    dashboardPolicy,
+    "dashboard.view",
+  );
+  const dashboard = await getDashboard(ctx);
   // One "today" for every card, taken from the data (docs/decisions.md, 40).
   const { today } = dashboard;
 
@@ -37,7 +43,10 @@ export default async function DashboardPage({
           countdown={dashboard.countdown}
           tasks={dashboard.tasks}
         />
-        <GettingStartedCard dashboard={dashboard} />
+        <GettingStartedCard
+          dashboard={dashboard}
+          canInvite={ctx.role === "ADMIN"}
+        />
         <TotalsRow totals={dashboard.totals} money={dashboard.money} />
         <div className="grid gap-6 lg:grid-cols-3">
           <MyTasksCard

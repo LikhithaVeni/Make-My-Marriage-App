@@ -12,43 +12,63 @@ interface Tile {
   label: string;
   value: React.ReactNode;
   detail?: React.ReactNode;
-  link: { label: string; href: string };
+  link: { label: string; href: string; available: boolean };
 }
+
+const notYet = <span className="text-text-muted">—</span>;
 
 /**
  * The PRD's Totals card as a row of tiles: events, vendors, guests and money
- * spent. Guests wait for Phase 2 (docs/decisions.md, decision 38).
+ * spent. A tile whose feature isn't built yet says what it comes with
+ * (decisions 38 and 73).
  */
 export function TotalsRow({ totals, money }: TotalsRowProps) {
   const tiles: Tile[] = [
     {
       label: "Events",
       value: totals.events,
-      link: { label: "View events", href: "/events" },
+      link: { label: "View events", href: "/events", available: true },
     },
     {
       label: "Vendors",
-      value: totals.vendors,
-      link: { label: "Manage vendors", href: "/vendors" },
+      value: totals.vendors ?? notYet,
+      detail: totals.vendors === null ? "Comes with vendors" : undefined,
+      link: {
+        label: "Manage vendors",
+        href: "/vendors",
+        available: totals.vendors !== null,
+      },
     },
     {
       label: "Guests",
-      value: <span className="text-text-muted">—</span>,
-      detail: "Comes with the guest list",
-      link: { label: "Guest list", href: "/guests" },
+      value: totals.households ?? notYet,
+      detail:
+        totals.households === null
+          ? "Comes with the guest list"
+          : `${totals.people ?? 0} people`,
+      link: {
+        label: "Guest list",
+        href: "/guests",
+        available: totals.households !== null,
+      },
     },
     {
       label: "Spent",
-      value: formatRupeesShort(money.spentPaise),
-      detail:
-        money.pendingPaise > 0 ? (
-          <span className="text-warning">
-            {formatRupeesShort(money.pendingPaise)} pending
-          </span>
-        ) : (
-          "Nothing pending"
-        ),
-      link: { label: "View expenses", href: "/expenses" },
+      value: money ? formatRupeesShort(money.spentPaise) : notYet,
+      detail: !money ? (
+        "Comes with expenses"
+      ) : money.pendingPaise > 0 ? (
+        <span className="text-warning">
+          {formatRupeesShort(money.pendingPaise)} pending
+        </span>
+      ) : (
+        "Nothing pending"
+      ),
+      link: {
+        label: "View expenses",
+        href: "/expenses",
+        available: money !== null,
+      },
     },
   ];
 
@@ -71,7 +91,7 @@ export function TotalsRow({ totals, money }: TotalsRowProps) {
               <CardLink
                 label={tile.link.label}
                 href={tile.link.href}
-                available={false}
+                available={tile.link.available}
               />
             </div>
           </li>

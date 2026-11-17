@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 import { Card, CardLink } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { dateParts, formatTime, kolkataDateOf } from "@/lib/format";
+import { dateParts, formatTimeRange, kolkataDateOf } from "@/lib/format";
 import type { Dashboard } from "@/modules/dashboard";
 
 interface UpcomingEventsCardProps {
@@ -26,39 +28,44 @@ export function UpcomingEventsCard({
           description="Add Haldi, Mehendi, Sangeet and the rest to see them here."
         />
       ) : (
-        <ul className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-2">
           {events.map((event) => {
             const { weekday, day, month } = dateParts(
               kolkataDateOf(event.startAt),
             );
             return (
-              <li key={event.id} className="flex gap-4">
-                <div
-                  aria-hidden="true"
-                  className="flex w-14 shrink-0 flex-col items-center rounded-control border border-border bg-bg py-2"
+              <li key={event.id}>
+                <Link
+                  href={`/events/${event.id}`}
+                  className="-mx-3 flex gap-4 rounded-control px-3 py-2 hover:bg-accent-tint focus-visible:outline-2 focus-visible:outline-accent"
                 >
-                  <span className="text-caption font-medium text-text-muted uppercase">
-                    {month}
-                  </span>
-                  <span className="font-display text-heading text-text">
-                    {day}
-                  </span>
-                </div>
-                <div className="min-w-0">
-                  <p className="font-medium text-text">{event.name}</p>
-                  <p className="text-small text-text-muted">
-                    <span className="sr-only">
-                      {weekday} {day} {month},{" "}
+                  <div
+                    aria-hidden="true"
+                    className="flex w-14 shrink-0 flex-col items-center rounded-control border border-border bg-bg py-2"
+                  >
+                    <span className="text-caption font-medium text-text-muted uppercase">
+                      {month}
                     </span>
-                    {formatTime(event.startAt)} – {formatTime(event.endAt)} ·{" "}
-                    {event.venueName}
-                  </p>
-                  {event.dressCode && (
-                    <p className="mt-1 text-caption text-text-muted">
-                      Dress code: {event.dressCode}
+                    <span className="font-display text-heading text-text">
+                      {day}
+                    </span>
+                  </div>
+                  <div className="min-w-0 wrap-anywhere">
+                    <p className="font-medium text-text">{event.name}</p>
+                    <p className="text-small text-text-muted">
+                      <span className="sr-only">
+                        {weekday} {day} {month},{" "}
+                      </span>
+                      {formatTimeRange(event.startAt, event.endAt)} ·{" "}
+                      {event.venueName}
                     </p>
-                  )}
-                </div>
+                    {event.dressCode && (
+                      <p className="mt-1 text-caption text-text-muted">
+                        Dress code: {event.dressCode}
+                      </p>
+                    )}
+                  </div>
+                </Link>
               </li>
             );
           })}

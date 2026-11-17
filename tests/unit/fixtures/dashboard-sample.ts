@@ -1,10 +1,11 @@
-import type { Dashboard } from "./schemas";
+import type { Dashboard } from "@/modules/dashboard";
 
-// Sample dashboard for building the UI before the modules behind it exist
-// (docs/decisions.md, decision 42). It is a realistic mid-planning snapshot as
-// of 3 November 2026 and is internally consistent: counts, sums and dates agree.
-// Delete this file when getDashboard() reads real data; it ships in the bundle.
-// Phone numbers use the unassigned +91 00000 range so the call buttons ring nobody.
+// Sample dashboards for component tests: a busy wedding and a brand-new one.
+// The app itself shows only real data (decision 73).
+
+// The busy wedding is a realistic mid-planning snapshot as of 3 November 2026,
+// internally consistent: counts, sums and dates agree. Phone numbers use the
+// unassigned +91 00000 range.
 
 export const SAMPLE_AS_OF = "2026-11-03";
 

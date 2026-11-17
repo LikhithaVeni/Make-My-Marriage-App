@@ -318,16 +318,148 @@ export async function updateTask(
 }
 
 /**
- * Deletes a task (Admin, Manager). Linked expenses keep their data (API
- * Design); expenses unset their `taskId` when they exist (decision 71).
+ * Deletes a task (Admin, Manager). Linked expenses keep their data but lose
+ * the link (API Design; Database Design "What happens on delete"), in the
+ * same transaction: the route passes expenses' part in (decision 74).
  */
 export async function deleteTask(
   ctx: WeddingContext,
   id: string,
+  alsoDelete?: (
+    deleted: { weddingId: string; taskId: string },
+    session: ClientSession,
+  ) => Promise<void>,
 ): Promise<void> {
   const task = await findTask(ctx, id);
+  const mongoose = await connectDb();
+  const { Task } = taskModels(mongoose);
+  const transaction = await mongoose.startSession();
+  try {
+    await transaction.withTransaction(async () => {
+      await alsoDelete?.(
+        { weddingId: ctx.weddingId, taskId: task._id.toString() },
+        transaction,
+      );
+      await Task.deleteOne(
+        { _id: task._id, weddingId: ctx.weddingId },
+        { session: transaction },
+      );
+    });
+  } finally {
+    await transaction.endSession();
+  }
+}
+
+/** What the dashboard shows of tasks (decision 73). */
+export interface TaskOverview {
+  /** Overdue tasks are also counted in todo or inProgress. */
+  counts: {
+    todo: number;
+    inProgress: number;
+    completed: number;
+    overdue: number;
+  };
+  /** Open tasks assigned to the viewer: overdue first, then by due date. */
+  mine: {
+    id: string;
+    title: string;
+    dueDate: string | null;
+    overdue: boolean;
+    priority: Priority;
+    eventName: string | null;
+  }[];
+}
+
+/** The default list order's key (due date, priority, id) for any task shape. */
+function dueKey(task: Pick<TaskDoc, "_id" | "dueDate" | "priority">): SortKey {
+  return [
+    task.dueDate ?? NO_DUE_DATE,
+    PRIORITY_RANK[task.priority],
+    task._id.toString(),
+  ];
+}
+
+/**
+ * Task progress for the countdown card and "My tasks" (PRD dashboard):
+ * counts by status with overdue, and up to `limit` of the viewer's open
+ * tasks, overdue first (API Design `GET /dashboard`).
+ */
+export async function taskOverview(
+  ctx: WeddingContext,
+  now = new Date(),
+  limit = 10,
+): Promise<TaskOverview> {
+  const today = todayInKolkata(now);
   const { Task } = await models();
-  await Task.deleteOne({ _id: task._id, weddingId: ctx.weddingId });
+  const [tasks, events] = await Promise.all([
+    Task.find(
+      { weddingId: ctx.weddingId },
+      {
+        title: 1,
+        status: 1,
+        dueDate: 1,
+        priority: 1,
+        assigneeId: 1,
+        eventId: 1,
+      },
+    ).limit(MAX_TASKS),
+    eventNamesOf(ctx),
+  ]);
+  const eventName = new Map(events.map((event) => [event.id, event.name]));
+
+  const counts = { todo: 0, inProgress: 0, completed: 0, overdue: 0 };
+  for (const task of tasks) {
+    if (task.status === "TODO") counts.todo++;
+    else if (task.status === "IN_PROGRESS") counts.inProgress++;
+    else counts.completed++;
+    if (isOverdue(task, today)) counts.overdue++;
+  }
+
+  const mine = tasks
+    .filter(
+      (task) =>
+        task.assigneeId?.toString() === ctx.userId &&
+        task.status !== "COMPLETED",
+    )
+    .map((task) => ({ task, overdue: isOverdue(task, today) }))
+    .sort(
+      (a, b) =>
+        Number(b.overdue) - Number(a.overdue) ||
+        compareKeys(dueKey(a.task), dueKey(b.task)),
+    )
+    .slice(0, limit)
+    .map(({ task, overdue }) => ({
+      id: task._id.toString(),
+      title: task.title,
+      dueDate: task.dueDate ?? null,
+      overdue,
+      priority: task.priority,
+      eventName:
+        (task.eventId && eventName.get(task.eventId.toString())) || null,
+    }));
+
+  return { counts, mine };
+}
+
+/**
+ * Every task's id, title and event, for expenses to check and show
+ * (decision 74).
+ */
+export async function taskTitlesOf(
+  ctx: WeddingContext,
+): Promise<{ id: string; title: string; eventId: string | null }[]> {
+  const { Task } = await models();
+  const tasks = await Task.find(
+    { weddingId: ctx.weddingId },
+    { title: 1, eventId: 1 },
+  )
+    .sort({ title: 1 })
+    .limit(MAX_TASKS);
+  return tasks.map((task) => ({
+    id: task._id.toString(),
+    title: task.title,
+    eventId: task.eventId?.toString() ?? null,
+  }));
 }
 
 /** The assignee picker: the wedding's Admins and Managers. */
