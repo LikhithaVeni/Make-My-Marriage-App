@@ -4,12 +4,14 @@ export {
   createEvent,
   deleteEvent,
   eventNamesOf,
+  eventOverview,
   getEvent,
   googleMapsSearch,
   listEvents,
   updateEvent,
   type DeleteCheck,
   type EventLinks,
+  type EventOverview,
   type EventView,
 } from "./service";
 export { createEventIndexes } from "./model";

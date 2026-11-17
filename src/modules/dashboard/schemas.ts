@@ -2,6 +2,8 @@ import { z } from "zod";
 
 // Response of GET /api/v1/dashboard: the shape in docs/API Design v1.md
 // ("Dashboard"), extended as listed in docs/decisions.md (decision 40).
+// `null` means the feature behind a part isn't built yet, so its card says
+// what it comes with instead of showing a misleading zero (decision 73).
 
 const id = z.string().min(1);
 // Calendar date, e.g. "2028-01-28".
@@ -64,40 +66,48 @@ export const dashboardSchema = z.object({
     // Organisers in the wedding, including the viewer.
     members: count,
     events: count,
-    vendors: count,
-    households: count,
-    people: count,
+    // Vendors, then Guests (Phase 2).
+    vendors: count.nullable(),
+    households: count.nullable(),
+    people: count.nullable(),
   }),
-  rsvp: z.object({
-    replied: count,
-    pending: count,
-    byEvent: z.array(
-      z.object({
-        eventId: id,
-        name: z.string().min(1),
-        attendingPeople: count,
-      }),
-    ),
-  }),
-  money: z.object({
-    spentPaise: paise,
-    pendingPaise: paise,
-    nextDue: z
-      .object({ description: z.string().min(1), dueDate: date })
-      .nullable(),
-    // Nearest due first.
-    pendingPayments: z
-      .array(
+  // RSVP (Phase 2).
+  rsvp: z
+    .object({
+      replied: count,
+      pending: count,
+      byEvent: z.array(
         z.object({
-          id,
-          description: z.string().min(1),
-          vendorName: z.string().nullable(),
-          amountPaise: paise,
-          dueDate: date,
+          eventId: id,
+          name: z.string().min(1),
+          attendingPeople: count,
         }),
-      )
-      .max(3),
-  }),
+      ),
+    })
+    .nullable(),
+  // Expenses.
+  money: z
+    .object({
+      spentPaise: paise,
+      pendingPaise: paise,
+      nextDue: z
+        .object({ description: z.string().min(1), dueDate: date })
+        .nullable(),
+      // Nearest due first.
+      pendingPayments: z
+        .array(
+          z.object({
+            id,
+            description: z.string().min(1),
+            vendorName: z.string().nullable(),
+            amountPaise: paise,
+            dueDate: date,
+          }),
+        )
+        .max(3),
+    })
+    .nullable(),
+  // Vendors.
   weddingDayContacts: z
     .array(
       z.object({
@@ -108,7 +118,9 @@ export const dashboardSchema = z.object({
         phone: z.string().regex(/^\+[1-9]\d{6,14}$/),
       }),
     )
-    .max(4),
+    .max(4)
+    .nullable(),
+  // Activity log.
   recentActivity: z
     .array(
       z.object({
@@ -118,7 +130,8 @@ export const dashboardSchema = z.object({
         at: dateTime,
       }),
     )
-    .max(10),
+    .max(10)
+    .nullable(),
   // Admins only.
   storage: z.object({ usedBytes: count }).optional(),
 });

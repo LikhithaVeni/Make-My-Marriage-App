@@ -7,8 +7,10 @@ export {
   listTasks,
   taskAssignees,
   taskEventLinks,
+  taskOverview,
   unassignTasksOf,
   updateTask,
+  type TaskOverview,
   type TaskPage,
   type TaskView,
 } from "./service";

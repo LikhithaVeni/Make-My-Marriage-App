@@ -19,24 +19,33 @@ export function PendingPaymentsCard({
   today,
   className,
 }: PendingPaymentsCardProps) {
-  const payments = money.pendingPayments;
+  const payments = money?.pendingPayments ?? [];
 
   return (
     <Card
       title="Pending payments"
       className={className}
       aside={
-        money.pendingPaise > 0 ? (
+        money && money.pendingPaise > 0 ? (
           <span className="text-warning">
             {formatRupees(money.pendingPaise)} total
           </span>
         ) : undefined
       }
       footer={
-        <CardLink label="View expenses" href="/expenses" available={false} />
+        <CardLink
+          label="View expenses"
+          href="/expenses"
+          available={money !== null}
+        />
       }
     >
-      {payments.length === 0 ? (
+      {money === null ? (
+        <EmptyState
+          title="Comes with expenses"
+          description="Payments still due will show here, nearest first."
+        />
+      ) : payments.length === 0 ? (
         <EmptyState
           title="No pending payments"
           description="Expenses marked Pending show here, nearest due first."
