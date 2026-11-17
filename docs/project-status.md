@@ -9,30 +9,44 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status      | Branch / PR                       | Updated    |
-| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
-| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
-| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
-| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
-| Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
-| Database indexes in production (`db:indexes`)  | Done        | `fix/db-indexes`, PR #9           | 2026-11-16 |
-| Emailed links never use localhost on Vercel    | Done        | `fix/app-url`, PR #10             | 2026-11-17 |
-| Events (`/events`)                             | Done        | `feature/events`, PR #12          | 2026-11-17 |
-| Tasks (`/tasks`)                               | In progress | `feature/tasks`                   | 2026-11-17 |
-| Landing page: features, how it works, footer   | Later       | —                                 | —          |
+| Feature                                        | Status | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ------ | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done   | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done   | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | Done   | `feature/deploy`, PR #8           | 2026-11-16 |
+| Database indexes in production (`db:indexes`)  | Done   | `fix/db-indexes`, PR #9           | 2026-11-16 |
+| Emailed links never use localhost on Vercel    | Done   | `fix/app-url`, PR #10             | 2026-11-17 |
+| Events (`/events`)                             | Done   | `feature/events`, PR #12          | 2026-11-17 |
+| Tasks (`/tasks`)                               | Done   | `feature/tasks`, PR #14           | 2026-11-17 |
+| Next.js security upgrade (16.4.3 → 16.4.5)     | Done   | `fix/next-security`               | 2026-11-17 |
+| Landing page: features, how it works, footer   | Later  | —                                 | —          |
 
 ## Log
 
-### 2026-11-17: Tasks (In progress)
+### 2026-11-17: Next.js security upgrade (Done; PR into `dev` open)
+
+- `pnpm audit --prod` found one moderate advisory in Next.js 16.4.3
+  (GHSA-mfr8-8qww-v76h, information disclosure through `'use cache'` with
+  `unstable_cache()`), fixed in 16.4.5. The app uses neither, so it wasn't
+  exposed; upgraded anyway.
+- `next` and `eslint-config-next` pinned to 16.4.5 (two weeks old; 16.4.6
+  is too new). The audit is clean, and `next dev` no longer stops at the
+  upgrade notice.
+- 192 unit and database tests, 20 end-to-end tests and a production build
+  pass.
+- Decision 72.
+
+### 2026-11-17: Tasks (Done, PR #14)
 
 - **Tasks** in the sidebar: All tasks, My tasks and Overdue, with filters
   (status, priority, assignee, event, title search, sort). Admins and
@@ -71,9 +85,8 @@ branch), **Next**, **Later**.
   title, adding "Book a Mehendi artist" through the form as the owner did,
   filters, keyboard, 404s, no browser errors). All passed, with the 13 task
   unit tests and the Tasks browser test.
-- **Waiting for:** the owner's retry on `localhost:3000`, then the PR into
-  `dev`; after release, run `pnpm db:indexes --database mmm_prod` for the
-  `tasks` indexes.
+- Released to `main` (PR #15); `pnpm db:indexes` on `mmm_prod` added the
+  three `tasks` indexes.
 - Decision 71.
 
 ### 2026-11-17: Events (Done, PR #12)
@@ -369,13 +382,10 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Tasks:** restart the local dev server and check, merge, release, then
-   run `pnpm db:indexes --database mmm_prod`.
-2. **Next.js security notice:** check the advisory and upgrade Next.js on
-   its own branch.
-3. **Notifications and jobs runner:** the bell, task-assigned notices and
+1. **Next.js 16.4.5:** merge `fix/next-security` and release it.
+2. **Notifications and jobs runner:** the bell, task-assigned notices and
    emails through the job queue.
-4. **Production housekeeping:** a production-only Atlas user, and an
+3. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
@@ -404,11 +414,9 @@ owner's request, so the family could see the look early.
 
 - **Production indexes:** done. `pnpm db:indexes --database mmm_prod`
   (decision 68) builds every collection's indexes; run it after each release
-  that adds a collection or index (next: `tasks`).
-- **Next.js security notice:** on 2026-11-17 `next dev` printed that Next.js
-  16.4.3 is affected by a known security vulnerability and recommended
-  upgrading. Not acted on yet: check the advisory, then upgrade on its own
-  branch (a pinned version over two weeks old) and rerun every check.
+  that adds a collection or index.
+- **Next.js security notice:** resolved by upgrading to 16.4.5 (decision
+  72). Run `pnpm audit --prod` when checking a release.
 - **Local dev server:** after switching branches or many hours of running,
   restart `pnpm dev` if pages or saves fail with "Something went wrong."
   for no clear reason (seen on 2026-11-17). If `pnpm typecheck` fails inside
@@ -426,6 +434,6 @@ owner's request, so the family could see the look early.
 - **Old branches:** `feature/foundation-platform`, `feature/dashboard`,
   `feature/landing`, `feature/auth-api`, `feature/landing-session`,
   `feature/members`, `feature/email`, `feature/wedding-settings`,
-  `feature/deploy`, `docs/deployment-done`, `fix/db-indexes`, `fix/app-url`
-  and `feature/events` are fully merged into `dev` and can be deleted on
+  `feature/deploy`, `docs/deployment-done`, `fix/db-indexes`, `fix/app-url`,
+  `feature/events` and `feature/tasks` are fully merged into `dev` and can be deleted on
   GitHub.
