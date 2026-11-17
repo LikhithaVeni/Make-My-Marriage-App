@@ -276,3 +276,9 @@ The Stitch designs are in [`docs/stitch/`](stitch/README.md). The dashboard foll
     - **Status buttons show the new status as soon as the save succeeds**, before the page refreshes the rest, so a tap feels instant.
     - **End-to-end tests:** the suite now signs up more people than sign-up's limit of 10 per 15 minutes per address, so each test sign-up sends its own made-up `X-Forwarded-For` (`tests/e2e/support/client-ip.ts`); the limit itself stays covered by unit tests, and on Vercel that header is set by Vercel. Locally, assertions wait up to 10 seconds (CI 5), since the dev server builds each page on its first visit.
     - The dashboard's "My tasks" card links to the Tasks page's My tasks view; the cards themselves stay on sample data until "Dashboard on the real wedding".
+
+72. **Next.js 16.4.3 → 16.4.5 for a security advisory.** On 2026-11-17 `next dev` reported that 16.4.3 is affected by a known vulnerability, and stopped once at that notice before starting. `pnpm audit --prod` found one moderate advisory, [GHSA-mfr8-8qww-v76h](https://github.com/advisories/GHSA-mfr8-8qww-v76h): information disclosure across root params when a `'use cache'` function is called through `unstable_cache()`, affecting 16.3.0–16.4.4 and fixed in 16.4.5.
+    - The app uses neither `'use cache'` nor `unstable_cache`, so it wasn't exposed, but the patch release is upgraded to anyway, so the audit stays clean and the dev server starts without stopping.
+    - **16.4.5, not 16.4.6:** 16.4.5 (3 November) is two weeks old, as the project requires of pinned versions; 16.4.6 (9 November) isn't yet. `next` and `eslint-config-next` move together and stay pinned exactly.
+    - Afterwards `pnpm audit --prod` reports no known vulnerabilities; typecheck, lint, format, 192 unit and database tests, 20 end-to-end tests and a production build pass.
+    - Running `pnpm audit --prod` is now part of checking a release.

@@ -28,9 +28,23 @@ branch), **Next**, **Later**.
 | Emailed links never use localhost on Vercel    | Done   | `fix/app-url`, PR #10             | 2026-11-17 |
 | Events (`/events`)                             | Done   | `feature/events`, PR #12          | 2026-11-17 |
 | Tasks (`/tasks`)                               | Done   | `feature/tasks`, PR #14           | 2026-11-17 |
+| Next.js security upgrade (16.4.3 → 16.4.5)     | Done   | `fix/next-security`               | 2026-11-17 |
 | Landing page: features, how it works, footer   | Later  | —                                 | —          |
 
 ## Log
+
+### 2026-11-17: Next.js security upgrade (Done; PR into `dev` open)
+
+- `pnpm audit --prod` found one moderate advisory in Next.js 16.4.3
+  (GHSA-mfr8-8qww-v76h, information disclosure through `'use cache'` with
+  `unstable_cache()`), fixed in 16.4.5. The app uses neither, so it wasn't
+  exposed; upgraded anyway.
+- `next` and `eslint-config-next` pinned to 16.4.5 (two weeks old; 16.4.6
+  is too new). The audit is clean, and `next dev` no longer stops at the
+  upgrade notice.
+- 192 unit and database tests, 20 end-to-end tests and a production build
+  pass.
+- Decision 72.
 
 ### 2026-11-17: Tasks (Done, PR #14)
 
@@ -368,8 +382,7 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Next.js security notice:** check the advisory and upgrade Next.js on
-   its own branch.
+1. **Next.js 16.4.5:** merge `fix/next-security` and release it.
 2. **Notifications and jobs runner:** the bell, task-assigned notices and
    emails through the job queue.
 3. **Production housekeeping:** a production-only Atlas user, and an
@@ -402,10 +415,8 @@ owner's request, so the family could see the look early.
 - **Production indexes:** done. `pnpm db:indexes --database mmm_prod`
   (decision 68) builds every collection's indexes; run it after each release
   that adds a collection or index.
-- **Next.js security notice:** on 2026-11-17 `next dev` printed that Next.js
-  16.4.3 is affected by a known security vulnerability and recommended
-  upgrading. Not acted on yet: check the advisory, then upgrade on its own
-  branch (a pinned version over two weeks old) and rerun every check.
+- **Next.js security notice:** resolved by upgrading to 16.4.5 (decision
+  72). Run `pnpm audit --prod` when checking a release.
 - **Local dev server:** after switching branches or many hours of running,
   restart `pnpm dev` if pages or saves fail with "Something went wrong."
   for no clear reason (seen on 2026-11-17). If `pnpm typecheck` fails inside
