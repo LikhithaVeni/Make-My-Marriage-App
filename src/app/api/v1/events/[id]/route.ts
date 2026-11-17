@@ -6,6 +6,7 @@ import {
   updateEvent,
   updateEventSchema,
 } from "@/modules/events";
+import { taskEventLinks } from "@/modules/tasks";
 import { errorResponse, noContent, ok } from "@/platform/http";
 import { parseJsonBody, requireCsrfHeader } from "@/platform/request";
 import { createRequestId } from "@/platform/request-id";
@@ -54,7 +55,7 @@ export async function DELETE(
   try {
     requireCsrfHeader(request);
     const { ctx } = await authorizeRequest(eventsPolicy, "events.delete");
-    await deleteEvent(ctx, (await params).id);
+    await deleteEvent(ctx, (await params).id, [taskEventLinks]);
     return noContent({ requestId, headers });
   } catch (err) {
     return errorResponse(err, { requestId, headers });

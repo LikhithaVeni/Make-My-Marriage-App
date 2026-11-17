@@ -3,14 +3,18 @@ import Link from "next/link";
 
 import { DeleteEventButton } from "@/components/events/DeleteEventButton";
 import { TopBar } from "@/components/layout/TopBar";
+import { TaskList } from "@/components/tasks/TaskList";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import {
   formatDayHeading,
   formatTimeFrom,
   formatTimeRange,
   kolkataDateOf,
+  todayInKolkata,
 } from "@/lib/format";
+import { listTasks, listTasksQuerySchema } from "@/modules/tasks";
 
 import { can, eventOr404, eventsContext } from "../event-access";
 
@@ -44,6 +48,13 @@ export default async function EventPage(props: PageProps<"/events/[id]">) {
   const ctx = await eventsContext("events.view");
   const event = await eventOr404(ctx, (await props.params).id);
   const startDay = kolkataDateOf(event.startAt);
+  // PRD "Event detail": the event's tasks (expenses, guests and photos
+  // join as those features arrive).
+  const { tasks } = await listTasks(
+    ctx,
+    listTasksQuerySchema.parse({ eventId: event.id, limit: 100 }),
+  );
+  const completed = tasks.filter((task) => task.status === "COMPLETED").length;
 
   return (
     <>
@@ -115,6 +126,44 @@ export default async function EventPage(props: PageProps<"/events/[id]">) {
               </Row>
             )}
           </dl>
+        </Card>
+
+        <Card
+          title="Tasks"
+          className="max-w-3xl"
+          aside={
+            tasks.length > 0
+              ? `${completed} of ${tasks.length} completed`
+              : undefined
+          }
+          footer={
+            <div className="flex flex-wrap items-center justify-between gap-3 py-2">
+              <ButtonLink href={`/tasks/new?eventId=${event.id}`}>
+                Add task
+              </ButtonLink>
+              {tasks.length > 0 && (
+                <Link
+                  href={`/tasks?eventId=${event.id}`}
+                  className={`text-small ${linkClass}`}
+                >
+                  Filter in Tasks →
+                </Link>
+              )}
+            </div>
+          }
+        >
+          {tasks.length === 0 ? (
+            <EmptyState
+              title={`No tasks for ${event.name} yet`}
+              description="Add what needs doing, such as booking the decorator, and assign it to someone."
+            />
+          ) : (
+            <TaskList
+              tasks={tasks}
+              today={todayInKolkata()}
+              showEvent={false}
+            />
+          )}
         </Card>
 
         {can(ctx.role, "events.delete") && (
