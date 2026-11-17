@@ -1,5 +1,6 @@
 import { type APIRequestContext, expect, test } from "@playwright/test";
 
+import { ownVisitor } from "./support/client-ip";
 import { E2E_DB_URI, E2E_USER } from "./support/e2e-db";
 import { closeDb, seedInvite, seedOtherWedding } from "./support/invites";
 import { logIn } from "./support/login";
@@ -82,7 +83,7 @@ test("the invite link shows the wedding; signing up through it joins as Manager"
 
   // The invited email is the only one that can use the link.
   const wrongEmail = await visitor.post(`/api/v1/auth/signup?invite=${token}`, {
-    headers: csrf,
+    headers: { ...csrf, ...ownVisitor() },
     data: {
       name: "Meena",
       email: "someone.else@example.com",
@@ -92,7 +93,7 @@ test("the invite link shows the wedding; signing up through it joins as Manager"
   expect(wrongEmail.status()).toBe(403);
 
   const joined = await visitor.post(`/api/v1/auth/signup?invite=${token}`, {
-    headers: csrf,
+    headers: { ...csrf, ...ownVisitor() },
     data: { name: "Meena", email: "meena.e2e@example.com", password: PASSWORD },
   });
   expect(joined.status()).toBe(201);
@@ -149,7 +150,7 @@ test("someone with an account logs in from the invite and joins", async ({
   expect(
     (
       await visitor.post("/api/v1/auth/signup", {
-        headers: csrf,
+        headers: { ...csrf, ...ownVisitor() },
         data: {
           name: "Ravi",
           email: "ravi.e2e@example.com",

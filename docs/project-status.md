@@ -26,12 +26,57 @@ branch), **Next**, **Later**.
 | Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
 | Database indexes in production (`db:indexes`)  | Done        | `fix/db-indexes`, PR #9           | 2026-11-16 |
 | Emailed links never use localhost on Vercel    | Done        | `fix/app-url`, PR #10             | 2026-11-17 |
-| Events (`/events`)                             | In progress | `feature/events`                  | 2026-11-17 |
+| Events (`/events`)                             | Done        | `feature/events`, PR #12          | 2026-11-17 |
+| Tasks (`/tasks`)                               | In progress | `feature/tasks`                   | 2026-11-17 |
 | Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
 
-### 2026-11-17: Events (In progress)
+### 2026-11-17: Tasks (In progress)
+
+- **Tasks** in the sidebar: All tasks, My tasks and Overdue, with filters
+  (status, priority, assignee, event, title search, sort). Admins and
+  Managers add tasks (title, event or general, assignee, due date,
+  priority, notes), move them To Do → In Progress → Completed in one tap,
+  edit and delete them. Overdue shows in red. Each event's page lists its
+  tasks and adds tasks to it.
+- Removing a member unassigns their tasks; deleting an event is blocked
+  while one of its tasks is In Progress, otherwise its tasks become general
+  tasks (one transaction each).
+- API: `GET`/`POST /tasks`, `GET`/`PATCH`/`DELETE /tasks/{id}`,
+  `GET /tasks/assignees`. Indexes added to `pnpm db:indexes`.
+- Notifying the assignee comes with notifications and the jobs runner (next).
+- Tested: schema, permission and database tests (filters, sorts, cursor
+  paging, overdue, statuses, other weddings, member removal, event delete);
+  a browser test as Admin and Manager; a QA pass (bad and boundary input,
+  other weddings, CSRF, injected fields, tampered cursors, 126 tasks paged
+  with no gaps, a script in the title, long titles at 360 px, keyboard).
+  A long event name in the new "No tasks for …" message widened the event
+  page on phones; empty-state titles now wrap. 192 unit and database tests
+  and 20 end-to-end tests pass (three full runs in a row).
+- Owner's check on the local app: "Add task" showed "Something went
+  wrong." on `localhost:3000`. The same task saved on a fresh second dev
+  server (`localhost:3200`, same dev database): `POST /api/v1/tasks` 201,
+  then two status changes 200. The code was fine; the dev server on port
+  3000 had run for days across many branch switches and was stale. Restart
+  it (Ctrl + C, then `pnpm dev`).
+- The dev server on port 3000 was restarted (the second server on 3200
+  stopped). `next dev` stopped once at its upgrade notice before starting;
+  starting it again worked.
+- Second QA run on the test server after the restart: about 40 API checks
+  (bad and boundary input, February 30, other weddings, CSRF, signed out,
+  injected fields, tampered cursors, the assignee list showing only id,
+  name and relation, literal search, two Admins at once, 126 tasks in 3
+  pages with no gaps) and the pages (360 px and desktop, a script in the
+  title, adding "Book a Mehendi artist" through the form as the owner did,
+  filters, keyboard, 404s, no browser errors). All passed, with the 13 task
+  unit tests and the Tasks browser test.
+- **Waiting for:** the owner's retry on `localhost:3000`, then the PR into
+  `dev`; after release, run `pnpm db:indexes --database mmm_prod` for the
+  `tasks` indexes.
+- Decision 71.
+
+### 2026-11-17: Events (Done, PR #12)
 
 - **Events** in the sidebar: the schedule grouped by day, earliest first,
   in India time. Admins add events (name, start and end, which may be the
@@ -56,9 +101,8 @@ branch), **Next**, **Later**.
   80-character name with no spaces widened the page (865 px on a phone);
   long text now wraps, and a browser test checks it. 179 unit and database
   tests and 19 end-to-end tests pass.
-- **Waiting for:** the owner's check in the browser, then the PR into `dev`;
-  after release, run `pnpm db:indexes --database mmm_prod` for the new
-  `events` indexes.
+- Released to `main` (PR #13); `pnpm db:indexes` run on `mmm_prod` added the
+  `events` indexes. The owner added Haldi on the live site.
 - Decision 70.
 
 ### 2026-11-17: Emailed links never use localhost on Vercel (Done, PR #10)
@@ -325,11 +369,13 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Events:** Haldi to Reception with date, time, venue and dress code
-   (PRD "Events"; next in System Design's Phase 1 order).
-2. **Dashboard on the real wedding:** replace the sample data as events,
-   tasks and money arrive.
-3. **Production housekeeping:** a production-only Atlas user, and an
+1. **Tasks:** restart the local dev server and check, merge, release, then
+   run `pnpm db:indexes --database mmm_prod`.
+2. **Next.js security notice:** check the advisory and upgrade Next.js on
+   its own branch.
+3. **Notifications and jobs runner:** the bell, task-assigned notices and
+   emails through the job queue.
+4. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
@@ -356,10 +402,18 @@ owner's request, so the family could see the look early.
 
 ## Housekeeping
 
-- **Production indexes:** Mongoose builds indexes only outside production
-  (decision 25); Database Design's setup script that creates them (unique
-  email, slug and tokens, TTLs) is still to be written before the first
-  deploy.
+- **Production indexes:** done. `pnpm db:indexes --database mmm_prod`
+  (decision 68) builds every collection's indexes; run it after each release
+  that adds a collection or index (next: `tasks`).
+- **Next.js security notice:** on 2026-11-17 `next dev` printed that Next.js
+  16.4.3 is affected by a known security vulnerability and recommended
+  upgrading. Not acted on yet: check the advisory, then upgrade on its own
+  branch (a pinned version over two weeks old) and rerun every check.
+- **Local dev server:** after switching branches or many hours of running,
+  restart `pnpm dev` if pages or saves fail with "Something went wrong."
+  for no clear reason (seen on 2026-11-17). If `pnpm typecheck` fails inside
+  `.next/dev/types/`, that generated folder was corrupted while being
+  rewritten; delete it and the dev server rebuilds it.
 - **CI test database:** add `MONGODB_TEST_URI` as a GitHub secret so CI runs
   the database and logged-in end-to-end tests.
 
@@ -371,5 +425,7 @@ owner's request, so the family could see the look early.
   since Gmail does the sending.
 - **Old branches:** `feature/foundation-platform`, `feature/dashboard`,
   `feature/landing`, `feature/auth-api`, `feature/landing-session`,
-  `feature/members` and `feature/email` are fully merged into `dev` and can
-  be deleted on GitHub.
+  `feature/members`, `feature/email`, `feature/wedding-settings`,
+  `feature/deploy`, `docs/deployment-done`, `fix/db-indexes`, `fix/app-url`
+  and `feature/events` are fully merged into `dev` and can be deleted on
+  GitHub.

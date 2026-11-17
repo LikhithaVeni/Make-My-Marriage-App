@@ -5,6 +5,7 @@ import {
   updateMemberSchema,
   weddingPolicy,
 } from "@/modules/wedding";
+import { unassignTasksOf } from "@/modules/tasks";
 import { errorResponse, noContent, ok } from "@/platform/http";
 import { parseJsonBody, requireCsrfHeader } from "@/platform/request";
 import { createRequestId } from "@/platform/request-id";
@@ -37,7 +38,8 @@ export async function DELETE(
   try {
     requireCsrfHeader(request);
     const { ctx } = await authorizeRequest(weddingPolicy, "members.remove");
-    await removeMember(ctx, (await params).userId);
+    // Their tasks become unassigned, in the same transaction (PRD).
+    await removeMember(ctx, (await params).userId, unassignTasksOf);
     return noContent({ requestId });
   } catch (err) {
     return errorResponse(err, { requestId, headers });

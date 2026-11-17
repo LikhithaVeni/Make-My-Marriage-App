@@ -9,7 +9,7 @@ interface EmptyStateProps {
 export function EmptyState({ title, description, children }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center gap-1 py-6 text-center">
-      <p className="font-medium text-text">{title}</p>
+      <p className="font-medium wrap-anywhere text-text">{title}</p>
       {description && (
         <p className="max-w-xs text-small text-text-muted">{description}</p>
       )}

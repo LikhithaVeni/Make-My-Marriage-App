@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { ownVisitor } from "./support/client-ip";
 import { E2E_DB_URI } from "./support/e2e-db";
 import { closeDb, markEmailVerified } from "./support/invites";
 
@@ -16,7 +17,7 @@ test("a new organiser creates their wedding, picking a free address", async ({
   expect(
     (
       await page.request.post("/api/v1/auth/signup", {
-        headers: { "X-Requested-With": "mmm" },
+        headers: { "X-Requested-With": "mmm", ...ownVisitor() },
         data: { name: "Create E2E", email, password: "create-e2e-password" },
       })
     ).status(),

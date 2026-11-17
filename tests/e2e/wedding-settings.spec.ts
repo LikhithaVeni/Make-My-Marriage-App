@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { ownVisitor } from "./support/client-ip";
 import { E2E_DB_URI } from "./support/e2e-db";
 import { closeDb, seedInvite, seedOtherWedding } from "./support/invites";
 
@@ -34,7 +35,7 @@ test("an Admin edits the wedding's details; a Manager can only view them", async
   expect(
     (
       await admin.post(`/api/v1/auth/signup?invite=${adminToken}`, {
-        headers: csrf,
+        headers: { ...csrf, ...ownVisitor() },
         data: {
           name: "Settings Admin",
           email: "settings.admin.e2e@example.com",
@@ -47,7 +48,7 @@ test("an Admin edits the wedding's details; a Manager can only view them", async
   expect(
     (
       await manager.post(`/api/v1/auth/signup?invite=${managerToken}`, {
-        headers: csrf,
+        headers: { ...csrf, ...ownVisitor() },
         data: {
           name: "Settings Manager",
           email: "settings.manager.e2e@example.com",

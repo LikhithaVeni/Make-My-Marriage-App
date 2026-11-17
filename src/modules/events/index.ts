@@ -3,11 +3,13 @@ export {
   checkEventDelete,
   createEvent,
   deleteEvent,
+  eventNamesOf,
   getEvent,
   googleMapsSearch,
   listEvents,
   updateEvent,
   type DeleteCheck,
+  type EventLinks,
   type EventView,
 } from "./service";
 export { createEventIndexes } from "./model";

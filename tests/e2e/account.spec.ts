@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { ownVisitor } from "./support/client-ip";
 import { E2E_DB_URI } from "./support/e2e-db";
 
 // Changing your name and password (API Design `PATCH /auth/me`), with a
@@ -19,7 +20,7 @@ test("you can change your name, and your password with the current one", async (
   expect(
     (
       await phone.post("/api/v1/auth/signup", {
-        headers: csrf,
+        headers: { ...csrf, ...ownVisitor() },
         data: { name: "Account", email, password: "first-password-1" },
       })
     ).status(),
