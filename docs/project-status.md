@@ -60,9 +60,20 @@ branch), **Next**, **Later**.
   then two status changes 200. The code was fine; the dev server on port
   3000 had run for days across many branch switches and was stale. Restart
   it (Ctrl + C, then `pnpm dev`).
-- **Waiting for:** the owner's check after restarting the dev server, then
-  the PR into `dev`; after release, run `pnpm db:indexes --database
-mmm_prod` for the `tasks` indexes.
+- The dev server on port 3000 was restarted (the second server on 3200
+  stopped). `next dev` stopped once at its upgrade notice before starting;
+  starting it again worked.
+- Second QA run on the test server after the restart: about 40 API checks
+  (bad and boundary input, February 30, other weddings, CSRF, signed out,
+  injected fields, tampered cursors, the assignee list showing only id,
+  name and relation, literal search, two Admins at once, 126 tasks in 3
+  pages with no gaps) and the pages (360 px and desktop, a script in the
+  title, adding "Book a Mehendi artist" through the form as the owner did,
+  filters, keyboard, 404s, no browser errors). All passed, with the 13 task
+  unit tests and the Tasks browser test.
+- **Waiting for:** the owner's retry on `localhost:3000`, then the PR into
+  `dev`; after release, run `pnpm db:indexes --database mmm_prod` for the
+  `tasks` indexes.
 - Decision 71.
 
 ### 2026-11-17: Events (Done, PR #12)
