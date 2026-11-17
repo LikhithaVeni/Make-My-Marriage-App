@@ -11,35 +11,42 @@ export interface ChecklistItem {
   available: boolean;
 }
 
-/** The PRD's new-wedding checklist (key flow F1, step 5), in PRD order. */
-export function gettingStartedItems(dashboard: Dashboard): ChecklistItem[] {
+/**
+ * The PRD's new-wedding checklist (key flow F1, step 5), in PRD order.
+ * Inviting is for Admins (PRD "Roles and permissions"); guests wait for the
+ * guest list (decision 73).
+ */
+export function gettingStartedItems(
+  dashboard: Dashboard,
+  { canInvite = false }: { canInvite?: boolean } = {},
+): ChecklistItem[] {
   const { totals, tasks } = dashboard;
   return [
     {
       label: "Invite family members",
       description: "Add parents, siblings and friends as Managers.",
       done: totals.members > 1,
-      href: "/settings",
-      available: false,
+      href: "/settings/members",
+      available: canInvite,
     },
     {
       label: "Add events",
       description: "Haldi, Mehendi, Sangeet, Pelli, Reception and more.",
       done: totals.events > 0,
-      href: "/events",
-      available: false,
+      href: "/events/new",
+      available: canInvite,
     },
     {
       label: "Add tasks",
       description: "Who does what, by when, for each event.",
       done: tasks.todo + tasks.inProgress + tasks.completed > 0,
-      href: "/tasks",
-      available: false,
+      href: "/tasks/new",
+      available: true,
     },
     {
       label: "Add guests",
       description: "Households, with how many from each are invited.",
-      done: totals.households > 0,
+      done: (totals.households ?? 0) > 0,
       href: "/guests",
       available: false,
     },
@@ -74,11 +81,21 @@ function StatusIcon({ done }: { done: boolean }) {
   );
 }
 
-/** Shown until every checklist item is done; then it disappears. */
-export function GettingStartedCard({ dashboard }: { dashboard: Dashboard }) {
-  const items = gettingStartedItems(dashboard);
+/**
+ * Shown until every step that can be done today is done; then it disappears
+ * (decision 73). Steps the viewer can't do yet show "Soon".
+ */
+export function GettingStartedCard({
+  dashboard,
+  canInvite = false,
+}: {
+  dashboard: Dashboard;
+  /** Admins invite members and add events (PRD "Roles and permissions"). */
+  canInvite?: boolean;
+}) {
+  const items = gettingStartedItems(dashboard, { canInvite });
   const done = items.filter((item) => item.done).length;
-  if (done === items.length) return null;
+  if (items.every((item) => item.done || !item.available)) return null;
 
   return (
     <Card title="Get started" aside={`${done} of ${items.length} done`}>

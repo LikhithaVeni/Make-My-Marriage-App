@@ -24,11 +24,16 @@ export function WeddingDayContactsCard({
         <CardLink
           label="View all contacts"
           href="/vendors/contacts"
-          available={false}
+          available={contacts !== null}
         />
       }
     >
-      {contacts.length === 0 ? (
+      {contacts === null ? (
+        <EmptyState
+          title="Comes with vendors"
+          description="Vendors marked as wedding-day contacts will show here, with a call button."
+        />
+      ) : contacts.length === 0 ? (
         <EmptyState
           title="No contacts yet"
           description="Mark vendors as wedding-day contacts to list them here."

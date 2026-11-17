@@ -9,31 +9,56 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status | Branch / PR                       | Updated    |
-| ---------------------------------------------- | ------ | --------------------------------- | ---------- |
-| Foundation scaffold                            | Done   | `dev` (first commits)             | 2026-11-03 |
-| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1        | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2          | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4  | 2026-11-11 |
-| Members and invites                            | Done   | `feature/members`, PR #5          | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6            | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`, PR #7 | 2026-11-16 |
-| Deployment (Vercel, Production from `main`)    | Done   | `feature/deploy`, PR #8           | 2026-11-16 |
-| Database indexes in production (`db:indexes`)  | Done   | `fix/db-indexes`, PR #9           | 2026-11-16 |
-| Emailed links never use localhost on Vercel    | Done   | `fix/app-url`, PR #10             | 2026-11-17 |
-| Events (`/events`)                             | Done   | `feature/events`, PR #12          | 2026-11-17 |
-| Tasks (`/tasks`)                               | Done   | `feature/tasks`, PR #14           | 2026-11-17 |
-| Next.js security upgrade (16.4.3 → 16.4.5)     | Done   | `fix/next-security`               | 2026-11-17 |
-| Landing page: features, how it works, footer   | Later  | —                                 | —          |
+| Feature                                        | Status      | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
+| Database indexes in production (`db:indexes`)  | Done        | `fix/db-indexes`, PR #9           | 2026-11-16 |
+| Emailed links never use localhost on Vercel    | Done        | `fix/app-url`, PR #10             | 2026-11-17 |
+| Events (`/events`)                             | Done        | `feature/events`, PR #12          | 2026-11-17 |
+| Tasks (`/tasks`)                               | Done        | `feature/tasks`, PR #14           | 2026-11-17 |
+| Next.js security upgrade (16.4.3 → 16.4.5)     | Done        | `fix/next-security`, PR #16       | 2026-11-17 |
+| Dashboard on real data                         | In progress | `feature/dashboard-real`          | 2026-11-17 |
+| Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
 
-### 2026-11-17: Next.js security upgrade (Done; PR into `dev` open)
+### 2026-11-17: Dashboard on real data (In progress)
+
+- The live dashboard showed sample data (made-up tasks, events and
+  payments) for the owner's real wedding. At the owner's suggestion it now
+  shows real data: the countdown, task progress, My tasks (overdue first),
+  the next 3 events, and the members and events totals. Cards whose
+  feature isn't built yet say what they come with instead of a zero.
+- My tasks and upcoming events rows open the task or event. "Get started"
+  offers each step to whoever can do it and hides once those are done.
+- `GET /api/v1/dashboard` (Admin, Manager) returns the same data, with
+  `null` for unbuilt parts. The sample data and `?sample=` are gone from the
+  app; the sample is now a test fixture.
+- Order from here: Expenses, Vendors, the activity log, then notifications
+  and the jobs runner, each switching on its card.
+- Tested: schema tests, database tests of the real dashboard (counts,
+  overdue order, events under way and over, a Manager's view), checklist
+  tests, and browser tests (unbuilt cards, a new wedding filling in, rows
+  opening their pages, the API). Checked at 360 px and on desktop. QA:
+  other weddings see none of it, a Manager gets no storage figure, signed
+  out is refused, `?sample=` is ignored, a script in names stays text, and
+  a Manager's checklist offers only "Add tasks". 185 unit and database
+  tests and 20 end-to-end tests pass; the audit is clean.
+- Decision 73.
+
+### 2026-11-17: Next.js security upgrade (Done, PR #16)
 
 - `pnpm audit --prod` found one moderate advisory in Next.js 16.4.3
   (GHSA-mfr8-8qww-v76h, information disclosure through `'use cache'` with
@@ -382,10 +407,14 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Next.js 16.4.5:** merge `fix/next-security` and release it.
-2. **Notifications and jobs runner:** the bell, task-assigned notices and
-   emails through the job queue.
-3. **Production housekeeping:** a production-only Atlas user, and an
+1. **Dashboard on real data:** the owner's check, merge and release.
+2. **Expenses:** spending against events, tasks and vendors; switches on
+   pending payments and the spent total.
+3. **Vendors:** vendor list, booking, Find nearby; switches on the vendors
+   total and wedding-day contacts.
+4. **Activity log:** switches on recent activity.
+5. **Notifications and jobs runner:** the bell and task-assigned emails.
+6. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
@@ -403,6 +432,9 @@ it starts.
 
 The dashboard UI and the landing page were built ahead of this order, at the
 owner's request, so the family could see the look early.
+The dashboard switched to real data after Tasks (decision 73); from there
+the order is expenses → vendors → activity log → notifications and jobs
+runner, each switching on its dashboard card.
 
 ## Temporary until a later feature
 

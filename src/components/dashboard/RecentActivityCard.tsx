@@ -21,11 +21,16 @@ export function RecentActivityCard({
         <CardLink
           label="View full activity log"
           href="/activity"
-          available={false}
+          available={activity !== null}
         />
       }
     >
-      {activity.length === 0 ? (
+      {activity === null ? (
+        <EmptyState
+          title="Comes with the activity log"
+          description="Every change by the family will show here, newest first."
+        />
+      ) : activity.length === 0 ? (
         <EmptyState
           title="Nothing yet"
           description="Changes by the family show here as they happen."

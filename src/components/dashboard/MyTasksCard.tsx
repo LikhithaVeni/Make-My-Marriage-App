@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { PRIORITY_LABELS } from "@/components/tasks/task-labels";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardLink } from "@/components/ui/Card";
@@ -47,28 +49,30 @@ export function MyTasksCard({ tasks, today, className }: MyTasksCardProps) {
           {tasks.map((task) => {
             const priority = PRIORITY_LABELS[task.priority];
             return (
-              <li
-                key={task.id}
-                className="flex items-start justify-between gap-4 py-3"
-              >
-                <div className="min-w-0">
-                  <p className="text-text">{task.title}</p>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-small">
-                    {task.dueDate && (
-                      <span
-                        className={
-                          task.overdue ? "text-danger" : "text-text-muted"
-                        }
-                      >
-                        {task.overdue
-                          ? `Overdue · ${formatDayMonth(task.dueDate)}`
-                          : formatDue(task.dueDate, today)}
-                      </span>
-                    )}
-                    {task.eventName && <Badge>{task.eventName}</Badge>}
+              <li key={task.id} className="py-1">
+                <Link
+                  href={`/tasks/${task.id}`}
+                  className="-mx-3 flex items-start justify-between gap-4 rounded-control px-3 py-2 hover:bg-accent-tint focus-visible:outline-2 focus-visible:outline-accent"
+                >
+                  <div className="min-w-0 wrap-anywhere">
+                    <p className="text-text">{task.title}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-small">
+                      {task.dueDate && (
+                        <span
+                          className={
+                            task.overdue ? "text-danger" : "text-text-muted"
+                          }
+                        >
+                          {task.overdue
+                            ? `Overdue · ${formatDayMonth(task.dueDate)}`
+                            : formatDue(task.dueDate, today)}
+                        </span>
+                      )}
+                      {task.eventName && <Badge>{task.eventName}</Badge>}
+                    </div>
                   </div>
-                </div>
-                <Badge tone={priority.tone}>{priority.label}</Badge>
+                  <Badge tone={priority.tone}>{priority.label}</Badge>
+                </Link>
               </li>
             );
           })}

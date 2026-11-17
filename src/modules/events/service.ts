@@ -121,6 +121,50 @@ async function findEvent(ctx: WeddingContext, id: string) {
   return event;
 }
 
+/** What the dashboard shows of events (decision 73). */
+export interface EventOverview {
+  count: number;
+  /** The next few events not yet over, soonest first. */
+  upcoming: {
+    id: string;
+    name: string;
+    startAt: string;
+    endAt: string;
+    venueName: string;
+    dressCode: string | null;
+  }[];
+}
+
+/**
+ * The number of events and the next `limit` that haven't ended (PRD
+ * dashboard "Upcoming events": next 3 with date, time and venue). An event
+ * already under way still shows until it ends.
+ */
+export async function eventOverview(
+  ctx: WeddingContext,
+  now = new Date(),
+  limit = 3,
+): Promise<EventOverview> {
+  const { Event } = await models();
+  const [count, upcoming] = await Promise.all([
+    Event.countDocuments({ weddingId: ctx.weddingId }),
+    Event.find({ weddingId: ctx.weddingId, endAt: { $gt: now } })
+      .sort({ startAt: 1, sortOrder: 1, _id: 1 })
+      .limit(limit),
+  ]);
+  return {
+    count,
+    upcoming: upcoming.map((event) => ({
+      id: event._id.toString(),
+      name: event.name,
+      startAt: event.startAt.toISOString(),
+      endAt: event.endAt.toISOString(),
+      venueName: event.venue.name,
+      dressCode: event.dressCode ?? null,
+    })),
+  };
+}
+
 /** Every event's id and name, for tasks to check and show (decision 71). */
 export async function eventNamesOf(
   ctx: WeddingContext,
