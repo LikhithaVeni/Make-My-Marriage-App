@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { todayInKolkata } from "@/lib/format";
 import { eventNamesOf } from "@/modules/events";
 import { taskTitlesOf } from "@/modules/tasks";
+import { vendorNamesOf } from "@/modules/vendors";
 import { organisersOf } from "@/modules/wedding";
 
 import { expenseOr404, expensesContext } from "../../expense-access";
@@ -21,9 +22,10 @@ export default async function EditExpensePage(
 ) {
   const { ctx, myName } = await expensesContext("expenses.update");
   const expense = await expenseOr404(ctx, (await props.params).id);
-  const [events, tasks, organisers] = await Promise.all([
+  const [events, tasks, vendors, organisers] = await Promise.all([
     eventNamesOf(ctx),
     taskTitlesOf(ctx),
+    vendorNamesOf(ctx),
     organisersOf(ctx),
   ]);
 
@@ -42,6 +44,7 @@ export default async function EditExpensePage(
             expense={expense}
             events={events}
             tasks={tasks}
+            vendors={vendors}
             organisers={organisers.map((person) => person.name)}
             myName={myName}
             today={todayInKolkata()}

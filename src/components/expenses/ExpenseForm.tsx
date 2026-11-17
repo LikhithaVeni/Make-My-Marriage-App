@@ -20,6 +20,7 @@ type Field =
   | "date"
   | "eventId"
   | "taskId"
+  | "vendorId"
   | "category"
   | "description"
   | "paidBy"
@@ -33,6 +34,7 @@ const FIELDS: Field[] = [
   "date",
   "eventId",
   "taskId",
+  "vendorId",
   "category",
   "status",
   "dueDate",
@@ -46,6 +48,7 @@ function valuesOf(expense: ExpenseView): Values {
     date: expense.date,
     eventId: expense.event?.id ?? "",
     taskId: expense.task?.id ?? "",
+    vendorId: expense.vendor?.id ?? "",
     category: expense.category,
     description: expense.description ?? "",
     paidBy: expense.paidBy,
@@ -59,6 +62,7 @@ interface ExpenseFormProps {
   expense?: ExpenseView;
   events: { id: string; name: string }[];
   tasks: { id: string; title: string; eventId: string | null }[];
+  vendors: { id: string; name: string }[];
   /** Organisers' names, offered for "Paid by". */
   organisers: string[];
   /** The signed-in organiser, the default "Paid by". */
@@ -67,6 +71,8 @@ interface ExpenseFormProps {
   today: string;
   /** A new expense's event, when added from an event's page. */
   defaultEventId?: string;
+  /** A new expense's vendor, from a vendor's "Record payment". */
+  defaultVendorId?: string;
 }
 
 /** Record or edit an expense (PRD "Expense fields", key flow F4). */
@@ -74,10 +80,12 @@ export function ExpenseForm({
   expense,
   events,
   tasks,
+  vendors,
   organisers,
   myName,
   today,
   defaultEventId,
+  defaultVendorId,
 }: ExpenseFormProps) {
   const router = useRouter();
   const listId = useId();
@@ -88,6 +96,7 @@ export function ExpenseForm({
       date: today,
       eventId: defaultEventId ?? "",
       taskId: "",
+      vendorId: defaultVendorId ?? "",
       category: "",
       description: "",
       paidBy: myName,
@@ -112,9 +121,11 @@ export function ExpenseForm({
   );
   const cancelHref = expense
     ? `/expenses/${expense.id}`
-    : defaultEventId
-      ? `/events/${defaultEventId}`
-      : "/expenses";
+    : defaultVendorId
+      ? `/vendors/${defaultVendorId}`
+      : defaultEventId
+        ? `/events/${defaultEventId}`
+        : "/expenses";
 
   function update(field: Field, value: string) {
     setValues((current) => {
@@ -281,6 +292,22 @@ export function ExpenseForm({
         options={[
           { value: "", label: "No task" },
           ...eventTasks.map((task) => ({ value: task.id, label: task.title })),
+        ]}
+      />
+
+      <SelectField
+        label="Vendor (optional)"
+        name="vendorId"
+        value={values.vendorId}
+        onChange={(value) => update("vendorId", value)}
+        error={errors.vendorId}
+        hint="Payments to a vendor show on their page, against the agreed cost."
+        options={[
+          { value: "", label: "No vendor" },
+          ...vendors.map((vendor) => ({
+            value: vendor.id,
+            label: vendor.name,
+          })),
         ]}
       />
 

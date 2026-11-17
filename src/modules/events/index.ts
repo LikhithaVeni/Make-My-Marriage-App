@@ -6,7 +6,6 @@ export {
   eventNamesOf,
   eventOverview,
   getEvent,
-  googleMapsSearch,
   listEvents,
   updateEvent,
   type DeleteCheck,
@@ -14,6 +13,7 @@ export {
   type EventOverview,
   type EventView,
 } from "./service";
+export { googleMapsSearch } from "@/lib/maps";
 export { createEventIndexes } from "./model";
 export { eventsPolicy } from "./policy";
 export {

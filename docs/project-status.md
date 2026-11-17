@@ -31,9 +31,34 @@ branch), **Next**, **Later**.
 | Next.js security upgrade (16.4.3 → 16.4.5)     | Done        | `fix/next-security`, PR #16       | 2026-11-17 |
 | Dashboard on real data                         | In progress | `feature/dashboard-real`          | 2026-11-17 |
 | Expenses (`/expenses`)                         | In progress | `feature/expenses`                | 2026-11-17 |
+| Vendors (`/vendors`)                           | In progress | `feature/vendors`                 | 2026-11-18 |
 | Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
+
+### 2026-11-18: Vendors (In progress)
+
+- **Vendors** in the sidebar: save vendors (service, phone, booking status,
+  quote, agreed cost, notes, wedding-day contact), grouped by service with
+  filters; each vendor's page shows paid vs agreed from its expenses and
+  **Record payment**. **Wedding-day contacts** has a page with Call
+  buttons. **Find nearby** opens Google Maps for a service near an event's
+  venue, on the Vendors page and each event's page.
+- Expenses take a vendor (picker, filter, rows, pages); the dashboard's
+  **Vendors** tile, **Wedding-day contacts** card and pending payments'
+  vendor names are now real.
+- Deleting a vendor keeps its payments as expenses. Documents wait for file
+  storage.
+- Tested: phone parsing, Maps links, schema, permission and database tests
+  (filters, paid vs agreed, the contact-needs-phone rule, other weddings,
+  delete); a browser test of key flow F4 end to end; a QA pass (bad and
+  boundary input, other weddings, CSRF, a script in names, phone width).
+  QA found long service and venue names widening three pages; fixed.
+  204 unit and database tests and 22 end-to-end tests pass; the audit is
+  clean. End-to-end tests now retry once locally, as in CI (decision 75).
+- Stacked on `feature/expenses`: merge `feature/dashboard-real`, then
+  `feature/expenses`, then this.
+- Decision 75.
 
 ### 2026-11-17: Expenses (In progress)
 
@@ -430,15 +455,14 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Dashboard on real data** and **Expenses:** the owner's check, merge
-   `feature/dashboard-real` then `feature/expenses`, release, then run
-   `pnpm db:indexes --database mmm_prod` for the `expenses` indexes.
-2. **Vendors:** vendor list, booking status, Find nearby, wedding-day
-   contacts; the vendor on expenses; switches on the vendors total and
-   wedding-day contacts.
-3. **Activity log:** switches on recent activity.
-4. **Notifications and jobs runner:** the bell and task-assigned emails.
-5. **Production housekeeping:** a production-only Atlas user, and an
+1. **Dashboard on real data, Expenses and Vendors:** the owner's check,
+   merge `feature/dashboard-real`, `feature/expenses` and `feature/vendors`
+   in that order, release, then run `pnpm db:indexes --database mmm_prod`
+   for the `expenses` and `vendors` indexes.
+2. **Activity log:** switches on recent activity, the last dashboard card
+   of Phase 1.
+3. **Notifications and jobs runner:** the bell and task-assigned emails.
+4. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap

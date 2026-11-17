@@ -178,7 +178,7 @@ describe.skipIf(!TEST_DB_URI)("getDashboard (real data)", () => {
       totals: {
         members: 1,
         events: 0,
-        vendors: null,
+        vendors: 0,
         households: null,
         people: null,
       },
@@ -190,7 +190,7 @@ describe.skipIf(!TEST_DB_URI)("getDashboard (real data)", () => {
         nextDue: null,
         pendingPayments: [],
       },
-      weddingDayContacts: null,
+      weddingDayContacts: [],
       recentActivity: null,
     });
     expect(dashboard.storage).toBeUndefined();

@@ -1,14 +1,18 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { createAuthIndexes } from "@/modules/auth";
 import { createEventIndexes } from "@/modules/events";
 import { createExpenseIndexes } from "@/modules/expenses";
 import { createTaskIndexes } from "@/modules/tasks";
+import { createVendorIndexes } from "@/modules/vendors";
 import { createWeddingIndexes } from "@/modules/wedding";
 import { connectDb } from "@/platform/db";
 import { createRateLimitIndexes } from "@/platform/rate-limit";
 
 import { startTestDb, TEST_DB_URI } from "../helpers/test-db";
+
+// Building every index on a remote cluster takes several seconds.
+vi.setConfig({ testTimeout: 60_000 });
 
 // The setup script's index builders (decision 68) against Database Design's
 // "Indexes" table, for the collections built so far.
@@ -55,6 +59,7 @@ describe.skipIf(!TEST_DB_URI)("index setup", () => {
       await createEventIndexes(mongoose);
       await createTaskIndexes(mongoose);
       await createExpenseIndexes(mongoose);
+      await createVendorIndexes(mongoose);
       await createRateLimitIndexes(mongoose);
     }
 
@@ -72,6 +77,9 @@ describe.skipIf(!TEST_DB_URI)("index setup", () => {
       ["tokenHash:1 unique", "weddingId:1,status:1"].sort(),
     );
     expect(await indexesOf("weddings")).toEqual(["slug:1 unique"]);
+    expect(await indexesOf("vendors")).toEqual(
+      ["weddingId:1,serviceType:1", "weddingId:1,weddingDayContact:1"].sort(),
+    );
     expect(await indexesOf("expenses")).toEqual(
       [
         "weddingId:1,eventId:1,date:-1",

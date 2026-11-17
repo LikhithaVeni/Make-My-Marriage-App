@@ -14,7 +14,10 @@ export default defineConfig({
   // Seeds the e2e database with a logged-in-able organiser (decision 58).
   globalSetup: "./tests/e2e/global-setup.ts",
   forbidOnly: isCI,
-  retries: isCI ? 1 : 0,
+  // One retry everywhere: locally the dev server sometimes resets a reused
+  // connection after a slow first build (ECONNRESET on a POST, which isn't
+  // retried by itself). A test that needs it is still reported as flaky.
+  retries: 1,
   reporter: isCI ? "github" : "list",
   // Locally the dev server builds each page on its first visit, which can
   // take several seconds while tests run side by side; CI tests a build.
