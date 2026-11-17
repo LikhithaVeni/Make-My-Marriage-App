@@ -1,7 +1,7 @@
 // Expenses business logic: recording what was spent or is still due, marking
 // payments Paid, and the totals by event, category and status (PRD "Expenses
-// and vendors", key flow F4; API Design "Expenses"). Vendors and receipts
-// arrive later (decision 74). Callers outside this module reach it only
+// and vendors", key flow F4; API Design "Expenses"). Receipts arrive with
+// file storage (decision 74). Callers outside this module reach it only
 // through index.ts.
 import "server-only";
 
@@ -11,6 +11,7 @@ import { CATEGORY_LABELS } from "@/lib/expense-labels";
 import { todayInKolkata } from "@/lib/format";
 import { eventNamesOf, type EventLinks } from "@/modules/events";
 import { taskTitlesOf } from "@/modules/tasks";
+import { vendorNamesOf } from "@/modules/vendors";
 import { connectDb } from "@/platform/db";
 import { AppError } from "@/platform/errors";
 import type { WeddingContext } from "@/platform/rbac";
@@ -38,7 +39,6 @@ export interface ExpenseView {
   /** Null once its event was deleted: shown under "No event". */
   event: { id: string; name: string } | null;
   task: { id: string; title: string } | null;
-  /** Arrives with Vendors (decision 74). */
   vendor: { id: string; name: string } | null;
   category: Category;
   description: string | null;
@@ -113,15 +113,17 @@ function labelOf(
   );
 }
 
-/** The wedding's events and tasks, to check ids and show names. */
+/** The wedding's events, tasks and vendors, to check ids and show names. */
 async function lookups(ctx: WeddingContext) {
-  const [events, tasks] = await Promise.all([
+  const [events, tasks, vendors] = await Promise.all([
     eventNamesOf(ctx),
     taskTitlesOf(ctx),
+    vendorNamesOf(ctx),
   ]);
   return {
     events: new Map(events.map((event) => [event.id, event])),
     tasks: new Map(tasks.map((task) => [task.id, task])),
+    vendors: new Map(vendors.map((vendor) => [vendor.id, vendor])),
   };
 }
 type Lookups = Awaited<ReturnType<typeof lookups>>;
@@ -133,13 +135,15 @@ function toView(
 ): ExpenseView {
   const event = expense.eventId && found.events.get(expense.eventId.toString());
   const task = expense.taskId && found.tasks.get(expense.taskId.toString());
+  const vendor =
+    expense.vendorId && found.vendors.get(expense.vendorId.toString());
   return {
     id: expense._id.toString(),
     amountPaise: expense.amountPaise,
     date: expense.date,
     event: event || null,
     task: task ? { id: task.id, title: task.title } : null,
-    vendor: null,
+    vendor: vendor || null,
     category: expense.category,
     description: expense.description ?? null,
     paidBy: expense.paidBy,
@@ -160,7 +164,7 @@ function toView(
  * rules"; API Design: 400 when they're not).
  */
 function checkLinks(
-  input: { eventId?: string; taskId?: string },
+  input: { eventId?: string; taskId?: string; vendorId?: string },
   found: Lookups,
 ) {
   const problems: Record<string, string> = {};
@@ -169,6 +173,9 @@ function checkLinks(
   }
   if (input.taskId && !found.tasks.has(input.taskId)) {
     problems.taskId = "Choose one of this wedding's tasks";
+  }
+  if (input.vendorId && !found.vendors.has(input.vendorId)) {
+    problems.vendorId = "Choose one of this wedding's vendors";
   }
   if (Object.keys(problems).length > 0) throw validationFailed(problems);
 }
@@ -233,6 +240,7 @@ export async function listExpenses(
   if (query.eventId === "none") filter.eventId = { $exists: false };
   else if (query.eventId) filter.eventId = query.eventId;
   if (query.taskId) filter.taskId = query.taskId;
+  if (query.vendorId) filter.vendorId = query.vendorId;
   if (query.category) filter.category = query.category;
   if (query.status) filter.status = query.status;
   if (query.from || query.to) {
@@ -305,6 +313,7 @@ export async function createExpense(
     date: input.date,
     eventId: input.eventId,
     ...(input.taskId && { taskId: input.taskId }),
+    ...(input.vendorId && { vendorId: input.vendorId }),
     category: input.category,
     ...(input.description && { description: input.description }),
     paidBy: input.paidBy,
@@ -351,7 +360,12 @@ export async function updateExpense(
   ] as const) {
     if (input[field] !== undefined) set[field] = input[field];
   }
-  for (const field of ["taskId", "description", "dueDate"] as const) {
+  for (const field of [
+    "taskId",
+    "vendorId",
+    "description",
+    "dueDate",
+  ] as const) {
     const value = input[field];
     if (value === undefined) continue;
     if (value) set[field] = value;
@@ -390,7 +404,7 @@ export async function expenseSummary(
   ctx: WeddingContext,
 ): Promise<ExpenseSummary> {
   const { Expense } = await models();
-  const [expenses, events] = await Promise.all([
+  const [expenses, events, vendors] = await Promise.all([
     Expense.find(
       { weddingId: ctx.weddingId },
       {
@@ -401,11 +415,14 @@ export async function expenseSummary(
         category: 1,
         description: 1,
         date: 1,
+        vendorId: 1,
       },
     ).limit(MAX_EXPENSES),
     eventNamesOf(ctx),
+    vendorNamesOf(ctx),
   ]);
   const eventName = new Map(events.map((event) => [event.id, event.name]));
+  const vendorName = new Map(vendors.map((vendor) => [vendor.id, vendor.name]));
 
   let paidPaise = 0;
   let pendingPaise = 0;
@@ -468,7 +485,9 @@ export async function expenseSummary(
     pendingPayments: pending.slice(0, 3).map((expense) => ({
       id: expense._id.toString(),
       description: describe(expense),
-      vendorName: null,
+      vendorName:
+        (expense.vendorId && vendorName.get(expense.vendorId.toString())) ||
+        null,
       amountPaise: expense.amountPaise,
       dueDate: expense.dueDate,
     })),
@@ -519,6 +538,42 @@ export const expenseEventLinks: EventLinks = {
     );
   },
 };
+
+/**
+ * What each vendor has been paid: the Paid expenses linked to it (PRD: "the
+ * vendor page shows paid vs agreed cost"; API Design `GET /vendors`).
+ */
+export async function paidByVendor(
+  ctx: WeddingContext,
+): Promise<Map<string, number>> {
+  const { Expense } = await models();
+  const paid = await Expense.find(
+    { weddingId: ctx.weddingId, status: "PAID", vendorId: { $exists: true } },
+    { vendorId: 1, amountPaise: 1 },
+  ).limit(MAX_EXPENSES);
+  const totals = new Map<string, number>();
+  for (const expense of paid) {
+    const id = expense.vendorId!.toString();
+    totals.set(id, (totals.get(id) ?? 0) + expense.amountPaise);
+  }
+  return totals;
+}
+
+/**
+ * Deleting a vendor keeps its expenses but removes the link, in the
+ * delete's transaction (Database Design "What happens on delete").
+ */
+export async function unlinkVendorExpenses(
+  deleted: { weddingId: string; vendorId: string },
+  session: ClientSession,
+): Promise<void> {
+  const { Expense } = await models();
+  await Expense.updateMany(
+    { weddingId: deleted.weddingId, vendorId: deleted.vendorId },
+    { $unset: { vendorId: "" } },
+    { session },
+  );
+}
 
 /**
  * Deleting a task keeps its expenses but removes the link, in the delete's

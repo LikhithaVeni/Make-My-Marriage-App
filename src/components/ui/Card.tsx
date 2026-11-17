@@ -28,7 +28,10 @@ export function Card({ title, aside, footer, className, children }: CardProps) {
     >
       {/* The note wraps under the title when a phone is too narrow for both. */}
       <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
-        <h2 id={id} className="font-display text-heading text-text">
+        <h2
+          id={id}
+          className="min-w-0 font-display text-heading wrap-anywhere text-text"
+        >
           {title}
         </h2>
         {aside && (

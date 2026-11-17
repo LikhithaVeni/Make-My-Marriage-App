@@ -39,6 +39,7 @@ export function ExpenseList({
                 <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-small text-text-muted">
                   <span>{formatDate(expense.date)}</span>
                   {expense.description && <span>{category}</span>}
+                  {expense.vendor && <span>{expense.vendor.name}</span>}
                   {showEvent && (
                     <Badge>{expense.event?.name ?? "No event"}</Badge>
                   )}

@@ -35,6 +35,8 @@ const fields = {
   eventId: objectId,
   /** "" removes the task. */
   taskId: z.union([z.literal(""), objectId]),
+  /** "" removes the vendor. */
+  vendorId: z.union([z.literal(""), objectId]),
   category: z.enum(CATEGORIES, { error: "Pick a category" }),
   description: z.string().trim().max(2000, "Use at most 2,000 characters"),
   paidBy: z
@@ -49,8 +51,7 @@ const fields = {
 
 /**
  * POST /expenses (Admin, Manager). Database Design "Field rules": the amount
- * is more than 0, and a Pending expense needs a due date. The vendor link
- * arrives with Vendors (decision 74).
+ * is more than 0, and a Pending expense needs a due date.
  */
 export const createExpenseSchema = z
   .object({
@@ -58,6 +59,7 @@ export const createExpenseSchema = z
     date: fields.date,
     eventId: fields.eventId,
     taskId: fields.taskId.optional(),
+    vendorId: fields.vendorId.optional(),
     category: fields.category,
     description: fields.description.optional(),
     paidBy: fields.paidBy,
@@ -93,11 +95,11 @@ export type ExpenseSort = (typeof EXPENSE_SORTS)[number];
  * GET /expenses filters (API Design): `eventId` (or `none`), `taskId`,
  * `category`, `status`, `from`, `to`, `dueBefore`; sort `-date` (default),
  * `dueDate`, `-amountPaise`; cursor paging, 50 by default, at most 100.
- * `vendorId` arrives with Vendors.
  */
 export const listExpensesQuerySchema = z.object({
   eventId: z.union([z.literal("none"), objectId]).optional(),
   taskId: objectId.optional(),
+  vendorId: objectId.optional(),
   category: fields.category.optional(),
   status: fields.status.optional(),
   from: calendarDate("Choose a date").optional(),

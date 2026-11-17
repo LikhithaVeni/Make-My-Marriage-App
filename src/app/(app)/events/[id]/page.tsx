@@ -5,6 +5,7 @@ import { DeleteEventButton } from "@/components/events/DeleteEventButton";
 import { TopBar } from "@/components/layout/TopBar";
 import { ExpenseList } from "@/components/expenses/ExpenseList";
 import { TaskList } from "@/components/tasks/TaskList";
+import { FindNearby } from "@/components/vendors/FindNearby";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -228,6 +229,22 @@ export default async function EventPage(props: PageProps<"/events/[id]">) {
               showEvent={false}
             />
           )}
+        </Card>
+
+        <Card title="Find nearby" className="max-w-3xl">
+          <p className="mb-4 text-small wrap-anywhere text-text-muted">
+            Search Google Maps for a caterer, decorator or any other service
+            near {event.venue.name}, then save the one you choose under Vendors.
+          </p>
+          <FindNearby
+            events={[
+              {
+                id: event.id,
+                name: event.name,
+                venue: { name: event.venue.name, address: event.venue.address },
+              },
+            ]}
+          />
         </Card>
 
         {can(ctx.role, "events.delete") && (

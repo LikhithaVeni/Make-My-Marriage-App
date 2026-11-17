@@ -110,6 +110,16 @@ export default async function ExpensePage(props: PageProps<"/expenses/[id]">) {
             >
               {expense.paidBy}
             </Row>
+            {expense.vendor && (
+              <Row label="Vendor">
+                <Link
+                  href={`/vendors/${expense.vendor.id}`}
+                  className={linkClass}
+                >
+                  {expense.vendor.name}
+                </Link>
+              </Row>
+            )}
             {expense.task && (
               <Row label="Task">
                 <Link href={`/tasks/${expense.task.id}`} className={linkClass}>

@@ -27,7 +27,6 @@ test("every card shows, and unbuilt ones say what they come with", async ({
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
   }
   await expect(page.getByText(/days to go/)).toBeVisible();
-  await expect(page.getByText("Comes with vendors").first()).toBeVisible();
   await expect(page.getByText("Comes with the activity log")).toBeVisible();
   await expect(page.getByText("Comes with the guest list")).toBeVisible();
   // The signed-in wedding heads the menu.
@@ -111,9 +110,9 @@ test("a new wedding's dashboard fills in as events and tasks are added", async (
   const data = (await api.json()).data;
   expect(data).toMatchObject({
     tasks: { todo: 1, inProgress: 0, completed: 0, overdue: 1 },
-    totals: { members: 1, events: 1, vendors: null, households: null },
+    totals: { members: 1, events: 1, vendors: 0, households: null },
     money: { spentPaise: 0, pendingPaise: 0, pendingPayments: [] },
-    weddingDayContacts: null,
+    weddingDayContacts: [],
     recentActivity: null,
   });
   const anon = await playwright.request.newContext({ baseURL });

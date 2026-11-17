@@ -9,6 +9,7 @@ import { randomBytes } from "node:crypto";
 
 import type { ClientSession } from "mongoose";
 
+import { googleMapsSearch } from "@/lib/maps";
 import { connectDb } from "@/platform/db";
 import { AppError } from "@/platform/errors";
 import { getPublicEnv } from "@/platform/public-env";
@@ -67,12 +68,6 @@ const notFound = () =>
 
 function isObjectId(id: string): boolean {
   return /^[0-9a-f]{24}$/i.test(id);
-}
-
-/** PRD: "Map link — auto-generated from address if left empty". */
-export function googleMapsSearch(venue: { name: string; address: string }) {
-  const query = encodeURIComponent(`${venue.name}, ${venue.address}`);
-  return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
 function toView(event: EventDoc, ctx: WeddingContext): EventView {
