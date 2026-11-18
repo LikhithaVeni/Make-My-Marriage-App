@@ -9,6 +9,15 @@ export interface ChecklistItem {
   href: string;
   /** False until the page exists; shown as "Soon". */
   available: boolean;
+  /** Once done, what was added: "2 events added". */
+  doneNote: string;
+  /** Once done, where to see them; null when the viewer can't open it. */
+  viewHref: string | null;
+}
+
+/** "1 event added", "3 tasks added". */
+function added(count: number, one: string, many: string, verb = "added") {
+  return `${count} ${count === 1 ? one : many} ${verb}`;
 }
 
 /**
@@ -21,13 +30,18 @@ export function gettingStartedItems(
   { canInvite = false }: { canInvite?: boolean } = {},
 ): ChecklistItem[] {
   const { totals, tasks } = dashboard;
+  const taskCount = tasks.todo + tasks.inProgress + tasks.completed;
+  const joined = totals.members - 1;
   return [
     {
       label: "Invite family members",
       description: "Add parents, siblings and friends as Managers.",
-      done: totals.members > 1,
+      done: joined > 0,
       href: "/settings/members",
       available: canInvite,
+      doneNote: added(joined, "family member", "family members", "joined"),
+      // Settings is for Admins (PRD screens).
+      viewHref: canInvite ? "/settings/members" : null,
     },
     {
       label: "Add events",
@@ -35,13 +49,17 @@ export function gettingStartedItems(
       done: totals.events > 0,
       href: "/events/new",
       available: canInvite,
+      doneNote: added(totals.events, "event", "events"),
+      viewHref: "/events",
     },
     {
       label: "Add tasks",
       description: "Who does what, by when, for each event.",
-      done: tasks.todo + tasks.inProgress + tasks.completed > 0,
+      done: taskCount > 0,
       href: "/tasks/new",
       available: true,
+      doneNote: added(taskCount, "task", "tasks"),
+      viewHref: "/tasks",
     },
     {
       label: "Add guests",
@@ -49,6 +67,8 @@ export function gettingStartedItems(
       done: (totals.households ?? 0) > 0,
       href: "/guests",
       available: false,
+      doneNote: added(totals.households ?? 0, "household", "households"),
+      viewHref: "/guests",
     },
   ];
 }
@@ -83,7 +103,8 @@ function StatusIcon({ done }: { done: boolean }) {
 
 /**
  * Shown until every step that can be done today is done; then it disappears
- * (decision 73). Steps the viewer can't do yet show "Soon".
+ * (decision 73). Steps the viewer can't do yet show "Soon"; finished steps
+ * keep a green tick, say what was added and link to it (decision 76).
  */
 export function GettingStartedCard({
   dashboard,
@@ -110,30 +131,33 @@ export function GettingStartedCard({
           <li key={item.label} className="flex items-start gap-3 py-3">
             <StatusIcon done={item.done} />
             <div className="min-w-0 flex-1">
-              <p
-                className={
-                  item.done ? "text-text-muted line-through" : "text-text"
-                }
-              >
+              <p className="text-text">
                 <span className="sr-only">
                   {item.done ? "Done: " : "To do: "}
                 </span>
                 {item.label}
               </p>
-              {!item.done && (
+              {item.done ? (
+                <p className="text-small text-success">{item.doneNote}</p>
+              ) : (
                 <p className="text-small text-text-muted">{item.description}</p>
               )}
             </div>
-            {!item.done &&
-              (item.available ? (
+            {item.done ? (
+              item.viewHref && (
                 <div className="shrink-0">
-                  <CardLink label="Start" href={item.href} available />
+                  <CardLink label="View" href={item.viewHref} available />
                 </div>
-              ) : (
-                <span className="shrink-0 pt-0.5 text-caption text-text-muted">
-                  Soon
-                </span>
-              ))}
+              )
+            ) : item.available ? (
+              <div className="shrink-0">
+                <CardLink label="Start" href={item.href} available />
+              </div>
+            ) : (
+              <span className="shrink-0 pt-0.5 text-caption text-text-muted">
+                Soon
+              </span>
+            )}
           </li>
         ))}
       </ul>

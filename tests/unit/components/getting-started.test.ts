@@ -67,4 +67,27 @@ describe("gettingStartedItems", () => {
     ]);
     expect(done(early).at(-1)).toEqual(["Add guests", false]);
   });
+
+  it("says what was added and links to it, instead of crossing out (decision 76)", () => {
+    const partway = {
+      ...emptySampleDashboard,
+      totals: { ...emptySampleDashboard.totals, members: 2, events: 1 },
+      tasks: { todo: 2, inProgress: 1, completed: 0, overdue: 0 },
+    };
+    const notes = (canInvite: boolean) =>
+      gettingStartedItems(partway, { canInvite })
+        .filter((item) => item.done)
+        .map((item) => [item.label, item.doneNote, item.viewHref]);
+    expect(notes(true)).toEqual([
+      ["Invite family members", "1 family member joined", "/settings/members"],
+      ["Add events", "1 event added", "/events"],
+      ["Add tasks", "3 tasks added", "/tasks"],
+    ]);
+    // Managers can't open Settings, so there's no link to it.
+    expect(notes(false)[0]).toEqual([
+      "Invite family members",
+      "1 family member joined",
+      null,
+    ]);
+  });
 });
