@@ -8,7 +8,8 @@ import "server-only";
 import type { ClientSession, QueryFilter } from "mongoose";
 
 import { CATEGORY_LABELS } from "@/lib/expense-labels";
-import { todayInKolkata } from "@/lib/format";
+import { changesOf, quoted, recordActivity } from "@/modules/activity";
+import { formatDate, formatRupees, todayInKolkata } from "@/lib/format";
 import { eventNamesOf, type EventLinks } from "@/modules/events";
 import { taskTitlesOf } from "@/modules/tasks";
 import { vendorNamesOf } from "@/modules/vendors";
@@ -322,6 +323,15 @@ export async function createExpense(
     createdBy: ctx.userId,
     updatedBy: ctx.userId,
   });
+  const label = labelOf(expense, found.events.get(input.eventId)?.name);
+  await recordActivity(ctx, {
+    action: "CREATE",
+    entity: { type: "EXPENSE", id: expense._id.toString(), label },
+    did:
+      expense.status === "PAID"
+        ? `recorded ${formatRupees(expense.amountPaise)} for ${quoted(label)}`
+        : `added ${formatRupees(expense.amountPaise)} due ${formatDate(expense.dueDate!)} for ${quoted(label)}`,
+  });
   return toView(expense, found, todayInKolkata(now));
 }
 
@@ -379,6 +389,37 @@ export async function updateExpense(
     { returnDocument: "after" },
   );
   if (!updated) throw notFound();
+  const changes = changesOf(
+    {
+      amountPaise: current.amountPaise,
+      date: current.date,
+      eventId: current.eventId?.toString(),
+      taskId: current.taskId?.toString(),
+      vendorId: current.vendorId?.toString(),
+      category: current.category,
+      description: current.description,
+      paidBy: current.paidBy,
+      status: current.status,
+      dueDate: current.dueDate,
+    },
+    input,
+    ["description"],
+  );
+  if (changes.length > 0) {
+    const label = labelOf(
+      updated,
+      updated.eventId && found.events.get(updated.eventId.toString())?.name,
+    );
+    const paid = current.status === "PENDING" && updated.status === "PAID";
+    await recordActivity(ctx, {
+      action: "UPDATE",
+      entity: { type: "EXPENSE", id: updated._id.toString(), label },
+      did: paid
+        ? `marked ${formatRupees(updated.amountPaise)} for ${quoted(label)} as paid`
+        : `edited the expense ${quoted(label)}`,
+      changes,
+    });
+  }
   return toView(updated, found, todayInKolkata(now));
 }
 
@@ -393,6 +434,12 @@ export async function deleteExpense(
   const expense = await findExpense(ctx, id);
   const { Expense } = await models();
   await Expense.deleteOne({ _id: expense._id, weddingId: ctx.weddingId });
+  const label = labelOf(expense);
+  await recordActivity(ctx, {
+    action: "DELETE",
+    entity: { type: "EXPENSE", id: expense._id.toString(), label },
+    did: `deleted the expense ${quoted(label)} (${formatRupees(expense.amountPaise)})`,
+  });
 }
 
 /**

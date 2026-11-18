@@ -27,7 +27,6 @@ test("every card shows, and unbuilt ones say what they come with", async ({
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
   }
   await expect(page.getByText(/days to go/)).toBeVisible();
-  await expect(page.getByText("Comes with the activity log")).toBeVisible();
   await expect(page.getByText("Comes with the guest list")).toBeVisible();
   // The signed-in wedding heads the menu.
   await expect(page.getByText("E2E weds Test").first()).toBeVisible();
@@ -113,7 +112,7 @@ test("a new wedding's dashboard fills in as events and tasks are added", async (
     totals: { members: 1, events: 1, vendors: 0, households: null },
     money: { spentPaise: 0, pendingPaise: 0, pendingPayments: [] },
     weddingDayContacts: [],
-    recentActivity: null,
+    recentActivity: expect.any(Array),
   });
   const anon = await playwright.request.newContext({ baseURL });
   expect((await anon.get("/api/v1/dashboard")).status()).toBe(401);

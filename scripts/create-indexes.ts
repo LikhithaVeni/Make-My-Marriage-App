@@ -12,6 +12,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { parseEnv } from "node:util";
 
+import { createActivityIndexes } from "@/modules/activity";
 import { createAuthIndexes } from "@/modules/auth";
 import { createEventIndexes } from "@/modules/events";
 import { createExpenseIndexes } from "@/modules/expenses";
@@ -52,6 +53,7 @@ async function main() {
     await createTaskIndexes(mongoose);
     await createExpenseIndexes(mongoose);
     await createVendorIndexes(mongoose);
+    await createActivityIndexes(mongoose);
     await createRateLimitIndexes(mongoose);
 
     const db = mongoose.connection.db!;

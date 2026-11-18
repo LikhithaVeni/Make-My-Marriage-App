@@ -29,7 +29,7 @@ const mainItems: NavItem[] = [
   },
   { label: "Gallery", href: "/gallery", available: false },
   { label: "Website & livestream", href: "/website", available: false },
-  { label: "Activity", href: "/activity", available: false },
+  { label: "Activity", href: "/activity", available: true },
 ];
 
 // Admin only (PRD screens: Settings is for Admins), so it isn't shown to
