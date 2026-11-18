@@ -32,9 +32,19 @@ branch), **Next**, **Later**.
 | Dashboard on real data                         | Done   | `feature/dashboard-real`, PR #18  | 2026-11-18 |
 | Expenses (`/expenses`)                         | Done   | `feature/expenses`, PR #19        | 2026-11-18 |
 | Vendors (`/vendors`)                           | Done   | `feature/vendors`, PR #20         | 2026-11-18 |
+| Clearer "Get started" checklist                | Done   | `fix/getting-started`             | 2026-11-18 |
 | Landing page: features, how it works, footer   | Later  | —                                 | —          |
 
 ## Log
+
+### 2026-11-18: Clearer "Get started" checklist (Done; PR into `dev` open)
+
+- The owner read the crossed-out "Add events" and "Add tasks" as
+  cancelled. Finished steps now keep a green tick and normal text, say what
+  was added ("1 event added", "2 tasks added") and link to it with
+  **View**. Checked at 360 px and on desktop; a unit test covers the notes
+  and links.
+- Decision 76.
 
 ### 2026-11-18: Vendors (Done, PR #20)
 
