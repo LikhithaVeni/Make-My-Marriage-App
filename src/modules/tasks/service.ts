@@ -7,6 +7,7 @@ import "server-only";
 import type { ClientSession, QueryFilter } from "mongoose";
 
 import { todayInKolkata } from "@/lib/format";
+import { changesOf, quoted, recordActivity } from "@/modules/activity";
 import { eventNamesOf, type EventLinks } from "@/modules/events";
 import { organisersOf } from "@/modules/wedding";
 import { connectDb } from "@/platform/db";
@@ -269,6 +270,12 @@ export async function createTask(
     createdBy: ctx.userId,
     updatedBy: ctx.userId,
   });
+  const assignee = input.assigneeId && found.organisers.get(input.assigneeId);
+  await recordActivity(ctx, {
+    action: "CREATE",
+    entity: { type: "TASK", id: task._id.toString(), label: task.title },
+    did: `added the task ${quoted(task.title)}${assignee ? ` for ${assignee.name}` : ""}`,
+  });
   return toView(task, found, todayInKolkata(now));
 }
 
@@ -314,6 +321,47 @@ export async function updateTask(
     { returnDocument: "after" },
   );
   if (!updated) throw notFound();
+  const changes = changesOf(
+    {
+      title: current.title,
+      description: current.description,
+      eventId: current.eventId?.toString(),
+      assigneeId: current.assigneeId?.toString(),
+      dueDate: current.dueDate,
+      priority: current.priority,
+      status: current.status,
+    },
+    input,
+    ["description"],
+  );
+  if (changes.length > 0) {
+    const title = quoted(updated.title);
+    const statusChange = changes.find((change) => change.field === "status");
+    const assigneeChange = changes.find(
+      (change) => change.field === "assigneeId",
+    );
+    const assignee =
+      updated.assigneeId && found.organisers.get(updated.assigneeId.toString());
+    const did = statusChange
+      ? updated.status === "COMPLETED"
+        ? `completed ${title}`
+        : `moved ${title} to ${STATUS_NAMES[updated.status]}`
+      : assigneeChange
+        ? assignee
+          ? `assigned ${title} to ${assignee.name}`
+          : `unassigned ${title}`
+        : `edited ${title} (${[...new Set(changes.map((c) => TASK_FIELDS[c.field] ?? c.field))].join(", ")})`;
+    await recordActivity(ctx, {
+      action: "UPDATE",
+      entity: {
+        type: "TASK",
+        id: updated._id.toString(),
+        label: updated.title,
+      },
+      did,
+      changes,
+    });
+  }
   return toView(updated, found, todayInKolkata(now));
 }
 
@@ -348,7 +396,28 @@ export async function deleteTask(
   } finally {
     await transaction.endSession();
   }
+  await recordActivity(ctx, {
+    action: "DELETE",
+    entity: { type: "TASK", id: task._id.toString(), label: task.title },
+    did: `deleted the task ${quoted(task.title)}`,
+  });
 }
+
+const STATUS_NAMES: Record<Status, string> = {
+  TODO: "To Do",
+  IN_PROGRESS: "In Progress",
+  COMPLETED: "Completed",
+};
+
+const TASK_FIELDS: Record<string, string> = {
+  title: "title",
+  description: "notes",
+  eventId: "event",
+  assigneeId: "assignee",
+  dueDate: "due date",
+  priority: "priority",
+  status: "status",
+};
 
 /** What the dashboard shows of tasks (decision 73). */
 export interface TaskOverview {

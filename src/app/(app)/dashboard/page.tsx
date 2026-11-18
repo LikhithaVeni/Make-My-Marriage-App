@@ -52,15 +52,28 @@ export default async function DashboardPage() {
           <MyTasksCard
             tasks={dashboard.myTasks}
             today={today}
-            className="lg:col-span-2"
+            className="min-w-0 lg:col-span-2"
           />
-          <UpcomingEventsCard events={dashboard.upcomingEvents} />
+          <UpcomingEventsCard
+            events={dashboard.upcomingEvents}
+            className="min-w-0"
+          />
         </div>
         <div className="grid gap-6 lg:grid-cols-2">
-          <PendingPaymentsCard money={dashboard.money} today={today} />
-          <WeddingDayContactsCard contacts={dashboard.weddingDayContacts} />
+          <PendingPaymentsCard
+            money={dashboard.money}
+            today={today}
+            className="min-w-0"
+          />
+          <WeddingDayContactsCard
+            contacts={dashboard.weddingDayContacts}
+            className="min-w-0"
+          />
         </div>
-        <RecentActivityCard activity={dashboard.recentActivity} />
+        <RecentActivityCard
+          activity={dashboard.recentActivity}
+          className="min-w-0"
+        />
       </main>
     </>
   );

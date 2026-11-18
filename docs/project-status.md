@@ -29,14 +29,43 @@ branch), **Next**, **Later**.
 | Events (`/events`)                             | Done        | `feature/events`, PR #12          | 2026-11-17 |
 | Tasks (`/tasks`)                               | Done        | `feature/tasks`, PR #14           | 2026-11-17 |
 | Next.js security upgrade (16.4.3 → 16.4.5)     | Done        | `fix/next-security`, PR #16       | 2026-11-17 |
-| Dashboard on real data                         | In progress | `feature/dashboard-real`          | 2026-11-17 |
-| Expenses (`/expenses`)                         | In progress | `feature/expenses`                | 2026-11-17 |
-| Vendors (`/vendors`)                           | In progress | `feature/vendors`                 | 2026-11-18 |
+| Dashboard on real data                         | Done        | `feature/dashboard-real`, PR #18  | 2026-11-18 |
+| Expenses (`/expenses`)                         | Done        | `feature/expenses`, PR #19        | 2026-11-18 |
+| Vendors (`/vendors`)                           | Done        | `feature/vendors`, PR #20         | 2026-11-18 |
+| Clearer "Get started" checklist                | Done        | `fix/getting-started`, PR #22     | 2026-11-18 |
+| Activity log (`/activity`)                     | In progress | `feature/activity-log`            | 2026-11-18 |
 | Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
 
-### 2026-11-18: Vendors (In progress)
+### 2026-11-18: Activity log (In progress)
+
+- **Activity** in the sidebar: every change to events, tasks, expenses,
+  vendors, members and the wedding, as a sentence with who did it ("Priya
+  completed 'Order return gifts'"), newest first and grouped by day, with
+  filters by person, area and date. Rows open what changed.
+- The dashboard's **Recent activity** shows the last 10: every Phase 1
+  dashboard card is now real; only the Guests tile waits for Phase 2.
+- No email addresses or private values in the log; recording never breaks
+  the change itself.
+- Tested: helpers, filters, paging, privacy, each module's sentences, other
+  weddings and a failed write (unit and database tests); a browser test
+  with Admin and Manager; QA (a script in names, other weddings, phone
+  width). QA found a plain-data bug and several long-name overflows on
+  phones; fixed, and a new browser test opens eleven pages at 360 px with
+  the longest names.
+- Decision 77.
+
+### 2026-11-18: Clearer "Get started" checklist (Done, PR #22)
+
+- The owner read the crossed-out "Add events" and "Add tasks" as
+  cancelled. Finished steps now keep a green tick and normal text, say what
+  was added ("1 event added", "2 tasks added") and link to it with
+  **View**. Checked at 360 px and on desktop; a unit test covers the notes
+  and links.
+- Decision 76.
+
+### 2026-11-18: Vendors (Done, PR #20)
 
 - **Vendors** in the sidebar: save vendors (service, phone, booking status,
   quote, agreed cost, notes, wedding-day contact), grouped by service with
@@ -56,11 +85,12 @@ branch), **Next**, **Later**.
   QA found long service and venue names widening three pages; fixed.
   204 unit and database tests and 22 end-to-end tests pass; the audit is
   clean. End-to-end tests now retry once locally, as in CI (decision 75).
-- Stacked on `feature/expenses`: merge `feature/dashboard-real`, then
-  `feature/expenses`, then this.
+- Released with the real dashboard and Expenses in PR #21;
+  `pnpm db:indexes` on `mmm_prod` added the `expenses` and `vendors`
+  indexes.
 - Decision 75.
 
-### 2026-11-17: Expenses (In progress)
+### 2026-11-17: Expenses (Done, PR #19)
 
 - **Expenses** in the sidebar: record what's spent or still due (amount in
   rupees, date, event, optional task, category, description, paid by, Paid
@@ -79,10 +109,10 @@ branch), **Next**, **Later**.
   weddings, CSRF, injected fields, phone width). QA found two bugs, fixed:
   big totals widened the event page on phones (card notes now wrap), and
   overdue payments read "Overdue · Overdue".
-- Stacked on `feature/dashboard-real`: merge that first.
+- Released in PR #21.
 - Decision 74.
 
-### 2026-11-17: Dashboard on real data (In progress)
+### 2026-11-17: Dashboard on real data (Done, PR #18)
 
 - The live dashboard showed sample data (made-up tasks, events and
   payments) for the owner's real wedding. At the owner's suggestion it now
@@ -455,14 +485,11 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Dashboard on real data, Expenses and Vendors:** the owner's check,
-   merge `feature/dashboard-real`, `feature/expenses` and `feature/vendors`
-   in that order, release, then run `pnpm db:indexes --database mmm_prod`
-   for the `expenses` and `vendors` indexes.
-2. **Activity log:** switches on recent activity, the last dashboard card
-   of Phase 1.
-3. **Notifications and jobs runner:** the bell and task-assigned emails.
-4. **Production housekeeping:** a production-only Atlas user, and an
+1. **Activity log:** the owner's check, merge, release, then run
+   `pnpm db:indexes --database mmm_prod` for the `activityLog` indexes.
+2. **Notifications and jobs runner:** the bell, task-assigned notices and
+   emails through the job queue (Phase 1's last feature).
+3. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
 ## Roadmap
@@ -515,5 +542,6 @@ runner, each switching on its dashboard card.
   `feature/landing`, `feature/auth-api`, `feature/landing-session`,
   `feature/members`, `feature/email`, `feature/wedding-settings`,
   `feature/deploy`, `docs/deployment-done`, `fix/db-indexes`, `fix/app-url`,
-  `feature/events` and `feature/tasks` are fully merged into `dev` and can be deleted on
+  `feature/events`, `feature/tasks`, `fix/next-security`,
+  `feature/dashboard-real`, `feature/expenses` and `feature/vendors` are fully merged into `dev` and can be deleted on
   GitHub.

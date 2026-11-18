@@ -161,7 +161,7 @@ describe.skipIf(!TEST_DB_URI)("getDashboard (real data)", () => {
     admin = await adminWithWedding();
   }, 120_000);
 
-  it("shows a brand-new wedding: countdown, nothing added, unbuilt parts null", async () => {
+  it("shows a brand-new wedding: countdown, nothing added, only the wedding in the log", async () => {
     const dashboard = await getDashboard(admin, NOW);
     expect(dashboard).toMatchObject({
       today: "2027-11-15",
@@ -191,7 +191,13 @@ describe.skipIf(!TEST_DB_URI)("getDashboard (real data)", () => {
         pendingPayments: [],
       },
       weddingDayContacts: [],
-      recentActivity: null,
+      // The log starts with the wedding itself (decision 77).
+      recentActivity: [
+        expect.objectContaining({
+          summary: "Likhitha created the wedding 'KaLi's era'",
+          actorName: "Likhitha",
+        }),
+      ],
     });
     expect(dashboard.storage).toBeUndefined();
   });

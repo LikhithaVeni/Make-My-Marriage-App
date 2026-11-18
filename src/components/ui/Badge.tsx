@@ -18,10 +18,13 @@ interface BadgeProps {
 /** A small pill label: priority, status, an event name. */
 export function Badge({ tone = "neutral", children }: BadgeProps) {
   return (
+    // A long label (an 80-character event name) is cut with "…" rather than
+    // widening the page; the full text stays available as a tooltip.
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-caption font-medium whitespace-nowrap ${tones[tone]}`}
+      title={typeof children === "string" ? children : undefined}
+      className={`inline-flex max-w-full items-center rounded-full border px-2.5 py-0.5 text-caption font-medium whitespace-nowrap ${tones[tone]}`}
     >
-      {children}
+      <span className="truncate">{children}</span>
     </span>
   );
 }

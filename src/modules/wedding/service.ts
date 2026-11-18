@@ -19,6 +19,7 @@ import {
   markEmailVerified,
   type MembershipLookup,
 } from "@/modules/auth";
+import { changesOf, quoted, recordActivity } from "@/modules/activity";
 import { connectDb } from "@/platform/db";
 import { sendEmail } from "@/platform/email";
 import { AppError } from "@/platform/errors";
@@ -221,6 +222,18 @@ export async function createWedding(
     created._id.toString(),
     "ADMIN",
   );
+  await recordActivity(
+    { userId: session.userId, weddingId: created._id.toString() },
+    {
+      action: "CREATE",
+      entity: {
+        type: "WEDDING",
+        id: created._id.toString(),
+        label: created.title,
+      },
+      did: `created the wedding ${quoted(created.title)}`,
+    },
+  );
   return { wedding: toView(created), role: "ADMIN" };
 }
 
@@ -315,8 +328,53 @@ export async function updateWedding(
   if (!updated) {
     throw new AppError("NOT_FOUND", 404, "This wedding doesn't exist.");
   }
+  const changes = changesOf(
+    {
+      brideName: current.brideName,
+      groomName: current.groomName,
+      title: current.title,
+      date: current.date,
+      city: current.city,
+      slug: current.slug,
+      description: current.description,
+      tagline: current.tagline,
+    },
+    input,
+    ["description"],
+  );
+  if (changes.length > 0) {
+    await recordActivity(ctx, {
+      action: "UPDATE",
+      entity: {
+        type: "WEDDING",
+        id: updated._id.toString(),
+        label: updated.title,
+      },
+      did: `edited the wedding details (${[
+        ...new Set(changes.map((c) => WEDDING_FIELDS[c.field] ?? c.field)),
+      ].join(", ")})`,
+      changes,
+    });
+  }
   return toView(updated);
 }
+
+const WEDDING_FIELDS: Record<string, string> = {
+  brideName: "bride's name",
+  groomName: "groom's name",
+  title: "name",
+  date: "date",
+  city: "city",
+  slug: "website address",
+  description: "description",
+  tagline: "tagline",
+};
+
+const ROLE_NAMES = {
+  ADMIN: "an Admin",
+  MANAGER: "a Manager",
+  PHOTOGRAPHER: "the photographer",
+} as const;
 
 // ---------------------------------------------------------------------------
 // Members and invites
@@ -519,6 +577,12 @@ export async function createInvite(
     invitedBy: ctx.userId,
   });
   await sendInviteEmail(invite, token, wedding, inviterName);
+  await recordActivity(ctx, {
+    action: "INVITE",
+    entity: { type: "MEMBER", id: invite._id.toString(), label: invite.name },
+    // No email address in the log: it's shown to every organiser.
+    did: `invited ${invite.name} as ${ROLE_NAMES[invite.role]}`,
+  });
 
   return {
     id: invite._id.toString(),
@@ -564,11 +628,20 @@ export async function cancelInvite(
 ): Promise<void> {
   if (!isObjectId(inviteId)) throw inviteNotFound();
   const { Invite } = await models();
-  const result = await Invite.updateOne(
+  const cancelled = await Invite.findOneAndUpdate(
     { _id: inviteId, weddingId: ctx.weddingId, status: "PENDING" },
     { $set: { status: "CANCELLED" } },
   );
-  if (result.matchedCount === 0) throw inviteNotFound();
+  if (!cancelled) throw inviteNotFound();
+  await recordActivity(ctx, {
+    action: "DELETE",
+    entity: {
+      type: "MEMBER",
+      id: cancelled._id.toString(),
+      label: cancelled.name,
+    },
+    did: `cancelled the invite for ${cancelled.name}`,
+  });
 }
 
 /**
@@ -690,6 +763,14 @@ export async function acceptInvite(
   const weddingId = invite.weddingId.toString();
   await markEmailVerified(user.id, now);
   await attachWeddingToSessions(user.id, weddingId, invite.role);
+  await recordActivity(
+    { userId: user.id, weddingId },
+    {
+      action: "CREATE",
+      entity: { type: "MEMBER", id: user.id, label: invite.name },
+      did: `joined as ${ROLE_NAMES[invite.role]}`,
+    },
+  );
   return { weddingId, role: invite.role };
 }
 
@@ -767,6 +848,31 @@ export async function updateMember(
   });
 
   if (roleChanges) await endSessionsOf(userId);
+  const [member] = await findUsersByIds([userId]);
+  const name = member?.name ?? "a member";
+  if (roleChanges) {
+    await recordActivity(ctx, {
+      action: "ROLE_CHANGE",
+      entity: { type: "MEMBER", id: userId, label: name },
+      did:
+        userId === ctx.userId
+          ? `made themselves ${ROLE_NAMES[input.role!]}`
+          : `made ${name} ${ROLE_NAMES[input.role!]}`,
+      changes: [{ field: "role", from: membership.role, to: input.role }],
+    });
+  }
+  if (
+    input.relationLabel !== undefined &&
+    input.relationLabel !== (membership.relationLabel ?? "")
+  ) {
+    await recordActivity(ctx, {
+      action: "UPDATE",
+      entity: { type: "MEMBER", id: userId, label: name },
+      did: input.relationLabel
+        ? `set ${name}'s relation to ${quoted(input.relationLabel)}`
+        : `cleared ${name}'s relation`,
+    });
+  }
 }
 
 /**
@@ -808,4 +914,11 @@ export async function removeMember(
   });
 
   await endSessionsOf(userId);
+  const [member] = await findUsersByIds([userId]);
+  const name = member?.name ?? "a member";
+  await recordActivity(ctx, {
+    action: "DELETE",
+    entity: { type: "MEMBER", id: userId, label: name },
+    did: userId === ctx.userId ? "left the wedding" : `removed ${name}`,
+  });
 }
