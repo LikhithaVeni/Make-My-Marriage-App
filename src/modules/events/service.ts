@@ -10,6 +10,7 @@ import { randomBytes } from "node:crypto";
 import type { ClientSession } from "mongoose";
 
 import { googleMapsSearch } from "@/lib/maps";
+import { changesOf, quoted, recordActivity } from "@/modules/activity";
 import { connectDb } from "@/platform/db";
 import { AppError } from "@/platform/errors";
 import { getPublicEnv } from "@/platform/public-env";
@@ -210,6 +211,11 @@ export async function createEvent(
     createdBy: ctx.userId,
     updatedBy: ctx.userId,
   });
+  await recordActivity(ctx, {
+    action: "CREATE",
+    entity: { type: "EVENT", id: event._id.toString(), label: event.name },
+    did: `added the event ${quoted(event.name)}`,
+  });
   return toView(event, ctx);
 }
 
@@ -282,6 +288,48 @@ export async function updateEvent(
     { returnDocument: "after" },
   );
   if (!updated) throw notFound();
+  const changes = changesOf(
+    {
+      name: current.name,
+      startAt: current.startAt.toISOString(),
+      endAt: current.endAt.toISOString(),
+      muhurthamAt: current.muhurthamAt?.toISOString(),
+      venueName: current.venue.name,
+      venueAddress: current.venue.address,
+      mapUrl: current.venue.mapUrl,
+      dressCode: current.dressCode,
+      instructions: current.instructions,
+      livestreamUrl: current.livestreamUrl,
+    },
+    {
+      name: input.name,
+      startAt: input.startAt && new Date(input.startAt).toISOString(),
+      endAt: input.endAt && new Date(input.endAt).toISOString(),
+      muhurthamAt:
+        input.muhurthamAt === undefined
+          ? undefined
+          : input.muhurthamAt && new Date(input.muhurthamAt).toISOString(),
+      venueName: input.venue?.name,
+      venueAddress: input.venue?.address,
+      mapUrl: input.venue?.mapUrl,
+      dressCode: input.dressCode,
+      instructions: input.instructions,
+      livestreamUrl: input.livestreamUrl,
+    },
+    ["instructions", "mapUrl", "livestreamUrl", "venueAddress"],
+  );
+  if (changes.length > 0) {
+    await recordActivity(ctx, {
+      action: "UPDATE",
+      entity: {
+        type: "EVENT",
+        id: updated._id.toString(),
+        label: updated.name,
+      },
+      did: `edited ${quoted(updated.name)} (${describeFields(changes)})`,
+      changes,
+    });
+  }
   return toView(updated, ctx);
 }
 
@@ -382,4 +430,29 @@ export async function deleteEvent(
   } finally {
     await transaction.endSession();
   }
+  await recordActivity(ctx, {
+    action: "DELETE",
+    entity: { type: "EVENT", id: event._id.toString(), label: event.name },
+    did: `deleted the event ${quoted(event.name)}`,
+  });
+}
+
+const FIELD_NAMES: Record<string, string> = {
+  name: "name",
+  startAt: "start",
+  endAt: "end",
+  muhurthamAt: "muhurtham",
+  venueName: "venue",
+  venueAddress: "address",
+  mapUrl: "map link",
+  dressCode: "dress code",
+  instructions: "instructions",
+  livestreamUrl: "livestream",
+};
+
+/** "start, venue" for an activity summary. */
+function describeFields(changes: { field: string }[]): string {
+  return [...new Set(changes.map((c) => FIELD_NAMES[c.field] ?? c.field))].join(
+    ", ",
+  );
 }

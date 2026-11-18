@@ -7,6 +7,8 @@ import "server-only";
 
 import type { ClientSession, QueryFilter } from "mongoose";
 
+import { BOOKING_STATUS_LABELS } from "@/lib/vendor-labels";
+import { changesOf, quoted, recordActivity } from "@/modules/activity";
 import { connectDb } from "@/platform/db";
 import { AppError } from "@/platform/errors";
 import type { WeddingContext } from "@/platform/rbac";
@@ -156,6 +158,11 @@ export async function createVendor(
     createdBy: ctx.userId,
     updatedBy: ctx.userId,
   });
+  await recordActivity(ctx, {
+    action: "CREATE",
+    entity: { type: "VENDOR", id: vendor._id.toString(), label: vendor.name },
+    did: `added the vendor ${quoted(vendor.name)} (${vendor.serviceType})`,
+  });
   return toView(vendor, new Map());
 }
 
@@ -207,6 +214,40 @@ export async function updateVendor(
     { returnDocument: "after" },
   );
   if (!updated) throw notFound();
+  const changes = changesOf(
+    {
+      name: current.name,
+      serviceType: current.serviceType,
+      phone: current.phone,
+      notes: current.notes,
+      bookingStatus: current.bookingStatus,
+      quotePaise: current.quotePaise,
+      agreedPaise: current.agreedPaise,
+      weddingDayContact: current.weddingDayContact,
+    },
+    {
+      ...input,
+      quotePaise: input.quotePaise === null ? "" : input.quotePaise,
+      agreedPaise: input.agreedPaise === null ? "" : input.agreedPaise,
+    },
+    ["notes", "phone"],
+  );
+  if (changes.length > 0) {
+    const name = quoted(updated.name);
+    const moved = changes.some((change) => change.field === "bookingStatus");
+    await recordActivity(ctx, {
+      action: "UPDATE",
+      entity: {
+        type: "VENDOR",
+        id: updated._id.toString(),
+        label: updated.name,
+      },
+      did: moved
+        ? `moved ${name} to ${BOOKING_STATUS_LABELS[updated.bookingStatus]!.label}`
+        : `edited the vendor ${name}`,
+      changes,
+    });
+  }
   return toView(updated, paid);
 }
 
@@ -242,6 +283,11 @@ export async function deleteVendor(
   } finally {
     await transaction.endSession();
   }
+  await recordActivity(ctx, {
+    action: "DELETE",
+    entity: { type: "VENDOR", id: vendor._id.toString(), label: vendor.name },
+    did: `deleted the vendor ${quoted(vendor.name)}`,
+  });
 }
 
 /** Every vendor's id and name, for expenses to check and show (decision 75). */

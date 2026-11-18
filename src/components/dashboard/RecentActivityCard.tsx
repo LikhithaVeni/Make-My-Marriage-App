@@ -45,7 +45,9 @@ export function RecentActivityCard({
               >
                 {entry.actorName.charAt(0).toUpperCase()}
               </span>
-              <p className="min-w-0 flex-1 text-text">{entry.summary}</p>
+              <p className="min-w-0 flex-1 wrap-anywhere text-text">
+                {entry.summary}
+              </p>
               <time
                 dateTime={entry.at}
                 className="shrink-0 text-small text-text-muted"

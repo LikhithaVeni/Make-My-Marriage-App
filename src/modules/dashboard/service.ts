@@ -6,6 +6,7 @@
 import "server-only";
 
 import { daysBetween, todayInKolkata } from "@/lib/format";
+import { recentActivity } from "@/modules/activity";
 import { eventOverview } from "@/modules/events";
 import { expenseSummary } from "@/modules/expenses";
 import { taskOverview } from "@/modules/tasks";
@@ -21,16 +22,25 @@ export async function getDashboard(
   now = new Date(),
 ): Promise<Dashboard> {
   const today = todayInKolkata(now);
-  const [wedding, organisers, events, tasks, expenses, vendors, contacts] =
-    await Promise.all([
-      getWedding(ctx),
-      organisersOf(ctx),
-      eventOverview(ctx, now),
-      taskOverview(ctx, now, MY_TASKS_LIMIT),
-      expenseSummary(ctx),
-      vendorCount(ctx),
-      weddingDayContacts(ctx),
-    ]);
+  const [
+    wedding,
+    organisers,
+    events,
+    tasks,
+    expenses,
+    vendors,
+    contacts,
+    activity,
+  ] = await Promise.all([
+    getWedding(ctx),
+    organisersOf(ctx),
+    eventOverview(ctx, now),
+    taskOverview(ctx, now, MY_TASKS_LIMIT),
+    expenseSummary(ctx),
+    vendorCount(ctx),
+    weddingDayContacts(ctx),
+    recentActivity(ctx, 10),
+  ]);
 
   return dashboardSchema.parse({
     today,
@@ -64,6 +74,12 @@ export async function getDashboard(
       pendingPayments: expenses.pendingPayments,
     },
     weddingDayContacts: contacts.slice(0, 4),
-    recentActivity: null,
+    // PRD: the last 10 entries from the activity log.
+    recentActivity: activity.map((entry) => ({
+      id: entry.id,
+      summary: entry.summary,
+      actorName: entry.actor.name,
+      at: entry.at,
+    })),
   } satisfies Dashboard);
 }

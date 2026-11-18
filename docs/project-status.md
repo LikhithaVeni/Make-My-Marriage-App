@@ -9,35 +9,54 @@ branch), **Next**, **Later**.
 
 ## Summary
 
-| Feature                                        | Status | Branch / PR                       | Updated    |
-| ---------------------------------------------- | ------ | --------------------------------- | ---------- |
-| Foundation scaffold                            | Done   | `dev` (first commits)             | 2026-11-03 |
-| Dashboard (sample data)                        | Done   | `feature/dashboard`, PR #1        | 2026-11-04 |
-| Landing page (homepage), sign-up and log-in UI | Done   | `feature/landing`, PR #2          | 2026-11-05 |
-| Permission checks and rate limits (platform)   | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Accounts: database, sign-up and log-in API     | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Dashboard only after login (`proxy.ts`)        | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Create wedding (`/wedding/new`)                | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Email verification and forgot password         | Done   | `feature/auth-api`, PR #3         | 2026-11-11 |
-| Landing page knows who's signed in             | Done   | `feature/landing-session`, PR #4  | 2026-11-11 |
-| Members and invites                            | Done   | `feature/members`, PR #5          | 2026-11-13 |
-| Email (Gmail, or Resend)                       | Done   | `feature/email`, PR #6            | 2026-11-15 |
-| Wedding settings (`/settings/wedding`)         | Done   | `feature/wedding-settings`, PR #7 | 2026-11-16 |
-| Deployment (Vercel, Production from `main`)    | Done   | `feature/deploy`, PR #8           | 2026-11-16 |
-| Database indexes in production (`db:indexes`)  | Done   | `fix/db-indexes`, PR #9           | 2026-11-16 |
-| Emailed links never use localhost on Vercel    | Done   | `fix/app-url`, PR #10             | 2026-11-17 |
-| Events (`/events`)                             | Done   | `feature/events`, PR #12          | 2026-11-17 |
-| Tasks (`/tasks`)                               | Done   | `feature/tasks`, PR #14           | 2026-11-17 |
-| Next.js security upgrade (16.4.3 → 16.4.5)     | Done   | `fix/next-security`, PR #16       | 2026-11-17 |
-| Dashboard on real data                         | Done   | `feature/dashboard-real`, PR #18  | 2026-11-18 |
-| Expenses (`/expenses`)                         | Done   | `feature/expenses`, PR #19        | 2026-11-18 |
-| Vendors (`/vendors`)                           | Done   | `feature/vendors`, PR #20         | 2026-11-18 |
-| Clearer "Get started" checklist                | Done   | `fix/getting-started`             | 2026-11-18 |
-| Landing page: features, how it works, footer   | Later  | —                                 | —          |
+| Feature                                        | Status      | Branch / PR                       | Updated    |
+| ---------------------------------------------- | ----------- | --------------------------------- | ---------- |
+| Foundation scaffold                            | Done        | `dev` (first commits)             | 2026-11-03 |
+| Dashboard (sample data)                        | Done        | `feature/dashboard`, PR #1        | 2026-11-04 |
+| Landing page (homepage), sign-up and log-in UI | Done        | `feature/landing`, PR #2          | 2026-11-05 |
+| Permission checks and rate limits (platform)   | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Accounts: database, sign-up and log-in API     | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Dashboard only after login (`proxy.ts`)        | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Create wedding (`/wedding/new`)                | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Email verification and forgot password         | Done        | `feature/auth-api`, PR #3         | 2026-11-11 |
+| Landing page knows who's signed in             | Done        | `feature/landing-session`, PR #4  | 2026-11-11 |
+| Members and invites                            | Done        | `feature/members`, PR #5          | 2026-11-13 |
+| Email (Gmail, or Resend)                       | Done        | `feature/email`, PR #6            | 2026-11-15 |
+| Wedding settings (`/settings/wedding`)         | Done        | `feature/wedding-settings`, PR #7 | 2026-11-16 |
+| Deployment (Vercel, Production from `main`)    | Done        | `feature/deploy`, PR #8           | 2026-11-16 |
+| Database indexes in production (`db:indexes`)  | Done        | `fix/db-indexes`, PR #9           | 2026-11-16 |
+| Emailed links never use localhost on Vercel    | Done        | `fix/app-url`, PR #10             | 2026-11-17 |
+| Events (`/events`)                             | Done        | `feature/events`, PR #12          | 2026-11-17 |
+| Tasks (`/tasks`)                               | Done        | `feature/tasks`, PR #14           | 2026-11-17 |
+| Next.js security upgrade (16.4.3 → 16.4.5)     | Done        | `fix/next-security`, PR #16       | 2026-11-17 |
+| Dashboard on real data                         | Done        | `feature/dashboard-real`, PR #18  | 2026-11-18 |
+| Expenses (`/expenses`)                         | Done        | `feature/expenses`, PR #19        | 2026-11-18 |
+| Vendors (`/vendors`)                           | Done        | `feature/vendors`, PR #20         | 2026-11-18 |
+| Clearer "Get started" checklist                | Done        | `fix/getting-started`, PR #22     | 2026-11-18 |
+| Activity log (`/activity`)                     | In progress | `feature/activity-log`            | 2026-11-18 |
+| Landing page: features, how it works, footer   | Later       | —                                 | —          |
 
 ## Log
 
-### 2026-11-18: Clearer "Get started" checklist (Done; PR into `dev` open)
+### 2026-11-18: Activity log (In progress)
+
+- **Activity** in the sidebar: every change to events, tasks, expenses,
+  vendors, members and the wedding, as a sentence with who did it ("Priya
+  completed 'Order return gifts'"), newest first and grouped by day, with
+  filters by person, area and date. Rows open what changed.
+- The dashboard's **Recent activity** shows the last 10: every Phase 1
+  dashboard card is now real; only the Guests tile waits for Phase 2.
+- No email addresses or private values in the log; recording never breaks
+  the change itself.
+- Tested: helpers, filters, paging, privacy, each module's sentences, other
+  weddings and a failed write (unit and database tests); a browser test
+  with Admin and Manager; QA (a script in names, other weddings, phone
+  width). QA found a plain-data bug and several long-name overflows on
+  phones; fixed, and a new browser test opens eleven pages at 360 px with
+  the longest names.
+- Decision 77.
+
+### 2026-11-18: Clearer "Get started" checklist (Done, PR #22)
 
 - The owner read the crossed-out "Add events" and "Add tasks" as
   cancelled. Finished steps now keep a green tick and normal text, say what
@@ -466,10 +485,10 @@ branch), **Next**, **Later**.
 
 ## Up next
 
-1. **Activity log:** every add, edit and delete with who and when, the
-   Activity page with filters, and the dashboard's Recent activity, the
-   last Phase 1 card.
-2. **Notifications and jobs runner:** the bell and task-assigned emails.
+1. **Activity log:** the owner's check, merge, release, then run
+   `pnpm db:indexes --database mmm_prod` for the `activityLog` indexes.
+2. **Notifications and jobs runner:** the bell, task-assigned notices and
+   emails through the job queue (Phase 1's last feature).
 3. **Production housekeeping:** a production-only Atlas user, and an
    uptime monitor on `/api/health` (decision 67).
 
